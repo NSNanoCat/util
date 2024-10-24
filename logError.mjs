@@ -8,10 +8,10 @@ export default function logError(error) {
         case "Shadowrocket":
         case "Quantumult X":
         default:
-            log("", `❗️执行错误!`, error, "");
+            log("", "❗️执行错误!", error, "");
             break
         case "Node.js":
-            log("", `❗️执行错误!`, error.stack, "");
+            log("", "❗️执行错误!", error.stack, "");
             break
     };
 };

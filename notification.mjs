@@ -15,72 +15,73 @@ import { $platform, log } from "./utils.mjs";
  * @param {*} mutableContent 通知扩展字段
  *
  */
-export default function notification(title = "", subtitle = "", body = "", mutableContent) {
-    switch ($platform) {
-        case "Surge":
-        case "Loon":
-        case "Stash":
-        case "Egern":
-        case "Shadowrocket":
-        default:
-            $notification.post(title, subtitle, body, MutableContent(mutableContent))
-            break
-        case "Quantumult X":
-            $notify(title, subtitle, body, MutableContent(mutableContent))
-            break
-        case "Node.js":
-            break
-    };
-    log(...["", "==============📣系统通知📣==============", subtitle || "", body || ""]);
-    const MutableContent = (content) => {
-        switch (typeof content) {
-            case undefined:
-                return content
-            case "string":
-                switch ($platform) {
-                    case "Surge":
-                    case "Stash":
-                    case "Egern":
-                    default:
-                        return { url: content };
-                    case "Loon":
-                    case "Shadowrocket":
-                        return content
-                    case "Quantumult X":
-                        return { "open-url": content };
-                    case "Node.js":
-                        return undefined;
-                }
-            case "object":
-                switch ($platform) {
-                    case "Surge":
-                    case "Stash":
-                    case "Egern":
-                    case "Shadowrocket":
-                    default: {
-                        let openUrl = content.url || content.openUrl || content["open-url"];
-                        return { url: openUrl };
-                    }
-                    case "Loon": {
-                        let openUrl = content.openUrl || content.url || content["open-url"];
-                        let mediaUrl = content.mediaUrl || content["media-url"];
-                        return { openUrl, mediaUrl };
-                    }
-                    case "Quantumult X": {
-                        let openUrl = content["open-url"] || content.url || content.openUrl;
-                        let mediaUrl = content["media-url"] || content.mediaUrl;
-                        let updatePasteboard = content["update-pasteboard"] || content.updatePasteboard;
-                        return {
-                            "open-url": openUrl,
-                            "media-url": mediaUrl,
-                            "update-pasteboard": updatePasteboard
-                        };
-                    }
-                    case "Node.js":
-                        return undefined;
-                }
-            default:
-                return undefined;
-        }
-    };
+export default function notification(title, subtitle, body, mutableContent) {
+	switch ($platform) {
+		case "Surge":
+		case "Loon":
+		case "Stash":
+		case "Egern":
+		case "Shadowrocket":
+		default:
+			$notification.post(title, subtitle, body, MutableContent(mutableContent));
+			break;
+		case "Quantumult X":
+			$notify(title, subtitle, body, MutableContent(mutableContent));
+			break;
+		case "Node.js":
+			break;
+	}
+	log(...["", "==============📣系统通知📣==============", subtitle || "", body || ""]);
+}
+
+const MutableContent = content => {
+	switch (typeof content) {
+		case undefined:
+			return content;
+		case "string":
+			switch ($platform) {
+				case "Surge":
+				case "Stash":
+				case "Egern":
+				default:
+					return { url: content };
+				case "Loon":
+				case "Shadowrocket":
+					return content;
+				case "Quantumult X":
+					return { "open-url": content };
+				case "Node.js":
+					return undefined;
+			}
+		case "object":
+			switch ($platform) {
+				case "Surge":
+				case "Stash":
+				case "Egern":
+				case "Shadowrocket":
+				default: {
+					const openUrl = content.url || content.openUrl || content["open-url"];
+					return { url: openUrl };
+				}
+				case "Loon": {
+					const openUrl = content.openUrl || content.url || content["open-url"];
+					const mediaUrl = content.mediaUrl || content["media-url"];
+					return { openUrl, mediaUrl };
+				}
+				case "Quantumult X": {
+					const openUrl = content["open-url"] || content.url || content.openUrl;
+					const mediaUrl = content["media-url"] || content.mediaUrl;
+					const updatePasteboard = content["update-pasteboard"] || content.updatePasteboard;
+					return {
+						"open-url": openUrl,
+						"media-url": mediaUrl,
+						"update-pasteboard": updatePasteboard,
+					};
+				}
+				case "Node.js":
+					return undefined;
+			}
+		default:
+			return undefined;
+	}
 };
