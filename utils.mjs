@@ -9,7 +9,7 @@ export const log = (...logs) => console.log(logs.join("\n"));
 import logError from "./logError.mjs";
 export const wait = (delay = 1000) => new Promise(resolve => setTimeout(resolve, delay));
 import done from "./done.mjs";
-export const getScript = async (url) => await fetch(url).then(response => response.body);
+export const getScript = async url => await fetch(url).then(response => response.body);
 import runScript from "./runScript.mjs";
 //import GRPC from "./GRPC.mjs";
 export { $platform, URL, _, Storage, fetch, time, notification, logError, done, runScript };

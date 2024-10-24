@@ -1,1 +1,1 @@
-export default function wait(time) { return new Promise(resolve => setTimeout(resolve, time)) };
+export default (wait = (delay = 1000) => new Promise(resolve => setTimeout(resolve, delay)));

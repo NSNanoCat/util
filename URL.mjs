@@ -4,6 +4,7 @@ export default class URL {
 		const version = "2.1.2";
 		console.log(`\n🟧 ${name} v${version}\n`);
 		url = this.#parse(url, base);
+		// biome-ignore lint/correctness/noConstructorReturn: <explanation>
 		return this;
 	};
 
@@ -26,7 +27,7 @@ export default class URL {
 		};
 		if (url.pathname || base?.pathname) {
 			this.pathname = url.pathname || base?.pathname;
-			if (!this.pathname.startsWith("/")) this.pathname = "/" + this.pathname;
+			if (!this.pathname.startsWith("/")) this.pathname = `/${this.pathname}`;
 			this.paths = this.pathname.split("/").filter(Boolean);
 			Object.freeze(this.paths);
 			if (this.paths) {
@@ -51,12 +52,12 @@ export default class URL {
 
 	toString() {
 		let string = "";
-		if (this.protocol) string += this.protocol + "//";
-		if (this.username) string += this.username + (this.password ? ":" + this.password : "") + "@";
+		if (this.protocol) string += `${this.protocol}//`;
+		if (this.username) string += `${this.username + (this.password ? `:${this.password}` : "")}@`;
 		if (this.hostname) string += this.hostname;
-		if (this.port) string += ":" + this.port;
+		if (this.port) string += `:${this.port}`;
 		if (this.pathname) string += this.pathname;
-		if (this.searchParams.size !== 0) string += "?" + Array.from(this.searchParams).map(param => param.join("=")).join("&");
+		if (this.searchParams.size !== 0) string += `?${Array.from(this.searchParams).map(param => param.join("=")).join("&")}`;
 		return string;
 	};
 
