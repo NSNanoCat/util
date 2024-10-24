@@ -11,36 +11,53 @@ import { _, Storage, log } from "./utils.mjs";
  */
 export default function getStorage(key, names, database) {
     //log(`☑️ getStorage, Get Environment Variables`, "");
-    /***************** BoxJs *****************/
-    // 包装为局部变量，用完释放内存
-    // BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
-    let BoxJs = Storage.getItem(key, database);
-    //log(`🚧 getStorage, Get Environment Variables`, `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs)}`, "");
+    /***************** Default *****************/
+    const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
+    /***************** Database *****************/
+    [names].flat(Infinity).forEach(name => {
+        Store.Settings = { ...Store.Settings, ...database?.[name]?.Settings };
+        Store.Configs = { ...Store.Configs, ...database?.[name]?.Configs };
+    });
     /***************** Argument *****************/
-    let Argument = {};
     switch (typeof $argument) {
         case "string":
-            let arg = Object.fromEntries($argument.split("&").map((item) => item.split("=").map(i => i.replace(/\"/g, ''))));
-            for (let item in arg) _.set(Argument, item, arg[item]);
-            break;
+            $argument = Object.fromEntries($argument.split("&").map((item) => item.split("=").map(i => i.replace(/\"/g, ''))));
         case "object":
-            for (let item in $argument) _.set(Argument, item, $argument[item]);
+            let argument = {};
+            Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
+            //log(`✅ getStorage, Get Environment Variables`, `argument: ${JSON.stringify(argument)}`, "");
+            Store.Settings = { ...Store.Settings, ...argument };
             break;
         case "undefined":
             break;
     };
-    //log(`✅ getStorage, Get Environment Variables`, `Argument类型: ${typeof Argument}`, `Argument内容: ${JSON.stringify(Argument)}`, "");
-    /***************** Store *****************/
-    const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
-    if (!Array.isArray(names)) names = [names];
-    //log(`🚧 getStorage, Get Environment Variables`, `names类型: ${typeof names}`, `names内容: ${JSON.stringify(names)}`, "");
-    for (let name of names) {
-        Store.Settings = { ...Store.Settings, ...database?.[name]?.Settings, ...Argument, ...BoxJs?.[name]?.Settings };
-        Store.Configs = { ...Store.Configs, ...database?.[name]?.Configs };
-        if (BoxJs?.[name]?.Caches && typeof BoxJs?.[name]?.Caches === "string") BoxJs[name].Caches = JSON.parse(BoxJs?.[name]?.Caches);
-        Store.Caches = { ...Store.Caches, ...BoxJs?.[name]?.Caches };
-    };
+    /***************** BoxJs *****************/
+    // 包装为局部变量，用完释放内存
+    // BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
+    const BoxJs = Storage.getItem(key, database);
+    //log(`🚧 getStorage, Get Environment Variables`, `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`, "");
+    [names].flat(Infinity).forEach(name => {
+        switch (typeof BoxJs?.[name]?.Settings) {
+            case "string":
+                BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
+            case "object":
+                Store.Settings = { ...Store.Settings, ...BoxJs[name].Settings };
+                break;
+            case "undefined":
+                break;
+        };
+        switch (typeof BoxJs?.[name]?.Caches) {
+            case "string":
+                BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
+            case "object":
+                Store.Caches = { ...Store.Caches, ...BoxJs[name].Caches };
+                break;
+            case "undefined":
+                break;
+        };
+    });
     //log(`🚧 getStorage, Get Environment Variables`, `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+    /***************** traverseObject *****************/
     traverseObject(Store.Settings, (key, value) => {
         //log(`🚧 getStorage, traverseObject`, `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`, "");
         if (value === "true" || value === "false") value = JSON.parse(value); // 字符串转Boolean
