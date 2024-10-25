@@ -1,4 +1,4 @@
-import { _, Storage, log } from "./utils.mjs";
+import { _, Storage, log } from ".";
 
 /**
  * Get Storage Variables

@@ -1,5 +1,21 @@
 {
-  "dependencies": {
-    "pako": "^2.1.0"
-  }
+	"name": "@nsnanocat/util",
+	"description": "Pure JS's util module for well-known iOS network tools",
+	"version": "1.2.1",
+	"author": "VirgilClyne <Virgil@nanocat.me>",
+	"homepage": "https://NSNanoCat.github.io/util",
+	"keywords": ["loon", "quantumult", "surge", "shadowrocket", "stash", "egern"],
+	"license": "Apache-2.0",
+	"main": "index.mjs",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/NSNanoCat/util.git"
+	},
+	"dependencies": {
+		"pako": "^2.1.0"
+	},
+	"files": ["lib", "index.mjs", "gRPC.mjs", "Lodash.mjs", "Storage.mjs", "URL.mjs", "getStorage.mjs"],
+	"publishConfig": {
+		"@NSNanoCat:registry": "https://npm.pkg.github.com"
+	}
 }

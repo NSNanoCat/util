@@ -1,4 +1,5 @@
-import { $platform, _, log } from "./utils.mjs";
+import { Lodash as _, $platform, log } from "..";
+
 /* https://developer.mozilla.org/zh-CN/docs/Web/API/Storage/setItem */
 export default class Storage {
 	static data = null;
