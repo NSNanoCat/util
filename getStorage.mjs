@@ -1,4 +1,5 @@
-import { _, Storage, log } from "./utils.mjs";
+import { Lodash as _, Storage } from "./polyfill/index.js";
+import { log } from "./lib/index.js";
 
 /**
  * Get Storage Variables
@@ -9,17 +10,20 @@ import { _, Storage, log } from "./utils.mjs";
  * @param {Object} database - Default Database
  * @return {Object} { Settings, Caches, Configs }
  */
-export default function getStorage(key, names, database) {
-	//log(`☑️ getStorage, Get Environment Variables`, "");
+export function getStorage(key, names, database) {
+	//log("☑️ getStorage, Get Environment Variables", "");
 	/***************** Default *****************/
 	const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
+	//log("🚧 getStorage, Get Environment Variables, Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
 	/***************** Database *****************/
 	[names].flat(Number.POSITIVE_INFINITY).forEach(name => {
 		Store.Settings = { ...Store.Settings, ...database?.[name]?.Settings };
 		Store.Configs = { ...Store.Configs, ...database?.[name]?.Configs };
 	});
+	//log("🚧 getStorage, Get Environment Variables, Database", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
 	/***************** Argument *****************/
 	switch (typeof $argument) {
+		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
 		case "string":
 			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=").map(i => i.replace(/\"/g, ""))));
 		case "object": {
@@ -32,6 +36,7 @@ export default function getStorage(key, names, database) {
 		case "undefined":
 			break;
 	}
+	//log("🚧 getStorage, Get Environment Variables, $argument", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
@@ -39,6 +44,7 @@ export default function getStorage(key, names, database) {
 	//log(`🚧 getStorage, Get Environment Variables`, `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`, "");
 	[names].flat(Number.POSITIVE_INFINITY).forEach(name => {
 		switch (typeof BoxJs?.[name]?.Settings) {
+			// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
 			case "string":
 				BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
 			case "object":
@@ -48,6 +54,7 @@ export default function getStorage(key, names, database) {
 				break;
 		}
 		switch (typeof BoxJs?.[name]?.Caches) {
+			// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
 			case "string":
 				BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
 			case "object":
@@ -57,7 +64,7 @@ export default function getStorage(key, names, database) {
 				break;
 		}
 	});
-	//log(`🚧 getStorage, Get Environment Variables`, `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+	//log("🚧 getStorage, Get Environment Variables, BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
 	/***************** traverseObject *****************/
 	traverseObject(Store.Settings, (key, value) => {
 		//log(`🚧 getStorage, traverseObject`, `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`, "");
@@ -70,18 +77,18 @@ export default function getStorage(key, names, database) {
 		}
 		return value;
 	});
-	//log(`✅ getStorage, Get Environment Variables`, `Store: ${typeof Store.Caches}`, `Store内容: ${JSON.stringify(Store)}`, "");
+	//log("✅ getStorage, Get Environment Variables, traverseObject", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
 	return Store;
-	/***************** function *****************/
-	function traverseObject(o, c) {
-		for (const t in o) {
-			const n = o[t];
-			o[t] = "object" === typeof n && null !== n ? traverseObject(n, c) : c(t, n);
-		}
-		return o;
+}
+
+function traverseObject(o, c) {
+	for (const t in o) {
+		const n = o[t];
+		o[t] = "object" === typeof n && null !== n ? traverseObject(n, c) : c(t, n);
 	}
-	function string2number(string) {
-		if (string && !Number.isNaN(string)) string = Number.parseInt(string, 10);
-		return string;
-	}
+	return o;
+}
+function string2number(string) {
+	if (/^\d+$/.test(string)) string = Number.parseInt(string, 10);
+	return string;
 }

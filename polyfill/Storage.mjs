@@ -1,6 +1,8 @@
-import { $platform, _, log } from "./utils.mjs";
+import { Lodash as _, } from "./Lodash.mjs";
+import { $platform, log } from "../index.js";
+
 /* https://developer.mozilla.org/zh-CN/docs/Web/API/Storage/setItem */
-export default class Storage {
+export class Storage {
 	static data = null;
 	static dataFile = "box.dat";
 	static #nameRegex = /^@(?<key>[^.]+)(?:\.(?<path>.*))?$/;

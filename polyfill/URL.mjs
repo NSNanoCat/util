@@ -1,4 +1,4 @@
-export default class URL {
+export class URL {
 	constructor(url, base = undefined) {
 		const name = "URL";
 		const version = "2.1.2";

@@ -1,0 +1,41 @@
+name: Node.js Package
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+      - run: npm ci
+      - run: npm test
+
+  publish-gpr:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update local package.json version from release tag
+        uses: BellCubeDev/update-package-version-by-release-tag@v2
+        with:
+          version: ${{ github.ref_name }}
+          keep-v: "false" # If set to "true", will not remove any 'v' prefix from the version number.
+          ignore-semver-check: "false" # If set to "true", will not check if the version number is a valid semver version.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+          registry-url: https://npm.pkg.github.com/
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

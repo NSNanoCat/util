@@ -1,7 +1,8 @@
-import { $platform, log } from "./utils.mjs";
+import { $platform, log } from "./lib/index.js";
 import pako from "pako";
+
 /* https://grpc.io/ */
-export default class gRPC {
+export class gRPC {
 	static decode(bytesBody = new Uint8Array([])) {
 		log("☑️ gRPC.decode", "");
 		// 先拆分gRPC校验头和protobuf数据体
@@ -31,7 +32,7 @@ export default class gRPC {
 		log("☑️ gRPC.encode", "");
 		// Header: 1位：是否校验数据 （0或者1） + 4位:校验值（数据长度）
 		const Header = new Uint8Array(5);
-		const Checksum = GRPC.#Checksum(body.length); // 校验值为未压缩情况下的数据长度, 不是压缩后的长度
+		const Checksum = gRPC.#Checksum(body.length); // 校验值为未压缩情况下的数据长度, 不是压缩后的长度
 		Header.set(Checksum, 1); // 1-4位： 校验值(4位)
 		switch (encoding) {
 			case "gzip":

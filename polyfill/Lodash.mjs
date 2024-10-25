@@ -1,5 +1,5 @@
 /* https://www.lodashjs.com */
-export default class Lodash {
+export class Lodash {
 	static get(object = {}, path = "", defaultValue = undefined) {
 		// translate array case to dot case, then split with .
 		// a[0].b -> a.0.b -> ['a', '0', 'b']
