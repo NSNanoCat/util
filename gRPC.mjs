@@ -53,7 +53,7 @@ export class gRPC {
 	}
 
 	// 计算校验和 (B站为数据本体字节数)
-	static #Checksum(num = 0) {
+	static #Checksum = (num = 0) => {
 		const array = new ArrayBuffer(4); // an Int32 takes 4 bytes
 		const view = new DataView(array);
 		// 首位填充计算过的新数据长度
