@@ -171,7 +171,7 @@ export class Storage {
 		return result;
 	}
 
-	static #loaddata(dataFile) {
+	static #loaddata = (dataFile) => {
 		if ($platform === "Node.js") {
 			this.fs = this.fs ? this.fs : require("fs");
 			this.path = this.path ? this.path : require("path");
@@ -190,7 +190,7 @@ export class Storage {
 		} else return {};
 	}
 
-	static #writedata(dataFile = this.dataFile) {
+	static #writedata = (dataFile = this.dataFile) => {
 		if (this.isNode()) {
 			this.fs = this.fs ? this.fs : require("fs");
 			this.path = this.path ? this.path : require("path");
