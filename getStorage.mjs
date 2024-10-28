@@ -25,7 +25,7 @@ export function getStorage(key, names, database) {
 	switch (typeof $argument) {
 		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
 		case "string":
-			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=").map(i => i.replace(/\"/g, ""))));
+			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=", 2).map(i => i.replace(/\"/g, ""))));
 		case "object": {
 			const argument = {};
 			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
