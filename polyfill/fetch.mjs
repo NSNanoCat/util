@@ -1,6 +1,6 @@
-import { $platform } from "./index.js";
-import { Lodash as _ } from "../polyfill/index.js";
-import { initGotEnv } from "./initGotEnv.mjs";
+import { $platform } from "../lib/platform.mjs";
+import { Lodash as _ } from "./Lodash.mjs";
+import { initGotEnv } from "../lib/initGotEnv.mjs";
 
 export async function fetch(request = {} || "", option = {}) {
 	// 初始化参数
