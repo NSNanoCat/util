@@ -110,6 +110,21 @@ export async function fetch(request = {} || "", option = {}) {
 				response => {
 					response.ok = /^2\d\d$/.test(response.statusCode);
 					response.status = response.statusCode;
+					switch ((response.headers?.["Content-Type"] ?? response.headers?.["content-type"])?.split(";")?.[0]) {
+						case "application/protobuf":
+						case "application/x-protobuf":
+						case "application/vnd.google.protobuf":
+						case "application/vnd.apple.flatbuffer":
+						case "application/grpc":
+						case "application/grpc+proto":
+						case "application/octet-stream":
+							response.body = response.bodyBytes;
+							break;
+						case undefined:
+						default:
+							break;
+					}
+					response.bodyBytes = undefined;
 					return response;
 				},
 				reason => Promise.reject(reason.error),
