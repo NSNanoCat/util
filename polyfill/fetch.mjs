@@ -66,6 +66,18 @@ export async function fetch(request = {} || "", option = {}) {
 				request.body = request.bodyBytes;
 				request.bodyBytes = undefined;
 			}
+			// 判断是否请求二进制响应体
+			switch ((request.headers?.Accept || request.headers?.accept)?.split(";")?.[0]) {
+				case "application/protobuf":
+				case "application/x-protobuf":
+				case "application/vnd.google.protobuf":
+				case "application/vnd.apple.flatbuffer":
+				case "application/grpc":
+				case "application/grpc+proto":
+				case "application/octet-stream":
+					request["binary-mode"] = true;
+					break;
+			}
 			// 发送请求
 			return await new Promise((resolve, reject) => {
 				$httpClient[method](request, (error, response, body) => {
