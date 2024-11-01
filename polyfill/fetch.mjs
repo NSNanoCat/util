@@ -103,7 +103,7 @@ export async function fetch(request = {} || "", option = {}) {
 				request.body = undefined;
 			} else if (ArrayBuffer.isView(request.body)) {
 				request.bodyBytes = request.body.buffer.slice(request.body.byteOffset, request.body.byteLength + request.body.byteOffset);
-				object.body = undefined;
+				request.body = undefined;
 			} else if (request.body) request.bodyBytes = undefined;
 			// 发送请求
 			return await $task.fetch(request).then(
