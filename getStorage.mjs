@@ -5,10 +5,10 @@ import { log } from "./lib/index.js";
  * Get Storage Variables
  * @link https://github.com/NanoCat-Me/utils/blob/main/getStorage.mjs
  * @author VirgilClyne
- * @param {String} key - Persistent Store Key
- * @param {Array} names - Platform Names
- * @param {Object} database - Default Database
- * @return {Object} { Settings, Caches, Configs }
+ * @param {string} key - Persistent Store Key
+ * @param {array | string} names - Platform Names
+ * @param {object} database - Default Database
+ * @return {object} { Settings, Caches, Configs }
  */
 export function getStorage(key, names, database) {
 	//log("☑️ getStorage, Get Environment Variables", "");
