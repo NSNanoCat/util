@@ -1,13 +1,41 @@
 import { Lodash as _, } from "./Lodash.mjs";
 import { $app, log } from "../index.js";
 
-/* https://developer.mozilla.org/zh-CN/docs/Web/API/Storage/setItem */
+/**
+ * Storage
+ *
+ * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Storage/setItem
+ * @export
+ * @class Storage
+ * @typedef {Storage}
+ */
 export class Storage {
+	/**
+	 * data
+	 *
+	 * @static
+	 * @type {file}
+	 */
 	static data = null;
 	static dataFile = "box.dat";
+	/**
+	 * nameRegex
+	 *
+	 * @static
+	 * @type {regexp}
+	 */
 	static #nameRegex = /^@(?<key>[^.]+)(?:\.(?<path>.*))?$/;
 
-	static getItem(keyName = new String(), defaultValue = null) {
+	
+	/**
+	 * getItem
+	 *
+	 * @static
+	 * @param {string} keyName
+	 * @param {*} [defaultValue]
+	 * @returns {*}
+	 */
+	static getItem(keyName, defaultValue = null) {
 		let keyValue = defaultValue;
 		// 如果以 @
 		switch (keyName.startsWith("@")) {
@@ -59,6 +87,14 @@ export class Storage {
 		return keyValue ?? defaultValue;
 	}
 
+	/**
+	 * setItem
+	 *
+	 * @static
+	 * @param {string} keyName
+	 * @param {*} keyValue
+	 * @returns {boolean}
+	 */
 	static setItem(keyName = new String(), keyValue = new String()) {
 		let result = false;
 		//log(`0: ${typeof keyValue}`);
@@ -112,6 +148,13 @@ export class Storage {
 		return result;
 	}
 
+	/**
+	 * removeItem
+	 *
+	 * @static
+	 * @param {string} keyName
+	 * @returns {boolean}
+	 */
 	static removeItem(keyName) {
 		let result = false;
 		switch (keyName.startsWith("@")) {
@@ -148,6 +191,12 @@ export class Storage {
 		return result;
 	}
 
+	/**
+	 * clear
+	 *
+	 * @static
+	 * @returns {boolean}
+	 */
 	static clear() {
 		let result = false;
 		switch ($app) {
@@ -171,10 +220,16 @@ export class Storage {
 		return result;
 	}
 
+	/**
+	 * #loaddata
+	 *
+	 * @param {string} dataFile
+	 * @returns {*}
+	 */
 	static #loaddata = (dataFile) => {
 		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("fs");
-			this.path = this.path ? this.path : require("path");
+			this.fs = this.fs ? this.fs : require("node:fs");
+			this.path = this.path ? this.path : require("node:path");
 			const curDirDataFilePath = this.path.resolve(dataFile);
 			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
 			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
@@ -190,10 +245,15 @@ export class Storage {
 		} else return {};
 	}
 
+	/**
+	 * #writedata
+	 *
+	 * @param {string} [dataFile=this.dataFile]
+	 */
 	static #writedata = (dataFile = this.dataFile) => {
 		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("fs");
-			this.path = this.path ? this.path : require("path");
+			this.fs = this.fs ? this.fs : require("node:fs");
+			this.path = this.path ? this.path : require("node:path");
 			const curDirDataFilePath = this.path.resolve(dataFile);
 			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
 			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);

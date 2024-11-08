@@ -1,7 +1,17 @@
 import { Lodash as _ } from "./Lodash.mjs";
 import { $app, initGotEnv } from "../lib/index.js";
 
-export async function fetch(request = {} || "", option = {}) {
+/**
+ * fetch
+ *
+ * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API
+ * @export
+ * @async
+ * @param {object|string} request
+ * @param {object} [option]
+ * @returns {Promise<object>}
+ */
+export async function fetch(request, option) {
 	// 初始化参数
 	switch (request.constructor) {
 		case Object:
