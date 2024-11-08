@@ -14,6 +14,7 @@ export class gRPC {
 				break;
 			case 1: // Gzip
 				switch ($platform) {
+					case "Loon":
 					case "Surge":
 						body = $utils.ungzip(body);
 						break;
