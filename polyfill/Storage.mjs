@@ -1,5 +1,5 @@
 import { Lodash as _, } from "./Lodash.mjs";
-import { $platform, log } from "../index.js";
+import { $app, log } from "../index.js";
 
 /* https://developer.mozilla.org/zh-CN/docs/Web/API/Storage/setItem */
 export class Storage {
@@ -30,7 +30,7 @@ export class Storage {
 				break;
 			}
 			default:
-				switch ($platform) {
+				switch ($app) {
 					case "Surge":
 					case "Loon":
 					case "Stash":
@@ -86,7 +86,7 @@ export class Storage {
 				break;
 			}
 			default:
-				switch ($platform) {
+				switch ($app) {
 					case "Surge":
 					case "Loon":
 					case "Stash":
@@ -125,7 +125,7 @@ export class Storage {
 				break;
 			}
 			default:
-				switch ($platform) {
+				switch ($app) {
 					case "Surge":
 					case "Loon":
 					case "Stash":
@@ -150,7 +150,7 @@ export class Storage {
 
 	static clear() {
 		let result = false;
-		switch ($platform) {
+		switch ($app) {
 			case "Surge":
 			case "Loon":
 			case "Stash":
@@ -172,7 +172,7 @@ export class Storage {
 	}
 
 	static #loaddata = (dataFile) => {
-		if ($platform === "Node.js") {
+		if ($app === "Node.js") {
 			this.fs = this.fs ? this.fs : require("fs");
 			this.path = this.path ? this.path : require("path");
 			const curDirDataFilePath = this.path.resolve(dataFile);
@@ -191,7 +191,7 @@ export class Storage {
 	}
 
 	static #writedata = (dataFile = this.dataFile) => {
-		if (this.isNode()) {
+		if ($app === "Node.js") {
 			this.fs = this.fs ? this.fs : require("fs");
 			this.path = this.path ? this.path : require("path");
 			const curDirDataFilePath = this.path.resolve(dataFile);

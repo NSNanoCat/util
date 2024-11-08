@@ -1,6 +1,5 @@
-import { $platform } from "../lib/platform.mjs";
 import { Lodash as _ } from "./Lodash.mjs";
-import { initGotEnv } from "../lib/initGotEnv.mjs";
+import { $app, initGotEnv } from "../lib/index.js";
 
 export async function fetch(request = {} || "", option = {}) {
 	// 初始化参数
@@ -25,7 +24,7 @@ export async function fetch(request = {} || "", option = {}) {
 	// 定义请求方法（小写）
 	const method = request.method.toLocaleLowerCase();
 	// 判断平台
-	switch ($platform) {
+	switch ($app) {
 		case "Loon":
 		case "Surge":
 		case "Stash":
@@ -35,7 +34,7 @@ export async function fetch(request = {} || "", option = {}) {
 			// 转换请求参数
 			if (request.timeout) {
 				request.timeout = Number.parseInt(request.timeout, 10);
-				switch ($platform) {
+				switch ($app) {
 					case "Loon":
 					case "Shadowrocket":
 					case "Stash":
@@ -48,7 +47,7 @@ export async function fetch(request = {} || "", option = {}) {
 				}
 			}
 			if (request.policy) {
-				switch ($platform) {
+				switch ($app) {
 					case "Loon":
 						request.node = request.policy;
 						break;
