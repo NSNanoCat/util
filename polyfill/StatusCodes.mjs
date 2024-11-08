@@ -1,4 +1,4 @@
-export default {
+export const StatusCodes = {
 	100: "HTTP/1.1 100 Continue",
 	101: "HTTP/1.1 101 Switching Protocols",
 	102: "HTTP/1.1 102 Processing",
