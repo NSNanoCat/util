@@ -1,4 +1,4 @@
-export * from "./lib/index.js";
-export * from "./polyfill/index.js";
+export * from "./lib";
+export * from "./polyfill";
 export * from "./gRPC.mjs";
 export * from "./getStorage.mjs";
