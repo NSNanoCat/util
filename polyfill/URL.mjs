@@ -2,7 +2,7 @@ import URLSearchParams from "./URLSearchParams.mjs";
 export default class URL {
 	constructor(url, base) {
 		const name = "URL";
-		const version = "3.0.0";
+		const version = "3.0.1";
 		console.log(`\n🔗 ${name} v${version}\n`);
 
 		Object.defineProperties(this, {
@@ -11,7 +11,7 @@ export default class URL {
 				set: value => (url.hash = value.length > 0 ? `#${value.match(/^#*(.*)/)[1]}` : ""),
 			},
 			host: {
-				get: () => (url.port.length > 0 ? `${url.hostname}:${url.port}` : url.hostname),
+				get: () => (this.port.length > 0 ? `${this.hostname}:${this.port}` : this.hostname),
 				set: value => {
 					const parts = value.split(":", 2);
 					this.hostname = parts[0];
@@ -25,8 +25,8 @@ export default class URL {
 			href: {
 				get: () => {
 					let value = `${this.protocol}//`;
-					if (this.username.length > 0 || this.password.length > 0) {
-						if (this.username.length > 0) value += this.username;
+					if (this.username.length > 0) {
+						value += this.username;
 						if (this.password.length > 0) value += `:${this.password}`;
 						value += "@";
 					}
@@ -38,6 +38,8 @@ export default class URL {
 				},
 				set: value => {
 					url = {};
+
+					if (value.startsWith("blob:") || value.startsWith("file:")) value = value.slice(5);
 
 					this.protocol = value;
 					value = value.replace(/.*?:\/*/, "");
@@ -67,19 +69,12 @@ export default class URL {
 			},
 			origin: {
 				get: () => `${this.protocol}//${this.host}`,
-				set: value => {
-					this.protocol = value;
-					value = value.replace(/.*?:\/*/, "");
-
-					this.hostname = value.match(/[^:/?]*/);
-
-					const portMatch = value.match(/:(\d+)/);
-					this.port = portMatch ? portMatch[1] : "";
-				},
 			},
 			password: {
 				get: () => url.password,
-				set: value => (url.password = encodeURIComponent(value ?? "")),
+				set: value => {
+					if (this.username.length > 0) url.password = encodeURIComponent(value ?? "");
+				},
 			},
 			pathname: {
 				get: () => url.pathname,
@@ -131,8 +126,8 @@ export default class URL {
 		// If a string is passed for url instead of location or link, then set the
 		switch (typeof url) {
 			case "string": {
-				const urlIsValid = /^[a-zA-z]+:\/\/.*/.test(url);
-				const baseIsValid = /^[a-zA-z]+:\/\/.*/.test(base);
+				const urlIsValid = /^(blob:|file:)?[a-zA-z]+:\/\/.*/.test(url);
+				const baseIsValid = /^(blob:|file:)?[a-zA-z]+:\/\/.*/.test(base);
 				if (urlIsValid) this.href = url;
 				// If the url isn't valid, but the base is, then prepend the base to the url.
 				else if (baseIsValid) this.href = base + url;
