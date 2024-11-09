@@ -114,7 +114,7 @@ class URLSearchParams {
 	global.URL = class URL {
 		constructor(url, base) {
 			const name = "URL";
-			const version = "3.0.1";
+			const version = "3.0.2";
 			console.log(`\n🔗 ${name} v${version}\n`);
 
 			Object.defineProperties(this, {
@@ -216,10 +216,7 @@ class URLSearchParams {
 					set: value => (url.protocol = `${value.match(/[^/:]*/)[0]}:`),
 				},
 				search: {
-					get: () => {
-						this.search = this.searchParams.toString();
-						return url.search;
-					},
+					get: () => (this.search = this.searchParams.toString()),
 					set: value => {
 						url.search = value.length > 0 ? `?${value.match(/\??(.*)/)[1]}` : "";
 						url.searchParams = new URLSearchParams(url.search);
