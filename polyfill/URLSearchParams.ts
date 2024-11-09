@@ -1,35 +1,54 @@
 export default class URLSearchParams {
-	constructor(params) {
-		this.params = params;
-		if (this.params.length > 0) {
-			const pairs = this.params.slice(1).split("&");
-			pairs.forEach(pair => {
-				const parts = pair.split("=", 2);
-				this.#params.push(parts[0]);
-				this.#values.push(parts[1]);
-			});
+	constructor(params?: string | Iterable<[string, string]> | object) {
+		switch (typeof params) {
+			case "string": {
+				const pairs: Array<[string, string]> = params
+					.slice(1)
+					.split("&")
+					.map(pair => pair.split("=") as [string, string]);
+				pairs.forEach(([key, value]) => {
+					this.#params.push(key);
+					this.#values.push(value);
+				});
+				break;
+			}
+			case "object":
+				if (Array.isArray(params)) {
+					Object.entries(params).forEach(([key, value]) => {
+						this.#params.push(key);
+						this.#values.push(value as string);
+					});
+				} else if (Symbol.iterator in Object(params)) {
+					for (const [key, value] of params as Iterable<[string, string]>) {
+						this.#params.push(key);
+						this.#values.push(value);
+					}
+				}
+				break;
 		}
+		this.#updateSearchString(this.#params, this.#values);
 	}
 
 	// Create 2 seperate arrays for the params and values to make management and lookup easier.
-	#params = [];
-	#values = [];
+	#param = "";
+	#params: string[] = [];
+	#values: string[] = [];
 
 	// Update the search property of the URL instance with the new params and values.
 	#updateSearchString(params, values) {
-		if (params.length === 0) this.params = "";
-		else this.params = params.map((param, index) => `${param}=${values[index]}`).join("&");
+		if (params.length === 0) this.#param = "";
+		else this.#param = params.map((param, index) => `${param}=${values[index]}`).join("&");
 	}
 
 	// Add a given param with a given value to the end.
-	append(name, value) {
+	append(name: string, value: string): void {
 		this.#params.push(name);
 		this.#values.push(value);
 		this.#updateSearchString(this.#params, this.#values);
 	}
 
 	// Remove all occurances of a given param
-	delete(name) {
+	delete(name: string, value?: string): void {
 		while (this.#params.indexOf(name) > -1) {
 			this.#values.splice(this.#params.indexOf(name), 1);
 			this.#params.splice(this.#params.indexOf(name), 1);
@@ -38,37 +57,37 @@ export default class URLSearchParams {
 	}
 
 	// Return an array to be structured in this way: [[param1, value1], [param2, value2]] to mimic the native method's ES6 iterator.
-	entries() {
+	entries(): Array<[string, string]> {
 		return this.#params.map((param, index) => [param, this.#values[index]]);
 	}
 
 	// Return the value matched to the first occurance of a given param.
-	get(name) {
+	get(name: string): string | undefined {
 		return this.#values[this.#params.indexOf(name)];
 	}
 
 	// Return all values matched to all occurances of a given param.
-	getAll(name) {
+	getAll(name: string): Array<string> {
 		return this.#values.filter((value, index) => this.#params[index] === name);
 	}
 
 	// Return a boolean to indicate whether a given param exists.
-	has(name) {
+	has(name: string, value?: string): boolean {
 		return this.#params.indexOf(name) > -1;
 	}
 
 	// Return an array of the param names to mimic the native method's ES6 iterator.
-	keys() {
+	keys(): Array<string> {
 		return this.#params;
 	}
 
 	// Set a given param to a given value.
-	set(name, value) {
+	set(name: string, value: string): void {
 		if (this.#params.indexOf(name) === -1) {
 			this.append(name, value); // If the given param doesn't already exist, append it.
 		} else {
 			let first = true;
-			const newValues = [];
+			const newValues: string[] = [];
 
 			// If the param already exists, change the value of the first occurance and remove any remaining occurances.
 			this.#params = this.#params.filter((currentParam, index) => {
@@ -90,7 +109,7 @@ export default class URLSearchParams {
 	}
 
 	// Sort all key/value pairs, if any, by their keys then by their values.
-	sort() {
+	sort(): void {
 		// Call entries to make sorting easier, then rewrite the params and values in the new order.
 		const sortedPairs = this.entries().sort();
 		this.#params = [];
@@ -103,8 +122,8 @@ export default class URLSearchParams {
 	}
 
 	// Return the search string without the '?'.
-	toString = () => this.params;
+	toString = (): string => (this.#param ? String(this.#param) : "");
 
 	// Return and array of the param values to mimic the native method's ES6 iterator..
-	values = () => this.#values;
+	values = (): Iterator<string> => this.#values.values();
 }
