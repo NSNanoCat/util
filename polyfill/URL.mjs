@@ -1,65 +1,186 @@
-export class URL {
-	constructor(url, base = undefined) {
+import URLSearchParams from "./URLSearchParams.mjs";
+export default class URL {
+	constructor(url, base) {
 		const name = "URL";
-		const version = "2.1.2";
-		console.log(`\n🟧 ${name} v${version}\n`);
-		url = this.#parse(url, base);
-		// biome-ignore lint/correctness/noConstructorReturn: <explanation>
-		return this;
+		const version = "3.0.0";
+		console.log(`\n🔗 ${name} v${version}\n`);
+
+		Object.defineProperties(this, {
+			hash: {
+				get: () => url.hash,
+				set: value => (url.hash = value.length > 0 ? `#${value.match(/^#*(.*)/)[1]}` : ""),
+			},
+			host: {
+				get: () => (url.port.length > 0 ? `${url.hostname}:${url.port}` : url.hostname),
+				set: value => {
+					const parts = value.split(":", 2);
+					this.hostname = parts[0];
+					this.port = parts[1];
+				},
+			},
+			hostname: {
+				get: () => url.hostname,
+				set: value => (url.hostname = encodeURIComponent(value)),
+			},
+			href: {
+				get: () => {
+					let value = `${this.protocol}//`;
+					if (this.username.length > 0 || this.password.length > 0) {
+						if (this.username.length > 0) value += this.username;
+						if (this.password.length > 0) value += `:${this.password}`;
+						value += "@";
+					}
+					value += this.host;
+					//value += this.hostname;
+					//if (this.port.length > 0) value += `:${this.port}`;
+					value += this.pathname + this.search + this.hash;
+					return value;
+				},
+				set: value => {
+					url = {};
+
+					this.protocol = value;
+					value = value.replace(/.*?:\/*/, "");
+
+					const usernameMatch = value.match(/([^:]*).*@/);
+					this.username = usernameMatch ? usernameMatch[1] : "";
+					value = value.replace(/([^:]*):?(.*@)/, this.#removeUsername);
+
+					const passwordMatch = value.match(/.*(?=@)/);
+					this.password = passwordMatch ? passwordMatch[0] : "";
+					value = value.replace(/.*@/, "");
+
+					this.hostname = value.match(/[^:/?]*/);
+
+					const portMatch = value.match(/:(\d+)/);
+					this.port = portMatch ? portMatch[1] : "";
+
+					const pathnameMatch = value.match(/\/([^?#]*)/);
+					this.pathname = pathnameMatch ? pathnameMatch[1] : "";
+
+					const searchMatch = value.match(/\?[^#]*/);
+					this.search = searchMatch ? searchMatch[0] : "";
+
+					const hashMatch = value.match(/\#.*/);
+					this.hash = hashMatch ? hashMatch[0] : "";
+				},
+			},
+			origin: {
+				get: () => `${this.protocol}//${this.host}`,
+				set: value => {
+					this.protocol = value;
+					value = value.replace(/.*?:\/*/, "");
+
+					this.hostname = value.match(/[^:/?]*/);
+
+					const portMatch = value.match(/:(\d+)/);
+					this.port = portMatch ? portMatch[1] : "";
+				},
+			},
+			password: {
+				get: () => url.password,
+				set: value => (url.password = encodeURIComponent(value ?? "")),
+			},
+			pathname: {
+				get: () => url.pathname,
+				set: value => (url.pathname = `/${value.match(/\/?(.*)/)[1]}`),
+			},
+			port: {
+				get: () => {
+					switch (this.protocol) {
+						case "ftp:":
+							return url.port === "21" ? "" : url.port;
+						case "http:":
+							return url.port === "80" ? "" : url.port;
+						case "https:":
+							return url.port === "443" ? "" : url.port;
+						default:
+							return url.port;
+					}
+				},
+				set: value => {
+					if (isNaN(value) || value === "") url.port = "";
+					else url.port = Math.min(65535, value).toString();
+					return value;
+				},
+			},
+			protocol: {
+				get: () => url.protocol,
+				set: value => (url.protocol = `${value.match(/[^/:]*/)[0]}:`),
+			},
+			search: {
+				get: () => {
+					this.search = this.searchParams.toString();
+					return url.search;
+				},
+				set: value => {
+					url.search = value.length > 0 ? `?${value.match(/\??(.*)/)[1]}` : "";
+					url.searchParams = new URLSearchParams(url.search);
+				},
+			},
+			searchParams: {
+				get: () => url.searchParams ?? new URLSearchParams(url.search),
+				set: value => (url.searchParams = value ?? new URLSearchParams("")),
+			},
+			username: {
+				get: () => url.username,
+				set: value => (url.username = value ?? ""),
+			},
+		});
+
+		// If a string is passed for url instead of location or link, then set the
+		switch (typeof url) {
+			case "string": {
+				const urlIsValid = /^[a-zA-z]+:\/\/.*/.test(url);
+				const baseIsValid = /^[a-zA-z]+:\/\/.*/.test(base);
+				if (urlIsValid) this.href = url;
+				// If the url isn't valid, but the base is, then prepend the base to the url.
+				else if (baseIsValid) this.href = base + url;
+				// If no valid url or base is given, then throw a type error.
+				else throw new TypeError('URL string is not valid. If using a relative url, a second argument needs to be passed representing the base URL. Example: new URL("relative/path", "http://www.example.com");');
+				break;
+			}
+			case "object":
+				// Copy all of the location or link properties to the new URL instance.
+				//url.hash = url.hash;
+				//url.hostname = url.hostname;
+				//url.password = url.password ? url.password : "";
+				//url.pathname = url.pathname;
+				//url.port = url.port;
+				//url.protocol = url.protocol;
+				//url.search = url.search;
+				//url.username = url.username ? url.username : "";
+				break;
+			default:
+				throw new TypeError("Invalid argument type.");
+		}
+
+		// Use IIFE to capture the URL instance and encapsulate the params instead of finding them each time a searchParam method is called
+		//this.searchParams = new URLSearchParams(url.search);
+	}
+
+	toString = () => this.href;
+
+	toJSON = () => {
+		const url = {
+			hash: this.hash,
+			host: this.host,
+			hostname: this.hostname,
+			href: this.href,
+			origin: this.origin,
+			password: this.password,
+			pathname: this.pathname,
+			port: this.port,
+			protocol: this.protocol,
+			search: this.search,
+			searchParams: this.searchParams,
+			username: this.username,
+		};
+		return JSON.stringify(url);
 	};
 
-	#parse(url, base = undefined) {
-		const URLRegex = /(?:(?<protocol>\w+:)\/\/(?:(?<username>[^\s:"]+)(?::(?<password>[^\s:"]+))?@)?(?<host>[^\s@/]+))?(?<pathname>\/?[^\s@?]+)?(?<search>\?[^\s?]+)?/
-		const PortRegex = /(?<hostname>.+):(?<port>\d+)$/;
-		url = url.match(URLRegex)?.groups || {};
-		if (base) {
-			base = base?.match(URLRegex)?.groups || {};
-			if (!base.protocol || !base.hostname) throw new Error(`🚨 ${name}, ${base} is not a valid URL`);
-		};
-		if (url.protocol || base?.protocol) this.protocol = url.protocol || base.protocol;
-		if (url.username || base?.username) this.username = url.username || base.username;
-		if (url.password || base?.password) this.password = url.password || base.password;
-		if (url.host || base?.host) {
-			this.host = url.host || base.host;
-			Object.freeze(this.host);
-			this.hostname = this.host.match(PortRegex)?.groups.hostname ?? this.host;
-			this.port = this.host.match(PortRegex)?.groups.port ?? "";
-		};
-		if (url.pathname || base?.pathname) {
-			this.pathname = url.pathname || base?.pathname;
-			if (!this.pathname.startsWith("/")) this.pathname = `/${this.pathname}`;
-			this.paths = this.pathname.split("/").filter(Boolean);
-			Object.freeze(this.paths);
-			if (this.paths) {
-				const fileName = this.paths[this.paths.length - 1];
-				if (fileName?.includes(".")) {
-					const list = fileName.split(".");
-					this.format = list[list.length - 1];
-					Object.freeze(this.format);
-				}
-			};
-		} else this.pathname = "";
-		if (url.search || base?.search) {
-			this.search = url.search || base.search;
-			Object.freeze(this.search);
-			if (this.search) this.searchParams = this.search.slice(1).split("&").map((param) => param.split("="));
-		};
-		this.searchParams = new Map(this.searchParams || []);
-		this.harf = this.toString();
-		Object.freeze(this.harf);
-		return this;
+	#removeUsername = (match, username, password) => {
+		if (password === "@") return "";
+		else return password;
 	};
-
-	toString() {
-		let string = "";
-		if (this.protocol) string += `${this.protocol}//`;
-		if (this.username) string += `${this.username + (this.password ? `:${this.password}` : "")}@`;
-		if (this.hostname) string += this.hostname;
-		if (this.port) string += `:${this.port}`;
-		if (this.pathname) string += this.pathname;
-		if (this.searchParams.size !== 0) string += `?${Array.from(this.searchParams).map(param => param.join("=")).join("&")}`;
-		return string;
-	};
-
-	toJSON() { return JSON.stringify({ ...this }) };
-}
+};
