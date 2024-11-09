@@ -31,8 +31,6 @@ export default class URL {
 						value += "@";
 					}
 					value += this.host;
-					//value += this.hostname;
-					//if (this.port.length > 0) value += `:${this.port}`;
 					value += this.pathname + this.search + this.hash;
 					return value;
 				},
@@ -120,11 +118,11 @@ export default class URL {
 			},
 		});
 
-		// If a string is passed for url instead of location or link, then set the
 		switch (typeof url) {
 			case "string": {
 				const urlIsValid = /^(blob:|file:)?[a-zA-z]+:\/\/.*/.test(url);
 				const baseIsValid = /^(blob:|file:)?[a-zA-z]+:\/\/.*/.test(base);
+				// If a string is passed for url instead of location or link, then set the properties of the URL instance.
 				if (urlIsValid) this.href = url;
 				// If the url isn't valid, but the base is, then prepend the base to the url.
 				else if (baseIsValid) this.href = base + url;
@@ -133,22 +131,10 @@ export default class URL {
 				break;
 			}
 			case "object":
-				// Copy all of the location or link properties to the new URL instance.
-				//url.hash = url.hash;
-				//url.hostname = url.hostname;
-				//url.password = url.password ? url.password : "";
-				//url.pathname = url.pathname;
-				//url.port = url.port;
-				//url.protocol = url.protocol;
-				//url.search = url.search;
-				//url.username = url.username ? url.username : "";
 				break;
 			default:
 				throw new TypeError("Invalid argument type.");
 		}
-
-		// Use IIFE to capture the URL instance and encapsulate the params instead of finding them each time a searchParam method is called
-		//this.searchParams = new URLSearchParams(url.search);
 	}
 
 	toString = () => this.href;
@@ -175,4 +161,4 @@ export default class URL {
 		if (password === "@") return "";
 		else return password;
 	};
-};
+}
