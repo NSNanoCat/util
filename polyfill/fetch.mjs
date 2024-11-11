@@ -1,5 +1,6 @@
 import { Lodash as _ } from "./Lodash.mjs";
-import { $app, initGotEnv } from "../lib/index.js";
+import { initGotEnv } from "../lib/initGotEnv.mjs";
+import { $app } from "../lib/app.mjs";
 
 /**
  * fetch
