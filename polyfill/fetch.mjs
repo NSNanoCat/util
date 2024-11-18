@@ -1,6 +1,6 @@
 import { Lodash as _ } from "./Lodash.mjs";
-import { initGotEnv } from "../lib/initGotEnv.mjs";
 import { $app } from "../lib/app.mjs";
+import { logError } from "../lib/logError.mjs";
 
 /**
  * fetch
@@ -141,22 +141,26 @@ export async function fetch(request, option) {
 			);
 		case "Node.js": {
 			const iconv = require("iconv-lite");
-			initGotEnv(request);
+			const got = globalThis.got ? globalThis.got : require("got");
+			const cktough = globalThis.cktough ? globalThis.cktough : require("tough-cookie");
+			const ckjar = globalThis.ckjar ? globalThis.ckjar : new cktough.CookieJar();
+			if (request) {
+				request.headers = request.headers ? request.headers : {};
+				if (undefined === request.headers.Cookie && undefined === request.cookieJar) request.cookieJar = ckjar;
+			}
 			const { url, ...option } = request;
-			return await this.got[method](url, option)
+			return await got[method](url, option)
 				.on("redirect", (response, nextOpts) => {
 					try {
 						if (response.headers["set-cookie"]) {
-							const ck = response.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();
-							if (ck) {
-								this.ckjar.setCookieSync(ck, null);
-							}
-							nextOpts.cookieJar = this.ckjar;
+							const ck = response.headers["set-cookie"].map(cktough.Cookie.parse).toString();
+							if (ck) ckjar.setCookieSync(ck, null);
+							nextOpts.cookieJar = ckjar;
 						}
 					} catch (e) {
-						this.logErr(e);
+						logError(e);
 					}
-					// this.ckjar.setCookieSync(response.headers["set-cookie"].map(Cookie.parse).toString())
+					// ckjar.setCookieSync(response.headers["set-cookie"].map(Cookie.parse).toString())
 				})
 				.then(
 					response => {
