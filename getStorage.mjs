@@ -11,12 +11,13 @@ import { log } from "./lib/index.js";
  * @return {object} { Settings, Caches, Configs }
  */
 export function getStorage(key, names, database) {
+	names = [names].flat(Number.POSITIVE_INFINITY);
 	//log("☑️ getStorage, Get Environment Variables", "");
 	/***************** Default *****************/
 	const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
 	//log("🚧 getStorage, Get Environment Variables, Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
 	/***************** Database *****************/
-	[names].flat(Number.POSITIVE_INFINITY).forEach(name => {
+	names.forEach(name => {
 		Store.Settings = { ...Store.Settings, ...database?.[name]?.Settings };
 		Store.Configs = { ...Store.Configs, ...database?.[name]?.Configs };
 	});
@@ -40,31 +41,33 @@ export function getStorage(key, names, database) {
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
-	const BoxJs = Storage.getItem(key, database);
-	//log(`🚧 getStorage, Get Environment Variables`, `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`, "");
-	[names].flat(Number.POSITIVE_INFINITY).forEach(name => {
-		switch (typeof BoxJs?.[name]?.Settings) {
-			// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
-			case "string":
-				BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
-			case "object":
-				Store.Settings = { ...Store.Settings, ...BoxJs[name].Settings };
-				break;
-			case "undefined":
-				break;
-		}
-		switch (typeof BoxJs?.[name]?.Caches) {
-			// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
-			case "string":
-				BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
-			case "object":
-				Store.Caches = { ...Store.Caches, ...BoxJs[name].Caches };
-				break;
-			case "undefined":
-				break;
-		}
-	});
-	//log("🚧 getStorage, Get Environment Variables, BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+	const BoxJs = Storage.getItem(key);
+	if (BoxJs) {
+		//log(`🚧 getStorage, Get Environment Variables`, `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`, "");
+		names.forEach(name => {
+			switch (typeof BoxJs?.[name]?.Settings) {
+				// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
+				case "string":
+					BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
+				case "object":
+					Store.Settings = { ...Store.Settings, ...BoxJs[name].Settings };
+					break;
+				case "undefined":
+					break;
+			}
+			switch (typeof BoxJs?.[name]?.Caches) {
+				// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
+				case "string":
+					BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
+				case "object":
+					Store.Caches = { ...Store.Caches, ...BoxJs[name].Caches };
+					break;
+				case "undefined":
+					break;
+			}
+		});
+		//log("🚧 getStorage, Get Environment Variables, BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+	}
 	/***************** traverseObject *****************/
 	traverseObject(Store.Settings, (key, value) => {
 		//log(`🚧 getStorage, traverseObject`, `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`, "");
