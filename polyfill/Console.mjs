@@ -1,6 +1,6 @@
 import { $app } from "../lib/app.mjs";
 
-export default class Console {
+export class Console {
 	static #counts = new Map([]);
 	static #groups = [];
 	static #times = new Map([]);
@@ -84,7 +84,7 @@ export default class Console {
 			}
 			return log;
 		});
-		Console.#groups.forEach((group, index) => {
+		Console.#groups.forEach(group => {
 			msg = msg.map(log => `  ${log}`);
 			msg.unshift(`▼ ${group}:`);
 		});
