@@ -32,7 +32,7 @@ export class Console {
 	};
 
 	static debug = (...msg) => {
-		msg = msg.map(m => `🐛 ${m}`);
+		msg = msg.map(m => `🅱️ ${m}`);
 		Console.log(...msg);
 	};
 
