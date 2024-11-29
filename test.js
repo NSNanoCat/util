@@ -1,4 +1,2 @@
-import { URL, URLSearchParams, Lodash as _ } from './';
-
-const url = new URL('https://example.com');
-const searchParams = new URLSearchParams(url.search);
+import { $app, Lodash as _, Storage, Console, fetch, notification, wait, done, gRPC } from "./";
+Console.log("Hello, World!");
