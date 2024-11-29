@@ -1,6 +1,6 @@
-import { Lodash as _ } from "./Lodash.mjs";
 import { $app } from "../lib/app.mjs";
-import { logError } from "../lib/logError.mjs";
+import { Console } from "./Console.mjs";
+import { Lodash as _ } from "./Lodash.mjs";
 
 /**
  * fetch
@@ -158,7 +158,7 @@ export async function fetch(request, option) {
 							nextOpts.cookieJar = ckjar;
 						}
 					} catch (e) {
-						logError(e);
+						Console.error(e);
 					}
 					// ckjar.setCookieSync(response.headers["set-cookie"].map(Cookie.parse).toString())
 				})

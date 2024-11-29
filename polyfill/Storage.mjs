@@ -1,5 +1,5 @@
-import { Lodash as _, } from "./Lodash.mjs";
-import { $app, log } from "../index.js";
+import { $app } from "../lib/app.mjs";
+import { Lodash as _ } from "./Lodash.mjs";
 
 /**
  * Storage
@@ -26,7 +26,6 @@ export class Storage {
 	 */
 	static #nameRegex = /^@(?<key>[^.]+)(?:\.(?<path>.*))?$/;
 
-	
 	/**
 	 * getItem
 	 *
@@ -41,20 +40,13 @@ export class Storage {
 		switch (keyName.startsWith("@")) {
 			case true: {
 				const { key, path } = keyName.match(Storage.#nameRegex)?.groups;
-				//log(`1: ${key}, ${path}`);
 				keyName = key;
 				let value = Storage.getItem(keyName, {});
-				//log(`2: ${JSON.stringify(value)}`)
 				if (typeof value !== "object") value = {};
-				//log(`3: ${JSON.stringify(value)}`)
 				keyValue = _.get(value, path);
-				//log(`4: ${JSON.stringify(keyValue)}`)
 				try {
 					keyValue = JSON.parse(keyValue);
-				} catch (e) {
-					// do nothing
-				}
-				//log(`5: ${JSON.stringify(keyValue)}`)
+				} catch (e) {}
 				break;
 			}
 			default:
@@ -97,7 +89,6 @@ export class Storage {
 	 */
 	static setItem(keyName = new String(), keyValue = new String()) {
 		let result = false;
-		//log(`0: ${typeof keyValue}`);
 		switch (typeof keyValue) {
 			case "object":
 				keyValue = JSON.stringify(keyValue);
@@ -109,16 +100,11 @@ export class Storage {
 		switch (keyName.startsWith("@")) {
 			case true: {
 				const { key, path } = keyName.match(Storage.#nameRegex)?.groups;
-				//log(`1: ${key}, ${path}`);
 				keyName = key;
 				let value = Storage.getItem(keyName, {});
-				//log(`2: ${JSON.stringify(value)}`)
 				if (typeof value !== "object") value = {};
-				//log(`3: ${JSON.stringify(value)}`)
 				_.set(value, path, keyValue);
-				//log(`4: ${JSON.stringify(value)}`)
 				result = Storage.setItem(keyName, value);
-				//log(`5: ${result}`)
 				break;
 			}
 			default:
@@ -226,7 +212,7 @@ export class Storage {
 	 * @param {string} dataFile
 	 * @returns {*}
 	 */
-	static #loaddata = (dataFile) => {
+	static #loaddata = dataFile => {
 		if ($app === "Node.js") {
 			this.fs = this.fs ? this.fs : require("node:fs");
 			this.path = this.path ? this.path : require("node:path");
@@ -243,7 +229,7 @@ export class Storage {
 				}
 			} else return {};
 		} else return {};
-	}
+	};
 
 	/**
 	 * #writedata
@@ -267,5 +253,5 @@ export class Storage {
 				this.fs.writeFileSync(curDirDataFilePath, jsondata);
 			}
 		}
-	}
+	};
 }

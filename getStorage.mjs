@@ -1,5 +1,6 @@
-import { Lodash as _, Storage } from "./polyfill/index.js";
-import { log } from "./lib/index.js";
+import { Console } from "./polyfill/Console.mjs";
+import { Lodash as _ } from "./polyfill/Lodash.mjs";
+import { Storage } from "./polyfill/Storage.mjs";
 
 /**
  * Get Storage Variables
@@ -12,16 +13,16 @@ import { log } from "./lib/index.js";
  */
 export function getStorage(key, names, database) {
 	names = [names].flat(Number.POSITIVE_INFINITY);
-	//log("☑️ getStorage, Get Environment Variables", "");
+	//Console.log("☑️ getStorage");
 	/***************** Default *****************/
 	const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
-	//log("🚧 getStorage, Get Environment Variables, Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+	//Console.debug("Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** Database *****************/
 	names.forEach(name => {
 		Store.Settings = { ...Store.Settings, ...database?.[name]?.Settings };
 		Store.Configs = { ...Store.Configs, ...database?.[name]?.Configs };
 	});
-	//log("🚧 getStorage, Get Environment Variables, Database", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+	//Console.debug("Database", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** Argument *****************/
 	switch (typeof $argument) {
 		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
@@ -30,20 +31,20 @@ export function getStorage(key, names, database) {
 		case "object": {
 			const argument = {};
 			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
-			//log(`✅ getStorage, Get Environment Variables`, `argument: ${JSON.stringify(argument)}`, "");
+			//Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
 			Store.Settings = { ...Store.Settings, ...argument };
 			break;
 		}
 		case "undefined":
 			break;
 	}
-	//log("🚧 getStorage, Get Environment Variables, $argument", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+	//Console.debug("$argument", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
 	const BoxJs = Storage.getItem(key);
 	if (BoxJs) {
-		//log(`🚧 getStorage, Get Environment Variables`, `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`, "");
+		//Console.debug("BoxJs", `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`);
 		names.forEach(name => {
 			switch (typeof BoxJs?.[name]?.Settings) {
 				// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
@@ -66,11 +67,11 @@ export function getStorage(key, names, database) {
 					break;
 			}
 		});
-		//log("🚧 getStorage, Get Environment Variables, BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+		//Console.debug("BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	}
 	/***************** traverseObject *****************/
 	traverseObject(Store.Settings, (key, value) => {
-		//log(`🚧 getStorage, traverseObject`, `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`, "");
+		//Console.debug("☑️ traverseObject", `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`);
 		if (value === "true" || value === "false")
 			value = JSON.parse(value); // 字符串转Boolean
 		else if (typeof value === "string") {
@@ -80,7 +81,7 @@ export function getStorage(key, names, database) {
 		}
 		return value;
 	});
-	//log("✅ getStorage, Get Environment Variables, traverseObject", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`, "");
+	//Console.debug("✅ traverseObject", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	return Store;
 }
 

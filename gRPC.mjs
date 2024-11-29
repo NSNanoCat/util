@@ -1,10 +1,11 @@
-import { $platform, log } from "./lib/index.js";
+import { $app } from "./lib/app.mjs";
+import { Console } from "./polyfill/Console.mjs";
 import pako from "pako";
 
 /* https://grpc.io/ */
 export class gRPC {
 	static decode(bytesBody = new Uint8Array([])) {
-		log("☑️ gRPC.decode", "");
+		Console.log("☑️ gRPC.decode");
 		// 先拆分gRPC校验头和protobuf数据体
 		const Header = bytesBody.slice(0, 5);
 		let body = bytesBody.slice(5);
@@ -13,9 +14,10 @@ export class gRPC {
 			default:
 				break;
 			case 1: // Gzip
-				switch ($platform) {
+				switch ($app) {
 					case "Loon":
 					case "Surge":
+					case "Egern":
 						body = $utils.ungzip(body);
 						break;
 					default:
@@ -25,12 +27,12 @@ export class gRPC {
 				Header[0] = 0; // unGzip
 				break;
 		}
-		log("✅ gRPC.decode", "");
+		Console.log("✅ gRPC.decode");
 		return body;
 	}
 
 	static encode(body = new Uint8Array([]), encoding = "identity") {
-		log("☑️ gRPC.encode", "");
+		Console.log("☑️ gRPC.encode");
 		// Header: 1位：是否校验数据 （0或者1） + 4位:校验值（数据长度）
 		const Header = new Uint8Array(5);
 		const Checksum = gRPC.#Checksum(body.length); // 校验值为未压缩情况下的数据长度, 不是压缩后的长度
@@ -49,7 +51,7 @@ export class gRPC {
 		const BytesBody = new Uint8Array(Header.length + body.length);
 		BytesBody.set(Header, 0); // 0-4位：gRPC校验头
 		BytesBody.set(body, 5); // 5-end位：protobuf数据
-		log("✅ gRPC.encode", "");
+		Console.log("✅ gRPC.encode");
 		return BytesBody;
 	}
 
@@ -60,5 +62,5 @@ export class gRPC {
 		// 首位填充计算过的新数据长度
 		view.setUint32(0, num, false); // byteOffset = 0; litteEndian = false
 		return new Uint8Array(array);
-	}
+	};
 }
