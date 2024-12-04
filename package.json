@@ -12,6 +12,7 @@
 		"egern"
 	],
 	"license": "Apache-2.0",
+	"bugs": "https://github.com/NSNanoCat/util/issues",
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
@@ -32,9 +33,6 @@
 		"gRPC.mjs",
 		"getStorage.mjs"
 	],
-	"publishConfig": {
-		"@nsnanocat:registry": "https://npm.pkg.github.com"
-	},
 	"devDependencies": {
 		"typescript": "^5.6.3"
 	}

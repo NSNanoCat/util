@@ -1,4 +1,4 @@
-name: Node.js Package
+name: Release Node.js Package
 
 on:
   push:
@@ -33,9 +33,15 @@ jobs:
           ignore-semver-check: "false" # If set to "true", will not check if the version number is a valid semver version.
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          registry-url: https://npm.pkg.github.com/
+          registry-url: 'https://npm.pkg.github.com'
       - run: npm ci
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm publish
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
