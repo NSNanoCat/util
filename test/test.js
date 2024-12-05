@@ -1,4 +1,5 @@
-import { $app, Lodash as _, Storage, Console, fetch, notification, wait, done, gRPC } from "../index.js";
+import { $app, Console, done, fetch, getStorage, gRPC, Lodash as _, notification, Storage, time, wait } from "@nsnanocat/util";
+Console.logLevel = "DEBUG";
 Console.log(Console.logLevel);
 Console.log("Hello, World!");
 Console.info("Hello, World!");
