@@ -79,7 +79,6 @@ export class Console {
 					break;
 				case "undefined":
 				default:
-					log = "";
 					break;
 			}
 			return log;
@@ -88,7 +87,7 @@ export class Console {
 			msg = msg.map(log => `  ${log}`);
 			msg.unshift(`▼ ${group}:`);
 		});
-		msg = ["", ...msg, ""];
+		msg = ["", ...msg];
 		console.log(msg.join("\n"));
 	};
 
