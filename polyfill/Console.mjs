@@ -32,11 +32,13 @@ export class Console {
 	};
 
 	static debug = (...msg) => {
+		if (Console.#level < 4) return;
 		msg = msg.map(m => `🅱️ ${m}`);
 		Console.log(...msg);
 	};
 
 	static error(...msg) {
+		if (Console.#level < 1) return;
 		switch ($app) {
 			case "Surge":
 			case "Loon":
@@ -61,11 +63,63 @@ export class Console {
 	static groupEnd = () => Console.#groups.shift();
 
 	static info(...msg) {
+		if (Console.#level < 3) return;
 		msg = msg.map(m => `ℹ️ ${m}`);
 		Console.log(...msg);
 	}
 
+	static #level = 2;
+
+	static get logLevel() {
+		switch (Console.#level) {
+			case 0:
+				return "off";
+			case 1:
+				return "error";
+			case 2:
+				return "warn";
+			case 3:
+			default:
+				return "info";
+			case 4:
+				return "debug";
+			case 5:
+				return "all";
+		}
+	}
+
+	static set logLevel(level) {
+		switch (level) {
+			case 0:
+			case "off":
+				Console.#level = 0;
+				break;
+			case 1:
+			case "error":
+				Console.#level = 1;
+				break;
+			case 2:
+			case "warn":
+				Console.#level = 2;
+				break;
+			case 3:
+			case "info":
+			default:
+				Console.#level = 3;
+				break;
+			case 4:
+			case "debug":
+				Console.#level = 4;
+				break;
+			case 5:
+			case "all":
+				Console.#level = 5;
+				break;
+		}
+	}
+
 	static log = (...msg) => {
+		if (Console.#level === 0) return;
 		msg = msg.map(log => {
 			switch (typeof log) {
 				case "object":
@@ -102,6 +156,7 @@ export class Console {
 	};
 
 	static warn(...msg) {
+		if (Console.#level < 2) return;
 		msg = msg.map(m => `⚠️ ${m}`);
 		Console.log(...msg);
 	}
