@@ -73,22 +73,33 @@ export class Console {
 	static get logLevel() {
 		switch (Console.#level) {
 			case 0:
-				return "off";
+				return "OFF";
 			case 1:
-				return "error";
+				return "ERROR";
 			case 2:
-				return "warn";
-			case 3:
 			default:
-				return "info";
+				return "WARN";
+			case 3:
+				return "INFO";
 			case 4:
-				return "debug";
+				return "DEBUG";
 			case 5:
-				return "all";
+				return "ALL";
 		}
 	}
 
 	static set logLevel(level) {
+		switch (typeof level) {
+			case "string":
+				level = level.toLowerCase();
+				break;
+			case "number":
+				break;
+			case "undefined":
+			default:
+				level = "warn";
+				break;
+		}
 		switch (level) {
 			case 0:
 			case "off":
@@ -100,11 +111,12 @@ export class Console {
 				break;
 			case 2:
 			case "warn":
+			case "warning":
+			default:
 				Console.#level = 2;
 				break;
 			case 3:
 			case "info":
-			default:
 				Console.#level = 3;
 				break;
 			case 4:
