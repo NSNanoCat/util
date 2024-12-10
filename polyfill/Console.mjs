@@ -68,7 +68,7 @@ export class Console {
 		Console.log(...msg);
 	}
 
-	static #level = 2;
+	static #level = 3;
 
 	static get logLevel() {
 		switch (Console.#level) {
@@ -77,9 +77,9 @@ export class Console {
 			case 1:
 				return "ERROR";
 			case 2:
-			default:
 				return "WARN";
 			case 3:
+			default:
 				return "INFO";
 			case 4:
 				return "DEBUG";
