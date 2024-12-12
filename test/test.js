@@ -1,22 +1,18 @@
-import { $app, Console, done, fetch, getStorage, gRPC, Lodash as _, notification, Storage, time, wait } from "@nsnanocat/util";
-Console.logLevel = "DEBUG";
-Console.log(Console.logLevel);
-Console.log("Hello, World!");
-Console.info("Hello, World!");
-Console.error("Hello, World!");
-Console.warn("Hello, World!");
-Console.debug("Hello, World!");
-Console.logLevel = "error";
-Console.log(Console.logLevel);
-Console.log("Hello, World!");
-Console.info("Hello, World!");
-Console.error("Hello, World!");
-Console.warn("Hello, World!");
-Console.debug("Hello, World!");
-Console.logLevel = "off";
-Console.log(Console.logLevel);
-Console.log("Hello, World!");
-Console.info("Hello, World!");
-Console.error("Hello, World!");
-Console.warn("Hello, World!");
-Console.debug("Hello, World!");
+//import { $app, Console, done, fetch, getStorage, gRPC, Lodash as _, notification, Storage, time, wait } from "@nsnanocat/util";
+import { $app, Console, done, fetch, getStorage, gRPC, Lodash as _, notification, Storage, time, wait } from "../index.js";
+const request = {
+    status: 200,
+    headers: {
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+        status: "ok",
+    }),
+    opt: {
+        method: "GET",
+    },
+    ok: true,
+};
+
+done(request);
+
