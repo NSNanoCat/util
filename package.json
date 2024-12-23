@@ -27,7 +27,6 @@
 		"index.js",
 		"lib",
 		"polyfill",
-		"gRPC.mjs",
 		"getStorage.mjs"
 	],
 	"devDependencies": {
