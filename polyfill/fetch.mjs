@@ -1,6 +1,7 @@
 import { $app } from "../lib/app.mjs";
 import { Console } from "./Console.mjs";
 import { Lodash as _ } from "./Lodash.mjs";
+import { StatusTexts } from "./StatusTexts.mjs";
 
 /**
  * fetch
@@ -104,6 +105,7 @@ export async function fetch(resource, options = {}) {
 					else {
 						response.ok = /^2\d\d$/.test(response.status);
 						response.statusCode = response.status;
+						response.statusText = StatusTexts[response.status];
 						if (body) {
 							response.body = body;
 							if (resource["binary-mode"] == true) response.bodyBytes = body;
@@ -130,6 +132,7 @@ export async function fetch(resource, options = {}) {
 					response => {
 						response.ok = /^2\d\d$/.test(response.statusCode);
 						response.status = response.statusCode;
+						response.statusText = StatusTexts[response.status];
 						switch ((response.headers?.["Content-Type"] ?? response.headers?.["content-type"])?.split(";")?.[0]) {
 							case "application/protobuf":
 							case "application/x-protobuf":
