@@ -158,38 +158,32 @@ export async function fetch(resource, options = {}) {
 					}, resource.timeout);
 				}),
 			]);
-		case "Node.js": {
-			const iconv = require("iconv-lite");
-			const got = globalThis.got ? globalThis.got : require("got");
-			const cktough = globalThis.cktough ? globalThis.cktough : require("tough-cookie");
-			const ckjar = globalThis.ckjar ? globalThis.ckjar : new cktough.CookieJar();
-			if (resource) {
-				resource.headers = resource.headers ? resource.headers : {};
-				if (undefined === resource.headers.Cookie && undefined === resource.cookieJar) resource.cookieJar = ckjar;
-			}
-			const { url, ...options } = resource;
-			return await got[method](url, options)
-				.on("redirect", (response, nextOpts) => {
-					try {
-						if (response.headers["set-cookie"]) {
-							const ck = response.headers["set-cookie"].map(cktough.Cookie.parse).toString();
-							if (ck) ckjar.setCookieSync(ck, null);
-							nextOpts.cookieJar = ckjar;
-						}
-					} catch (e) {
-						Console.error(e);
+		case 'Node.js': {
+			const nodeFetch = require('node-fetch')
+			const { default: fetchCookie } = require('fetch-cookie')
+			const fetch = fetchCookie(nodeFetch)
+			resource.timeout = resource.timeout * 1000
+			if (typeof resource.redirection === 'boolean') resource.redirect = resource.redirection ? 'follow' : 'manual'
+			const { url, ...options } = resource
+			return await fetch(url, options)
+				.then(async (response) => {
+					const bodyBytes = await response.buffer()
+					const body = bodyBytes.toString('utf-8')
+					const headers = response.headers.raw()
+					const resp = {
+						ok: response.ok ?? /^2\d\d$/.test(response.status),
+						status: response.status,
+						statusCode: response.status,
+						statusText: response.statusText,
+						body: body,
+						bodyBytes: bodyBytes,
+						headers: Object.fromEntries(
+							Object.entries(headers).map(([key, value]) => [key, key.toLowerCase() !== 'set-cookie' ? value.toString() : value])
+						)
 					}
-					// ckjar.setCookieSync(response.headers["set-cookie"].map(Cookie.parse).toString())
+					return resp
 				})
-				.then(
-					response => {
-						response.statusCode = response.status;
-						response.body = iconv.decode(response.rawBody, "utf-8");
-						response.bodyBytes = response.rawBody;
-						return response;
-					},
-					error => Promise.reject(error.message),
-				);
+				.catch((error) => Promise.reject(error.message))
 		}
 	}
 }
