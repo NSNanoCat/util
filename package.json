@@ -23,9 +23,6 @@
 		"type": "git",
 		"url": "https://github.com/NSNanoCat/util.git"
 	},
-	"dependencies": {
-		"pako": "^2.1.0"
-	},
 	"files": [
 		"index.js",
 		"lib",
