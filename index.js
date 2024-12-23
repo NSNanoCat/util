@@ -6,7 +6,7 @@ export * from "./lib/wait.mjs";
 export * from "./polyfill/Console.mjs";
 export * from "./polyfill/fetch.mjs";
 export * from "./polyfill/Lodash.mjs";
-export * from "./polyfill/StatusCodes.mjs";
+export * from "./polyfill/StatusTexts.mjs";
 export * from "./polyfill/Storage.mjs";
 export * from "./gRPC.mjs";
 export * from "./getStorage.mjs";
