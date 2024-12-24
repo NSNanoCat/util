@@ -158,32 +158,46 @@ export async function fetch(resource, options = {}) {
 					}, resource.timeout);
 				}),
 			]);
-		case 'Node.js': {
-			const nodeFetch = require('node-fetch')
-			const { default: fetchCookie } = require('fetch-cookie')
-			const fetch = fetchCookie(nodeFetch)
-			resource.timeout = resource.timeout * 1000
-			if (typeof resource.redirection === 'boolean') resource.redirect = resource.redirection ? 'follow' : 'manual'
-			const { url, ...options } = resource
-			return await fetch(url, options)
-				.then(async (response) => {
-					const bodyBytes = await response.buffer()
-					const body = bodyBytes.toString('utf-8')
-					const headers = response.headers.raw()
-					const resp = {
-						ok: response.ok ?? /^2\d\d$/.test(response.status),
-						status: response.status,
-						statusCode: response.status,
-						statusText: response.statusText,
-						body: body,
-						bodyBytes: bodyBytes,
-						headers: Object.fromEntries(
-							Object.entries(headers).map(([key, value]) => [key, key.toLowerCase() !== 'set-cookie' ? value.toString() : value])
-						)
-					}
-					return resp
-				})
-				.catch((error) => Promise.reject(error.message))
+		case "Node.js": {
+			const nodeFetch = globalThis.fetch ? globalThis.fetch : require("node-fetch");
+			const fetchCookie = globalThis.fetchCookie ? globalThis.fetchCookie : require("fetch-cookie").default;
+			const fetch = fetchCookie(nodeFetch);
+			// 转换请求参数
+			resource.timeout = resource.timeout * 1000;
+			resource.redirect = resource.redirection ? "follow" : "manual";
+			const { url, ...options } = resource;
+			// 发送请求
+			return Promise.race([
+				await fetch(url, options)
+					.then(async response => {
+						const bodyBytes = await response.arrayBuffer();
+						const decoder = new TextDecoder("utf-8");
+						let headers;
+						try {
+							headers = response.headers.raw();
+						} catch {
+							headers = Array.from(response.headers.entries()).reduce((acc, [key, value]) => {
+								acc[key] = acc[key] ? [...acc[key], value] : [value];
+								return acc;
+							}, {});
+						}
+						return {
+							ok: response.ok ?? /^2\d\d$/.test(response.status),
+							status: response.status,
+							statusCode: response.status,
+							statusText: response.statusText,
+							body: decoder.decode(bodyBytes),
+							bodyBytes: bodyBytes,
+							headers: Object.fromEntries(Object.entries(headers).map(([key, value]) => [key, key.toLowerCase() !== "set-cookie" ? value.toString() : value])),
+						};
+					})
+					.catch(error => Promise.reject(error.message)),
+				new Promise((resolve, reject) => {
+					setTimeout(() => {
+						reject(new Error(`${Function.name}: 请求超时, 请检查网络后重试`));
+					}, resource.timeout);
+				}),
+			]);
 		}
 	}
 }
