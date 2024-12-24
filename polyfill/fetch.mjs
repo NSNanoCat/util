@@ -185,7 +185,7 @@ export async function fetch(resource, options = {}) {
 							status: response.status,
 							statusCode: response.status,
 							statusText: response.statusText,
-							body: bodyBytes.toString("utf-8"),
+							body: new TextDecoder("utf-8").decode(bodyBytes),
 							bodyBytes: bodyBytes,
 							headers: Object.fromEntries(Object.entries(headers).map(([key, value]) => [key, key.toLowerCase() !== "set-cookie" ? value.toString() : value])),
 						};
