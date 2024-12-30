@@ -1,7 +1,7 @@
 /**
  * Current app name
  */
-export const $app = (() => {
+export const $app: "Quantumult X" | "Loon" | "Shadowrocket" | "Egern" | "Surge" | "Stash" | "Node.js" | undefined = (() => {
   if ('$task' in globalThis) {
     return 'Quantumult X';
   }
