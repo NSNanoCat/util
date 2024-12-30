@@ -24,6 +24,6 @@ jobs:
           PR_NUMBER=${{ github.event.number }}
           COMMIT_SHA=${{ github.sha }}
           npm version 0.0.0-preview-PR${PR_NUMBER}-${COMMIT_SHA::7} --no-git-tag-version
-      - run: npm publish --tag preview-${{ github.event.number }}-${{ github.sha }} --access public
+      - run: npm publish --tag preview-${{ github.event.number }} --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
