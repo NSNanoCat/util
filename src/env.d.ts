@@ -1,5 +1,5 @@
 interface Environment {
-  "loon-version"?: string;
+  'loon-version'?: string;
   'surge-version'?: string;
   'stash-version'?: string;
 }
@@ -7,5 +7,5 @@ interface Environment {
 // biome-ignore lint/suspicious/useNamespaceKeyword: This is a global declaration file
 declare module globalThis {
   // biome-ignore lint/style/noVar: This is a global declaration file
-  var $environment: Environment
+  var $environment: Environment;
 }

@@ -1,5 +1,5 @@
-import { set } from "lodash";
-import { Storage } from "./polyfill/Storage";
+import { set } from 'lodash';
+import { Storage } from './polyfill/Storage';
 
 type Database = Record<string, StoreType>;
 
@@ -13,11 +13,13 @@ interface StoreType<
   Caches: Caches;
 }
 
-declare const $argument: string | object
+declare const $argument: string | object;
 
-export function getStorage<Settings extends Record<string, any> = Record<string, any>,
+export function getStorage<
+  Settings extends Record<string, any> = Record<string, any>,
   Configs extends Record<string, any> = Record<string, any>,
-  Caches extends Record<string, any> = Record<string, any>,>(key: string, names: string | string[], database: Database): StoreType<Settings, Configs, Caches> {
+  Caches extends Record<string, any> = Record<string, any>,
+>(key: string, names: string | string[], database: Database): StoreType<Settings, Configs, Caches> {
   const nameList = Array.isArray(names) ? names : [names];
 
   const Store = {
@@ -31,12 +33,12 @@ export function getStorage<Settings extends Record<string, any> = Record<string,
     Store.Configs = { ...Store.Configs, ...database?.[name]?.Configs };
   });
 
-  if (typeof $argument === "string") {
+  if (typeof $argument === 'string') {
     const parsedArgument = Object.fromEntries(
-      $argument.split("&").map((item) => item.split("=", 2).map((i) => i.replace(/\"/g, "")))
+      $argument.split('&').map((item) => item.split('=', 2).map((i) => i.replace(/\"/g, ''))),
     );
     Object.keys(parsedArgument).forEach((key) => set(Store.Settings, key, parsedArgument[key]));
-  } else if (typeof $argument === "object") {
+  } else if (typeof $argument === 'object') {
     Object.keys($argument).forEach((key) => set(Store.Settings, key, $argument[key as keyof typeof $argument]));
   }
 
@@ -46,19 +48,19 @@ export function getStorage<Settings extends Record<string, any> = Record<string,
   const BoxJs = Storage.getItem(key);
   if (BoxJs) {
     //Console.debug("BoxJs", `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`);
-    nameList.forEach(name => {
+    nameList.forEach((name) => {
       const boxSettings = BoxJs?.[name]?.Settings;
       const boxCaches = BoxJs?.[name]?.Caches;
 
-      if (typeof boxSettings === "string") {
-        BoxJs[name].Settings = JSON.parse(boxSettings || "{}");
+      if (typeof boxSettings === 'string') {
+        BoxJs[name].Settings = JSON.parse(boxSettings || '{}');
       }
       if (boxSettings) {
         Store.Settings = { ...Store.Settings, ...BoxJs[name].Settings };
       }
 
-      if (typeof boxCaches === "string") {
-        BoxJs[name].Caches = JSON.parse(boxCaches || "{}");
+      if (typeof boxCaches === 'string') {
+        BoxJs[name].Caches = JSON.parse(boxCaches || '{}');
       }
       if (boxCaches) {
         Store.Caches = { ...Store.Caches, ...BoxJs[name].Caches };
@@ -70,11 +72,11 @@ export function getStorage<Settings extends Record<string, any> = Record<string,
   traverseObject(Store.Settings, (key, value) => {
     //Console.debug("☑️ traverseObject", `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`);
     let transformedValue = value;
-    if (transformedValue === "true" || transformedValue === "false")
+    if (transformedValue === 'true' || transformedValue === 'false')
       transformedValue = JSON.parse(transformedValue); // 字符串转Boolean
-    else if (typeof transformedValue === "string") {
-      if (transformedValue.includes(","))
-        transformedValue = transformedValue.split(",").map(item => string2number(item)); // 字符串转数组转数字
+    else if (typeof transformedValue === 'string') {
+      if (transformedValue.includes(','))
+        transformedValue = transformedValue.split(',').map((item) => string2number(item)); // 字符串转数组转数字
       else transformedValue = string2number(transformedValue); // 字符串转数字
     }
     return transformedValue;
@@ -83,16 +85,12 @@ export function getStorage<Settings extends Record<string, any> = Record<string,
   return Store;
 }
 
-
 /**
  * Recursively traverse and transform object properties.
  */
-function traverseObject<T>(
-  obj: Record<string, any>,
-  callback: (key: string, value: any) => any
-): Record<string, any> {
+function traverseObject<T>(obj: Record<string, any>, callback: (key: string, value: any) => any): Record<string, any> {
   Object.entries(obj).forEach(([key, value]) => {
-    if (value && typeof value === "object") {
+    if (value && typeof value === 'object') {
       obj[key] = traverseObject(value, callback);
     } else {
       obj[key] = callback(key, value);

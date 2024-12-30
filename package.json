@@ -4,14 +4,7 @@
   "type": "module",
   "author": "VirgilClyne <Virgil@nanocat.me>",
   "homepage": "https://NSNanoCat.github.io/util",
-  "keywords": [
-    "loon",
-    "quantumult",
-    "surge",
-    "shadowrocket",
-    "stash",
-    "egern"
-  ],
+  "keywords": ["loon", "quantumult", "surge", "shadowrocket", "stash", "egern"],
   "license": "Apache-2.0",
   "bugs": "https://github.com/NSNanoCat/util/issues",
   "main": "./dist/index.cjs",
@@ -40,15 +33,17 @@
     }
   },
   "scripts": {
-    "build": "rslib build"
+    "build": "rslib build",
+    "check": "biome check --write",
+    "dev": "rslib build --watch",
+    "format": "biome format --write",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/NSNanoCat/util.git"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "dependencies": {
     "lodash": "^4.17.21"
   },

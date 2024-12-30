@@ -1,7 +1,7 @@
-import { $app } from './app';
+import { pick, set } from 'lodash';
 import { Console } from '../polyfill/Console';
 import { StatusTexts } from '../polyfill/StatusTexts';
-import { pick, set } from 'lodash';
+import { $app } from './app';
 
 interface DoneObject {
   status?: number | string;
@@ -50,9 +50,8 @@ const handleDoneFactory = (startTime?: number) => {
   return (result: DoneObject) => {
     Console.log('🚩 执行结束!', startTime ? `🕛 ${((Date.now() - startTime) / 1000).toFixed(3)} 秒` : undefined);
     $done(result);
-  }
-}
-
+  };
+};
 
 /**
  * Complete the script execution
@@ -109,7 +108,7 @@ export function done(object: DoneObject = {}): void {
     }
     case 'Node.js':
     default:
-      Console.log("🚩 执行结束!");
+      Console.log('🚩 执行结束!');
       process.exit(1);
   }
 }

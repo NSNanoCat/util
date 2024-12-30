@@ -28,7 +28,6 @@ jobs:
           node-version: 20
           registry-url: ${{ matrix.registry }}
       - run: npm ci
-      - run: npm run build
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ matrix.registry == 'https://registry.npmjs.org' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}

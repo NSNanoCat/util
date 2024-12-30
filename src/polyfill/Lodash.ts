@@ -1,14 +1,4 @@
-import {
-  escape as lodashEscape,
-  get,
-  omit,
-  pick,
-  set,
-  toPath,
-  unescape as lodashUnescape,
-  unset,
-} from 'lodash'
-
+import { get, escape as lodashEscape, unescape as lodashUnescape, omit, pick, set, toPath, unset } from 'lodash';
 
 export const Lodash = {
   escape: lodashEscape,
@@ -19,4 +9,4 @@ export const Lodash = {
   toPath,
   unescape: lodashUnescape,
   unset,
-}
+};

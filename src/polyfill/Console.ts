@@ -1,13 +1,13 @@
-import { $app } from "../lib/app";
+import { $app } from '../lib/app';
 
 class ConsoleFactory {
   #counts = new Map<string, number>([]);
   #groups: string[] = [];
   #times = new Map<string, number>([]);
 
-  clear = () => { };
+  clear = () => {};
 
-  count = (label = "default") => {
+  count = (label = 'default') => {
     if (this.#counts.has(label)) {
       this.#counts.set(label, this.#counts.get(label) ?? 0 + 1);
     } else {
@@ -16,7 +16,7 @@ class ConsoleFactory {
     this.log(`${label}: ${this.#counts.get(label)}`);
   };
 
-  countReset = (label = "default") => {
+  countReset = (label = 'default') => {
     switch (this.#counts.has(label)) {
       case true:
         this.#counts.set(label, 0);
@@ -36,19 +36,21 @@ class ConsoleFactory {
   error(...msg: any[]) {
     if (this.#level < 1) return;
     switch ($app) {
-      case "Surge":
-      case "Loon":
-      case "Stash":
-      case "Egern":
-      case "Shadowrocket":
-      case "Quantumult X":
-      case "Node.js":
-        this.log(...msg.map((m) => {
-          if (m instanceof Error) {
-            return `❌ ${m.stack}`
-          }
-          return `❌ ${m}`
-        }));
+      case 'Surge':
+      case 'Loon':
+      case 'Stash':
+      case 'Egern':
+      case 'Shadowrocket':
+      case 'Quantumult X':
+      case 'Node.js':
+        this.log(
+          ...msg.map((m) => {
+            if (m instanceof Error) {
+              return `❌ ${m.stack}`;
+            }
+            return `❌ ${m}`;
+          }),
+        );
         break;
       default:
         this.log(...msg.map((m) => `❌ ${m}`));
@@ -72,58 +74,58 @@ class ConsoleFactory {
   get logLevel() {
     switch (this.#level) {
       case 0:
-        return "OFF";
+        return 'OFF';
       case 1:
-        return "ERROR";
+        return 'ERROR';
       case 2:
-        return "WARN";
+        return 'WARN';
       case 4:
-        return "DEBUG";
+        return 'DEBUG';
       case 5:
-        return "ALL";
+        return 'ALL';
       case 3:
       default:
-        return "INFO";
+        return 'INFO';
     }
   }
 
   set logLevel(_level: string | number) {
     let level = _level;
     switch (typeof level) {
-      case "string":
+      case 'string':
         level = level.toLowerCase();
         break;
-      case "number":
+      case 'number':
         break;
-      case "undefined":
+      case 'undefined':
       default:
-        level = "warn";
+        level = 'warn';
         break;
     }
     switch (level) {
       case 0:
-      case "off":
+      case 'off':
         this.#level = 0;
         break;
       case 1:
-      case "error":
+      case 'error':
         this.#level = 1;
         break;
       case 3:
-      case "info":
+      case 'info':
         this.#level = 3;
         break;
       case 4:
-      case "debug":
+      case 'debug':
         this.#level = 4;
         break;
       case 5:
-      case "all":
+      case 'all':
         this.#level = 5;
         break;
       case 2:
-      case "warn":
-      case "warning":
+      case 'warn':
+      case 'warning':
       default:
         this.#level = 2;
         break;
@@ -132,20 +134,20 @@ class ConsoleFactory {
 
   log = (...args: any[]) => {
     if (this.#level === 0) return;
-    let msg = args
+    let msg = args;
     msg = msg.map((item) => {
       let log = item;
       switch (typeof log) {
-        case "object":
+        case 'object':
           log = JSON.stringify(log);
           break;
-        case "bigint":
-        case "number":
-        case "boolean":
-        case "string":
+        case 'bigint':
+        case 'number':
+        case 'boolean':
+        case 'string':
           log = log.toString();
           break;
-        case "undefined":
+        case 'undefined':
         default:
           break;
       }
@@ -155,15 +157,15 @@ class ConsoleFactory {
       msg = msg.map((log) => `  ${log}`);
       msg.unshift(`▼ ${group}:`);
     });
-    msg = ["", ...msg];
-    console.log(msg.join("\n"));
+    msg = ['', ...msg];
+    console.log(msg.join('\n'));
   };
 
-  time = (label = "default") => this.#times.set(label, Date.now());
+  time = (label = 'default') => this.#times.set(label, Date.now());
 
-  timeEnd = (label = "default") => this.#times.delete(label);
+  timeEnd = (label = 'default') => this.#times.delete(label);
 
-  timeLog = (label = "default") => {
+  timeLog = (label = 'default') => {
     const time = this.#times.get(label);
     if (time) {
       this.log(`${label}: ${Date.now() - time}ms`);
@@ -181,6 +183,5 @@ class ConsoleFactory {
     this.log(...msg);
   }
 }
-
 
 export const Console = new ConsoleFactory();
