@@ -1,7 +1,16 @@
-import { $app } from "./app.mjs";
+import { $app } from "./app";
 
-export const $environment = environment();
-export function environment() {
+interface Environment extends globalThis.Environment {
+	app?: string;
+	device?: string;
+	ios?: string;
+	[key: string]: string | undefined;
+}
+
+declare const $loon: string;
+declare const $environment: Environment;
+
+export function environment(): Environment {
 	switch ($app) {
 		case "Surge":
 			$environment.app = "Surge";
@@ -26,9 +35,13 @@ export function environment() {
 				app: "Quantumult X",
 			};
 		case "Node.js":
-			process.env.app = "Node.js";
-			return process.env;
+			return {
+				...process.env,
+				app: "Node.js",
+			};
 		default:
 			return {};
 	}
 }
+
+// export const $environment = environment();

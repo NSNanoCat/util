@@ -10,7 +10,7 @@
  * @param {number} ts 可选: 根据指定时间戳返回格式化日期
  *
  */
-export function time(format, ts) {
+export function time(format: string, ts: number): string {
 	const date = ts ? new Date(ts) : new Date();
 	const Time = {
 		YY: date.getFullYear().toString().substring(3),
@@ -23,8 +23,9 @@ export function time(format, ts) {
 		ss: date.getSeconds().toString().padStart(2, "0"),
 		S: `${Math.floor(date.getMonth() / 3) + 1}`,
 	};
+	let result = format;
 	for (const [key, value] of Object.entries(Time)) {
-		format = format.replace(key, value);
+		result = result.replace(key, value);
 	}
-	return format;
+	return result;
 }

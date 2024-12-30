@@ -1,78 +1,53 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-    "files": {
-        "ignore": [
-            "**/*.bundle.js"
-        ],
-        "ignoreUnknown": false
-    },
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 120,
+    "attributePosition": "auto",
+    "bracketSpacing": true
+  },
+  "javascript": {
     "formatter": {
-        "enabled": true,
-        "indentStyle": "tab",
-        "indentWidth": 2,
-        "lineEnding": "lf",
-        "lineWidth": 320
-    },
-    "javascript": {
-        "formatter": {
-            "arrowParentheses": "asNeeded",
-            "bracketSameLine": true,
-            "quoteStyle": "double"
-        }
-    },
-    "json": {
-        "parser": {
-            "allowComments": true,
-            "allowTrailingCommas": true
-        }
-    },
-    "linter": {
-        "enabled": true,
-        "rules": {
-            "complexity": {
-                "noForEach": "off",
-                "noStaticOnlyClass": "off",
-                "noUselessSwitchCase": "off",
-                "useArrowFunction": "info",
-                "useFlatMap": "off",
-                "useLiteralKeys": "info"
-            },
-            "correctness": {
-                "noInnerDeclarations": "info",
-                "noSelfAssign": "off",
-                "noSwitchDeclarations": "info",
-                "noUnsafeOptionalChaining": "info"
-            },
-            "performance": {
-                "noDelete": "info"
-            },
-            "recommended": true,
-            "style": {
-                "noNegationElse": "off",
-                "noParameterAssign": "off",
-                "noUselessElse": "off",
-                "noVar": "info",
-                "useDefaultParameterLast": "info",
-                "useForOf": "error",
-                "useNodejsImportProtocol": "error",
-                "useNumberNamespace": "error",
-                "useSingleVarDeclarator": "off"
-            },
-            "suspicious": {
-                "noAssignInExpressions": "info",
-                "noDoubleEquals": "info",
-                "noFallthroughSwitchClause": "info",
-                "noGlobalIsNan": "off",
-                "useDefaultSwitchClauseLast": "off"
-            }
-        }
-    },
-    "organizeImports": {
-        "enabled": true
-    },
-    "vcs": {
-        "clientKind": "git",
-        "enabled": true,
-        "useIgnoreFile": true
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto",
+      "bracketSpacing": true
     }
+  },
+  "css": {
+    "parser": {
+      "cssModules": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noUselessSwitchCase": "off",
+        "noForEach": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      }
+    }
+  }
 }
