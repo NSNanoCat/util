@@ -1,23 +1,16 @@
 {
-    // Change this to match your project
-    "include": [
-        "polyfill/URL.mts",
-        "polyfill/URLSearchParams.mts",
-    ],
-    "compilerOptions": {
-        // Tells TypeScript to read JS files, as
-        // normally they are ignored as source files
-        "allowJs": true,
-        // Generate d.ts files
-        "declaration": true,
-        // This compiler run should
-        // only output d.ts files
-        "emitDeclarationOnly": false,
-        // go to js file when using IDE functions like
-        // "Go to Definition" in VSCode
-        "declarationMap": true,
-        "target": "ESNext",
-        "module": "ESNext",
-        "allowImportingTsExtensions": true,
-    },
+  "compilerOptions": {
+    "lib": ["ES2021"],
+    "module": "ESNext",
+    "target": "ES2021",
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src"]
 }

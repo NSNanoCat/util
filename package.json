@@ -1,35 +1,63 @@
 {
-	"name": "@nsnanocat/util",
-	"description": "Pure JS's util module for well-known iOS network tools",
-	"author": "VirgilClyne <Virgil@nanocat.me>",
-	"homepage": "https://NSNanoCat.github.io/util",
-	"keywords": [
-		"loon",
-		"quantumult",
-		"surge",
-		"shadowrocket",
-		"stash",
-		"egern"
-	],
-	"license": "Apache-2.0",
-	"bugs": "https://github.com/NSNanoCat/util/issues",
-	"main": "index.js",
-	"type": "module",
-	"scripts": {
-		"tsc:build": "npx tsc",
-		"test": "exit 0"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/NSNanoCat/util.git"
-	},
-	"files": [
-		"index.js",
-		"lib",
-		"polyfill",
-		"getStorage.mjs"
-	],
-	"devDependencies": {
-		"typescript": "^5.6.3"
-	}
+  "name": "@nsnanocat/util",
+  "description": "Pure JS's util module for well-known iOS network tools",
+  "type": "module",
+  "author": "VirgilClyne <Virgil@nanocat.me>",
+  "homepage": "https://NSNanoCat.github.io/util",
+  "keywords": ["loon", "quantumult", "surge", "shadowrocket", "stash", "egern"],
+  "license": "Apache-2.0",
+  "bugs": "https://github.com/NSNanoCat/util/issues",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./getStorage": {
+      "types": "./dist/getStorage.d.ts",
+      "import": "./dist/getStorage.js",
+      "require": "./dist/getStorage.cjs"
+    },
+    "./polyfill/**": {
+      "types": "./dist/polyfill/**.d.ts",
+      "import": "./dist/polyfill/**.js",
+      "require": "./dist/polyfill/**.cjs"
+    },
+    "./lib/**": {
+      "types": "./dist/lib/**.d.ts",
+      "import": "./dist/lib/**.js",
+      "require": "./dist/lib/**.cjs"
+    }
+  },
+  "scripts": {
+    "build": "rslib build",
+    "check": "biome check --write",
+    "dev": "rslib build --watch",
+    "format": "biome format --write",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NSNanoCat/util.git"
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.2",
+    "@rslib/core": "^0.2.2",
+    "@types/lodash": "^4.17.13",
+    "@types/node": "^22.10.2",
+    "fetch-cookie": "^3.1.0",
+    "node-fetch": "^3.3.2",
+    "typescript": "^5.6.3"
+  },
+  "optionalDependencies": {
+    "fetch-cookie": "^3.1.0",
+    "node-fetch": "^3.3.2"
+  }
 }
