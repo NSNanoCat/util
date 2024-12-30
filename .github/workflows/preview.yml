@@ -19,9 +19,7 @@ jobs:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
       - run: npm ci
-      - run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NODE_AUTH_TOKEN }}" > ~/.npmrc
       - run: |
           PR_NUMBER=${{ github.event.number }}
           COMMIT_SHA=${{ github.sha }}
