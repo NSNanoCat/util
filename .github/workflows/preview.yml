@@ -1,0 +1,29 @@
+name: preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize # Trigger on every push to the PR
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - run: npm ci
+      - name: Update package version for preview
+        run: |
+          PR_NUMBER=${{ github.event.number }}
+          COMMIT_SHA=${{ github.sha }}
+          npm version 0.0.0-preview-PR${PR_NUMBER}-${COMMIT_SHA::7}
+      - run: npm publish --tag preview-${{ github.event.number }}-${{ github.sha }} --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

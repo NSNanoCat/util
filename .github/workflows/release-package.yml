@@ -5,14 +5,9 @@ on:
     # Sequence of patterns matched against refs/tags
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
-  pull_request:
-    types:
-      - opened
-      - synchronize # Trigger on every push to the PR
 
 jobs:
   publish:
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -36,25 +31,3 @@ jobs:
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ matrix.registry == 'https://registry.npmjs.org' && secrets.NPM_TOKEN || secrets.GITHUB_TOKEN }}
-
-  preview:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: "https://registry.npmjs.org"
-      - run: npm ci
-      - name: Update package version for preview
-        run: |
-          PR_NUMBER=${{ github.event.number }}
-          COMMIT_SHA=${{ github.sha }}
-          npm version 0.0.0-preview-PR${PR_NUMBER}-${COMMIT_SHA::7}
-      - run: npm publish --tag preview-${{ github.event.number }}-${{ github.sha }} --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
