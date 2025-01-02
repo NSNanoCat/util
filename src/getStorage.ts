@@ -1,4 +1,4 @@
-import { set } from 'lodash';
+import { set } from './polyfill/Lodash';
 import { Storage } from './polyfill/Storage';
 
 type Database = Record<string, StoreType>;

@@ -1,4 +1,4 @@
-import { get, set, unset } from 'lodash';
+import { get, set, unset } from './Lodash';
 import { $app } from '../lib/app';
 
 declare const $persistentStore: {

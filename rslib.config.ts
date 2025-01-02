@@ -9,11 +9,5 @@ export default defineConfig({
     entry: {
       index: './src/**',
     },
-    transformImport: [
-      {
-        libraryName: 'lodash',
-        customName: 'lodash/{{ member }}',
-      },
-    ],
   },
 });

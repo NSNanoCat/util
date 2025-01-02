@@ -4,7 +4,14 @@
   "type": "module",
   "author": "VirgilClyne <Virgil@nanocat.me>",
   "homepage": "https://NSNanoCat.github.io/util",
-  "keywords": ["loon", "quantumult", "surge", "shadowrocket", "stash", "egern"],
+  "keywords": [
+    "loon",
+    "quantumult",
+    "surge",
+    "shadowrocket",
+    "stash",
+    "egern"
+  ],
   "license": "Apache-2.0",
   "bugs": "https://github.com/NSNanoCat/util/issues",
   "main": "./dist/index.cjs",
@@ -43,14 +50,15 @@
     "type": "git",
     "url": "https://github.com/NSNanoCat/util.git"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "dependencies": {
-    "lodash": "^4.17.21"
+    "type-fest": "^4.31.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.2",
     "@rslib/core": "^0.2.2",
-    "@types/lodash": "^4.17.13",
     "@types/node": "^22.10.2",
     "fetch-cookie": "^3.1.0",
     "node-fetch": "^3.3.2",

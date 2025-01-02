@@ -1,4 +1,4 @@
-import { set } from 'lodash';
+import { set } from './Lodash';
 import { $app } from '../lib/app';
 import { StatusTexts } from './StatusTexts';
 

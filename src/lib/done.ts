@@ -1,4 +1,4 @@
-import { pick, set } from 'lodash';
+import { pick, set } from '../polyfill/Lodash';
 import { Console } from '../polyfill/Console';
 import { StatusTexts } from '../polyfill/StatusTexts';
 import { $app } from './app';
