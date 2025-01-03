@@ -149,8 +149,10 @@ export class StorageClass {
 
   async #getNodeModule() {
     if ($app === 'Node.js') {
-      const fs = await import('node:fs')
-      const path = await import('node:path')
+      // biome-ignore lint/style/useNodejsImportProtocol: <explanation>
+      const fs = await import('fs')
+      // biome-ignore lint/style/useNodejsImportProtocol: <explanation>
+      const path = await import('path')
       return { fs, path }
     }
     return null;
