@@ -24,9 +24,9 @@ export class StorageClass {
 
   constructor() {
     if ($app === 'Node.js') {
-      const fs = require('node:fs');
-      const path = require('node:path');
-      this.data = this.#loadData(this.dataFile, fs, path);
+      this.#loadData(this.dataFile).then((res) => {
+        this.data = res;
+      })
     }
   }
 
@@ -147,7 +147,20 @@ export class StorageClass {
     }
   }
 
-  #loadData(dataFile: string, fs: any, path: any): StorageData {
+  async #getNodeModule() {
+    if ($app === 'Node.js') {
+      const fs = await import('node:fs')
+      const path = await import('node:path')
+      return { fs, path }
+    }
+    return null;
+  }
+
+  async  #loadData(dataFile: string): Promise<StorageData> {
+    const { fs, path } = await this.#getNodeModule() ?? {};
+    if (!fs || !path) {
+      return {};
+    }
     const curDirDataFilePath = path.resolve(dataFile);
     const rootDirDataFilePath = path.resolve(process.cwd(), dataFile);
     if (fs.existsSync(curDirDataFilePath)) {
@@ -159,13 +172,13 @@ export class StorageClass {
     return {};
   }
 
-  #writeData(dataFile: string): void {
-    if ($app === 'Node.js') {
-      const fs = require('node:fs');
-      const path = require('node:path');
-      const dataFilePath = path.resolve(dataFile);
-      fs.writeFileSync(dataFilePath, JSON.stringify(this.data), 'utf-8');
+  async #writeData(dataFile: string): Promise<void> {
+    const { fs, path } = await this.#getNodeModule() ?? {};
+    if (!fs || !path) {
+      return
     }
+    const dataFilePath = path.resolve(dataFile);
+    fs.writeFileSync(dataFilePath, JSON.stringify(this.data), 'utf-8');
   }
 }
 
