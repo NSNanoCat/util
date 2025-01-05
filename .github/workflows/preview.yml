@@ -29,7 +29,7 @@ jobs:
       - run: |
           VERSION=$(node -p "require('./package.json').version")
           PR_NUMBER=${{ github.event.pull_request.number }}
-          COMMENT_BODY="Preview version \`$VERSION\`published to npm. To install, run \n\n\`\`\`bash\nnpm install @nsnanocat/util@$VERSION\`\`\`"
+          COMMENT_BODY="Preview version \`$VERSION\`published to npm. To install, run \\n\\n\`\`\`bash\\nnpm install @nsnanocat/util@$VERSION\\n\`\`\`"
           gh pr comment $PR_NUMBER --body "$COMMENT_BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
