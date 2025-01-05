@@ -139,18 +139,14 @@ export async function fetch<T>(
   }
 
   if ($app === 'Node.js') {
-    const nodeFetch = globalThis.fetch ? globalThis.fetch : await import('node-fetch').then((module) => module.default);
-    const fetchCookie = (globalThis as any).fetchCookie
-      ? (globalThis as any).fetchCookie
-      : await import('fetch-cookie').then((module) => module.default);
-    const fetch = fetchCookie(nodeFetch);
+    const fetch = await import('./fetch-node').then((module) => module.getNodeFetch().then((module) => module.fetch));
     // 转换请求参数
     params.timeout = (params.timeout ?? 5) * 1000;
     params.redirect = params.redirection ? 'follow' : 'manual';
     const { url, ...options } = params;
     // 发送请求
     return Promise.race([
-      await fetch(url, options)
+      await fetch(url as string, options as any)
         .then(async (response: any) => {
           const bodyBytes = await response.arrayBuffer();
           let headers: any;
@@ -184,7 +180,7 @@ export async function fetch<T>(
           reject(new Error(`${Function.name}: 请求超时, 请检查网络后重试`));
         }, params.timeout);
       }),
-    ]);
+    ]) as unknown as FetchResponse<T>;
   }
 
   if ($app === 'Loon') {

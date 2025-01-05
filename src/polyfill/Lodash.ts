@@ -51,12 +51,15 @@ export const get = <T, Path extends string>(obj: T, path: Path, defaultValue?: G
 export const set = <T, Path extends string>(obj: T, path: Path, value: Get<T, Path>) => {
   const setPath = (Array.isArray(path) ? path : toPath(path)) as string[];
 
-  setPath.slice(0, -1).reduce((prev, key, index) => {
-    if (typeof prev[key] !== 'object' || prev[key] === null) {
-      prev[key] = /^\d+$/.test(setPath[index + 1]) ? [] : {};
-    }
-    return prev[key];
-  }, obj as Record<string, any>)[setPath[setPath.length - 1]] = value;
+  setPath.slice(0, -1).reduce(
+    (prev, key, index) => {
+      if (typeof prev[key] !== 'object' || prev[key] === null) {
+        prev[key] = /^\d+$/.test(setPath[index + 1]) ? [] : {};
+      }
+      return prev[key];
+    },
+    obj as Record<string, any>,
+  )[setPath[setPath.length - 1]] = value;
 
   return obj;
 };
@@ -70,7 +73,7 @@ export const unset = <T, Path extends string>(obj: T, path: Path) => {
     }
     return Object(previousValue)[currentValue];
   }, obj);
-}
+};
 
 export const omit = <T extends object, PathArray extends Array<Paths<T> & string>>(obj: T, paths: PathArray) => {
   const result = { ...obj };
@@ -86,9 +89,9 @@ export const pick = <T extends object, PathArray extends Array<Paths<T> & string
         (result as any)[key] = value;
         return result;
       },
-      {} as PickDeep<T, PathArray[number]>
+      {} as PickDeep<T, PathArray[number]>,
     );
-}
+};
 
 export const Lodash = {
   escape,
@@ -99,4 +102,4 @@ export const Lodash = {
   unset,
   omit,
   pick,
-}
+};

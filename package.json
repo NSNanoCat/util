@@ -1,42 +1,31 @@
 {
   "name": "@nsnanocat/util",
   "description": "Pure JS's util module for well-known iOS network tools",
-  "type": "module",
   "author": "VirgilClyne <Virgil@nanocat.me>",
   "homepage": "https://NSNanoCat.github.io/util",
-  "keywords": [
-    "loon",
-    "quantumult",
-    "surge",
-    "shadowrocket",
-    "stash",
-    "egern"
-  ],
+  "keywords": ["loon", "quantumult", "surge", "shadowrocket", "stash", "egern"],
   "license": "Apache-2.0",
   "bugs": "https://github.com/NSNanoCat/util/issues",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     },
     "./getStorage": {
       "types": "./dist/getStorage.d.ts",
-      "import": "./dist/getStorage.js",
-      "require": "./dist/getStorage.cjs"
+      "import": "./dist/getStorage.mjs"
     },
     "./polyfill/**": {
       "types": "./dist/polyfill/**.d.ts",
-      "import": "./dist/polyfill/**.js",
-      "require": "./dist/polyfill/**.cjs"
+      "import": "./dist/polyfill/**.mjs"
     },
     "./lib/**": {
       "types": "./dist/lib/**.d.ts",
-      "import": "./dist/lib/**.js",
-      "require": "./dist/lib/**.cjs"
+      "import": "./dist/lib/**.mjs"
     }
   },
   "scripts": {
@@ -50,9 +39,7 @@
     "type": "git",
     "url": "https://github.com/NSNanoCat/util.git"
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "dependencies": {
     "type-fest": "^4.31.0"
   },
