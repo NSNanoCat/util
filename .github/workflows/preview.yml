@@ -28,9 +28,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: |
           VERSION=$(node -p "require('./package.json').version")
-          echo "npm version is: $VERSION"
           PR_NUMBER=${{ github.event.pull_request.number }}
-          COMMENT_BODY="The npm version is: $VERSION"
+          COMMENT_BODY="Preview version $VERSION published to npm. To install, run \`npm install @nsnanocat/util@$VERSION\`"
           gh pr comment $PR_NUMBER --body "$COMMENT_BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
