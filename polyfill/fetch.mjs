@@ -143,7 +143,7 @@ export async function fetch(resource, options = {}) {
         new Promise((resolve, reject) => {
           setTimeout(() => {
             reject(new Error(`${Function.name}: 请求超时, 请检查网络后重试`));
-          }, resource.timeout);
+          }, resource.timeout * 1000);
         }),
       ]);
     case "Node.js": {
