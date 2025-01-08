@@ -116,6 +116,7 @@ export async function fetch(resource, options = {}) {
 			});
 		case "Quantumult X":
 			// 转换请求参数
+			resource.timeout = resource.timeout * 1000;
 			if (resource.policy) _.set(resource, "opts.policy", resource.policy);
 			if (typeof resource["auto-redirect"] === "boolean") _.set(resource, "opts.redirection", resource["auto-redirect"]);
 			// 转换请求体
