@@ -1,6 +1,6 @@
-import { Console } from '../polyfill/Console';
-import { Storage } from '../polyfill/Storage';
-import { fetch } from '../polyfill/fetch';
+import { Console } from '../polyfill/Console.mjs';
+import { Storage } from '../polyfill/Storage.mjs';
+import { fetch } from '../polyfill/fetch.mjs';
 
 export async function runScript(script: string, runOpts: { timeout?: number } = {}) {
   try {

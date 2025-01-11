@@ -1,7 +1,7 @@
-import { pick, set } from '../polyfill/Lodash';
-import { Console } from '../polyfill/Console';
-import { StatusTexts } from '../polyfill/StatusTexts';
-import { $app } from './app';
+import { pick, set } from '../polyfill/Lodash.mjs';
+import { Console } from '../polyfill/Console.mjs';
+import { StatusTexts } from '../polyfill/StatusTexts.mjs';
+import { $app } from './app.mjs';
 
 interface DoneObject {
   status?: number | string;

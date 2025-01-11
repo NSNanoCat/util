@@ -1,5 +1,5 @@
-import { set } from './polyfill/Lodash';
-import { Storage } from './polyfill/Storage';
+import { set } from './polyfill/Lodash.mjs';
+import { Storage } from './polyfill/Storage.mjs';
 
 type Database = Record<string, StoreType>;
 

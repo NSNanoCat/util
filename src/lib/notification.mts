@@ -1,5 +1,5 @@
-import { Console } from '../polyfill/Console.js';
-import { $app } from './app.js';
+import { Console } from '../polyfill/Console.mjs';
+import { $app } from './app.mjs';
 
 interface NotificationContent {
   open?: string;

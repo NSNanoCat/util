@@ -1,6 +1,6 @@
-import { set } from './Lodash';
-import { $app } from '../lib/app';
-import { StatusTexts } from './StatusTexts';
+import { set } from './Lodash.mjs';
+import { $app } from '../lib/app.mjs';
+import { StatusTexts } from './StatusTexts.mjs';
 
 declare const $task: {
   fetch: (options: FetchOptions) => Promise<any>;
@@ -139,7 +139,7 @@ export async function fetch<T>(
   }
 
   if ($app === 'Node.js') {
-    const fetch = await import('./fetch-node').then((module) => module.getNodeFetch().then((module) => module.fetch));
+    const fetch = await import('./fetch-node.mjs').then((module) => module.getNodeFetch().fetch);
     // 转换请求参数
     params.timeout = (params.timeout ?? 5) * 1000;
     params.redirect = params.redirection ? 'follow' : 'manual';

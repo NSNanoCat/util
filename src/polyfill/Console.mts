@@ -1,4 +1,4 @@
-import { $app } from '../lib/app';
+import { $app } from '../lib/app.mjs';
 
 class ConsoleFactory {
   #counts = new Map<string, number>([]);

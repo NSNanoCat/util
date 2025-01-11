@@ -3,14 +3,15 @@
     "lib": ["ES2021"],
     "module": "ESNext",
     "target": "ES2021",
-    "noEmit": true,
+    "noEmit": false,
     "strict": true,
     "skipLibCheck": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "useDefineForClassFields": true,
-    "allowImportingTsExtensions": true
+    "outDir": "./dist",
+    "declaration": true
   },
   "include": ["src"]
 }
