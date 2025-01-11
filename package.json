@@ -7,27 +7,7 @@
   "license": "Apache-2.0",
   "bugs": "https://github.com/NSNanoCat/util/issues",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    },
-    "./getStorage": {
-      "types": "./dist/getStorage.d.ts",
-      "import": "./dist/getStorage.mjs"
-    },
-    "./polyfill/**": {
-      "types": "./dist/polyfill/**.d.ts",
-      "import": "./dist/polyfill/**.mjs"
-    },
-    "./lib/**": {
-      "types": "./dist/lib/**.d.ts",
-      "import": "./dist/lib/**.mjs"
-    }
-  },
   "scripts": {
     "build": "rslib build",
     "check": "biome check --write",

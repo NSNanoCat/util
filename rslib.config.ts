@@ -6,7 +6,6 @@ import { wait } from './src/lib/wait';
 export default defineConfig({
   lib: [
     { format: 'esm', syntax: 'es2021', bundle: false, dts: true },
-    // { format: 'cjs', syntax: 'es2021', bundle: false },
   ],
   source: {
     entry: {
@@ -36,7 +35,7 @@ export default defineConfig({
         api.onAfterBuild(async () => {
           await wait(1000);
           const distPath = path.join(__dirname, 'dist');
-          await fs.promises.copyFile(path.join(distPath, 'index.mjs'), path.join(distPath, 'index.js'));
+          await fs.promises.rename(path.join(distPath, 'index.mjs'), path.join(distPath, 'index.js'));
           const tempFileReg = /\.temp$/;
           fs.promises.readdir(path.join(distPath, 'polyfill')).then((files) => {
             files.forEach((file) => {
