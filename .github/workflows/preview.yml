@@ -1,0 +1,38 @@
+name: preview
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize # Trigger on every push to the PR
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      - run: npm ci
+      - run: |
+          COMMIT_SHA=${{ github.sha }}
+          npm version 0.0.0-preview-${COMMIT_SHA::7} --no-git-tag-version
+      - run: npm publish --tag preview-${{ github.event.number }} --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: |
+          VERSION=$(node -p "require('./package.json').version")
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          COMMENT_BODY="Preview version \`$VERSION\` published to npm. To install, run:
+          \`\`\`bash
+          npm install @nsnanocat/util@$VERSION
+          \`\`\`"
+          gh pr comment $PR_NUMBER --body "$COMMENT_BODY"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,35 +1,47 @@
 {
-	"name": "@nsnanocat/util",
-	"description": "Pure JS's util module for well-known iOS network tools",
-	"author": "VirgilClyne <Virgil@nanocat.me>",
-	"homepage": "https://NSNanoCat.github.io/util",
-	"keywords": [
-		"loon",
-		"quantumult",
-		"surge",
-		"shadowrocket",
-		"stash",
-		"egern"
-	],
-	"license": "Apache-2.0",
-	"bugs": "https://github.com/NSNanoCat/util/issues",
-	"main": "index.js",
-	"type": "module",
-	"scripts": {
-		"tsc:build": "npx tsc",
-		"test": "exit 0"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/NSNanoCat/util.git"
-	},
-	"files": [
-		"index.js",
-		"lib",
-		"polyfill",
-		"getStorage.mjs"
-	],
-	"devDependencies": {
-		"typescript": "^5.6.3"
-	}
+  "name": "@nsnanocat/util",
+  "description": "Pure JS's util module for well-known iOS network tools",
+  "author": "VirgilClyne <Virgil@nanocat.me>",
+  "homepage": "https://NSNanoCat.github.io/util",
+  "keywords": [
+    "loon",
+    "quantumult",
+    "surge",
+    "shadowrocket",
+    "stash",
+    "egern"
+  ],
+  "license": "Apache-2.0",
+  "bugs": "https://github.com/NSNanoCat/util/issues",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prebuild": "rimraf dist",
+    "build": "tsc",
+    "check": "biome check --write",
+    "format": "biome format --write",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NSNanoCat/util.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "type-fest": "^4.31.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.2",
+    "@types/node": "^22.10.2",
+    "fetch-cookie": "^3.1.0",
+    "node-fetch": "^3.3.2",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.3"
+  },
+  "optionalDependencies": {
+    "fetch-cookie": "^3.1.0",
+    "node-fetch": "^3.3.2"
+  }
 }
