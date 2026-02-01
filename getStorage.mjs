@@ -29,6 +29,7 @@ export function getStorage(key, names, database) {
 		case "undefined":
 			break;
 	}
+	if (argument.LogLevel) Console.logLevel = argument.LogLevel;
 	Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
@@ -44,6 +45,7 @@ export function getStorage(key, names, database) {
 				BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
 			}
 		});
+		if (BoxJs.LogLevel) Console.logLevel = BoxJs.LogLevel;
 		Console.debug("✅ BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	}
 	/***************** Merge *****************/
@@ -54,6 +56,7 @@ export function getStorage(key, names, database) {
 		_.merge(Store.Caches, BoxJs?.[name]?.Caches);
 	});
 	_.merge(Store.Settings, argument);
+	if (Store.Settings.LogLevel) Console.logLevel = Store.Settings.LogLevel;
 	Console.debug("✅ Merge", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** traverseObject *****************/
 	traverseObject(Store.Settings, (key, value) => {
