@@ -18,7 +18,7 @@
 	"scripts": {
 		"tsc:build": "npx tsc",
 		"test": "node --test test/*.test.js",
-		"test:merge": "node --test test/merge.test.js"
+		"test:merge": "node --test test/Lodash.merge.test.js"
 	},
 	"repository": {
 		"type": "git",
