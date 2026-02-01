@@ -88,6 +88,28 @@ describe("Lodash.merge", () => {
 			const result = _.merge(target, source);
 			assert.deepStrictEqual(result, { a: [1, 2, 3] });
 		});
+
+		it("空数组不覆盖已有值", () => {
+			const target = { a: [1, 2, 3], b: { c: 1 }, d: "hello" };
+			const source = { a: [], b: [], d: [] };
+			const result = _.merge(target, source);
+			assert.deepStrictEqual(result, { a: [1, 2, 3], b: { c: 1 }, d: "hello" });
+		});
+
+		it("空数组可以赋值给 undefined 的目标属性", () => {
+			const target = { a: 1 };
+			const source = { b: [] };
+			const result = _.merge(target, source);
+			assert.deepStrictEqual(result, { a: 1, b: [] });
+		});
+
+		it("空数组不覆盖已有的空数组", () => {
+			const target = { a: [] };
+			const source = { a: [] };
+			const result = _.merge(target, source);
+			assert.deepStrictEqual(result, { a: [] });
+			assert.strictEqual(result.a, target.a); // 保持原引用
+		});
 	});
 
 	describe("特殊值处理", () => {

@@ -63,6 +63,9 @@ export class Lodash {
 						// 递归合并对象
 						object[key] = Lodash.merge(targetValue, sourceValue);
 						break;
+					case Array.isArray(sourceValue) && sourceValue.length === 0 && targetValue !== undefined:
+						// 空数组不覆盖已有值
+						break;
 					case sourceValue !== undefined:
 						object[key] = sourceValue;
 						break;
