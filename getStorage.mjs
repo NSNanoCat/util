@@ -23,22 +23,6 @@ export function getStorage(key, names, database) {
 		_.merge(Store.Configs, database?.[name]?.Configs);
 	});
 	//Console.debug("Database", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
-	/***************** Argument *****************/
-	switch (typeof $argument) {
-		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
-		case "string":
-			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=", 2).map(i => i.replace(/\"/g, ""))));
-		case "object": {
-			const argument = {};
-			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
-			//Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
-			_.merge(Store.Settings, argument);
-			break;
-		}
-		case "undefined":
-			break;
-	}
-	//Console.debug("$argument", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
@@ -69,6 +53,22 @@ export function getStorage(key, names, database) {
 		});
 		Console.debug("BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	}
+	/***************** Argument *****************/
+	switch (typeof $argument) {
+		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
+		case "string":
+			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=", 2).map(i => i.replace(/\"/g, ""))));
+		case "object": {
+			const argument = {};
+			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
+			//Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
+			_.merge(Store.Settings, argument);
+			break;
+		}
+		case "undefined":
+			break;
+	}
+	//Console.debug("$argument", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** traverseObject *****************/
 	traverseObject(Store.Settings, (key, value) => {
 		//Console.debug("☑️ traverseObject", `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`);
