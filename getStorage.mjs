@@ -13,6 +13,7 @@ import { Storage } from "./polyfill/Storage.mjs";
  */
 export function getStorage(key, names, database) {
 	Console.debug("☑️ getStorage");
+	names = [names].flat(Number.POSITIVE_INFINITY);
 	/***************** Default *****************/
 	const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
 	Console.debug("Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
@@ -49,7 +50,6 @@ export function getStorage(key, names, database) {
 		Console.debug("✅ BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	}
 	/***************** Merge *****************/
-	names = [names].flat(Number.POSITIVE_INFINITY);
 	names.forEach(name => {
 		_.merge(Store.Settings, database?.[name]?.Settings, BoxJs?.[name]?.Settings);
 		_.merge(Store.Configs, database?.[name]?.Configs);
