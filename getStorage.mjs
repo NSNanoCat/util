@@ -19,8 +19,8 @@ export function getStorage(key, names, database) {
 	//Console.debug("Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** Database *****************/
 	names.forEach(name => {
-		Store.Settings = { ...Store.Settings, ...database?.[name]?.Settings };
-		Store.Configs = { ...Store.Configs, ...database?.[name]?.Configs };
+		_.merge(Store.Settings, database?.[name]?.Settings);
+		_.merge(Store.Configs, database?.[name]?.Configs);
 	});
 	//Console.debug("Database", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** Argument *****************/
