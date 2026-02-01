@@ -12,66 +12,52 @@ import { Storage } from "./polyfill/Storage.mjs";
  * @return {object} { Settings, Caches, Configs }
  */
 export function getStorage(key, names, database) {
-	names = [names].flat(Number.POSITIVE_INFINITY);
-	//Console.log("☑️ getStorage");
+	Console.debug("☑️ getStorage");
 	/***************** Default *****************/
 	const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
-	//Console.debug("Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
-	/***************** Database *****************/
-	names.forEach(name => {
-		_.merge(Store.Settings, database?.[name]?.Settings);
-		_.merge(Store.Configs, database?.[name]?.Configs);
-	});
-	//Console.debug("Database", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	Console.debug("Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	/***************** Argument *****************/
+	Console.debug(`☑️ $argument`);
+	const argument = {};
+	switch (typeof $argument) {
+		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
+		case "string":
+			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=", 2).map(i => i.replace(/\"/g, ""))));
+		case "object":
+			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
+			break;
+		case "undefined":
+			break;
+	}
+	Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
 	const BoxJs = Storage.getItem(key);
 	if (BoxJs) {
-		Console.debug("BoxJs", `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`);
+		Console.debug("☑️ BoxJs", `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`);
 		names.forEach(name => {
-			switch (typeof BoxJs?.[name]?.Settings) {
-				// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
-				case "string":
-					BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
-				case "object":
-					_.merge(Store.Settings, BoxJs[name].Settings);
-					break;
-				case "undefined":
-					break;
+			if (typeof BoxJs?.[name]?.Settings === "string") {
+				BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
 			}
-			switch (typeof BoxJs?.[name]?.Caches) {
-				// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
-				case "string":
-					BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
-				case "object":
-					_.merge(Store.Caches, BoxJs[name].Caches);
-					break;
-				case "undefined":
-					break;
+			if (typeof BoxJs?.[name]?.Caches === "string") {
+				BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
 			}
 		});
-		Console.debug("BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+		Console.debug("✅ BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	}
-	/***************** Argument *****************/
-	switch (typeof $argument) {
-		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
-		case "string":
-			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=", 2).map(i => i.replace(/\"/g, ""))));
-		case "object": {
-			const argument = {};
-			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
-			//Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
-			_.merge(Store.Settings, argument);
-			break;
-		}
-		case "undefined":
-			break;
-	}
-	//Console.debug("$argument", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	/***************** Merge *****************/
+	names = [names].flat(Number.POSITIVE_INFINITY);
+	names.forEach(name => {
+		_.merge(Store.Settings, database?.[name]?.Settings, BoxJs?.[name]?.Settings);
+		_.merge(Store.Configs, database?.[name]?.Configs);
+		_.merge(Store.Caches, BoxJs?.[name]?.Caches);
+	});
+	_.merge(Store.Settings, argument);
+	Console.debug("✅ Merge", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** traverseObject *****************/
 	traverseObject(Store.Settings, (key, value) => {
-		//Console.debug("☑️ traverseObject", `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`);
+		Console.debug("☑️ traverseObject", `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`);
 		if (value === "true" || value === "false")
 			value = JSON.parse(value); // 字符串转Boolean
 		else if (typeof value === "string") {
@@ -82,6 +68,7 @@ export function getStorage(key, names, database) {
 		return value;
 	});
 	Console.debug("✅ traverseObject", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	Console.debug("✅ getStorage");
 	return Store;
 }
 
