@@ -32,7 +32,8 @@ export class Lodash {
 	 * - 多个源对象依次合并到目标对象
 	 *
 	 * 限制:
-	 * - 仅处理普通对象 (Plain Object)，不处理 Map/Set/Date/RegExp 等特殊对象
+	 * - 仅处理普通对象 (Plain Object)，不处理 Date/RegExp 等特殊对象
+	 * - Map/Set 仅支持同类型合并，不递归内部值
 	 * - 数组会被直接覆盖，不会合并数组元素
 	 * - 不处理循环引用，可能导致栈溢出
 	 * - 不复制 Symbol 属性和不可枚举属性
@@ -63,8 +64,28 @@ export class Lodash {
 						// 递归合并对象
 						object[key] = Lodash.merge(targetValue, sourceValue);
 						break;
+					case sourceValue instanceof Map && targetValue instanceof Map:
+						// 合并 Map（空 Map 跳过）
+						if (sourceValue.size > 0) {
+							for (const [k, v] of sourceValue) {
+								targetValue.set(k, v);
+							}
+						}
+						break;
+					case sourceValue instanceof Set && targetValue instanceof Set:
+						// 合并 Set（空 Set 跳过）
+						if (sourceValue.size > 0) {
+							for (const v of sourceValue) {
+								targetValue.add(v);
+							}
+						}
+						break;
 					case Array.isArray(sourceValue) && sourceValue.length === 0 && targetValue !== undefined:
 						// 空数组不覆盖已有值
+						break;
+					case (sourceValue instanceof Map && sourceValue.size === 0 && targetValue !== undefined):
+					case (sourceValue instanceof Set && sourceValue.size === 0 && targetValue !== undefined):
+						// 空 Map/Set 不覆盖已有值
 						break;
 					case sourceValue !== undefined:
 						object[key] = sourceValue;

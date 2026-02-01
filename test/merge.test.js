@@ -112,6 +112,88 @@ describe("Lodash.merge", () => {
 		});
 	});
 
+	describe("Map 处理", () => {
+		it("应该合并两个 Map", () => {
+			const target = { a: new Map([["x", 1], ["y", 2]]) };
+			const source = { a: new Map([["y", 3], ["z", 4]]) };
+			const result = _.merge(target, source);
+			assert.deepStrictEqual(result.a, new Map([["x", 1], ["y", 3], ["z", 4]]));
+		});
+
+		it("空 Map 不覆盖已有 Map", () => {
+			const targetMap = new Map([["x", 1]]);
+			const target = { a: targetMap };
+			const source = { a: new Map() };
+			const result = _.merge(target, source);
+			assert.strictEqual(result.a, targetMap);
+			assert.deepStrictEqual(result.a, new Map([["x", 1]]));
+		});
+
+		it("空 Map 不覆盖已有非 Map 值", () => {
+			const target = { a: { b: 1 } };
+			const source = { a: new Map() };
+			const result = _.merge(target, source);
+			assert.deepStrictEqual(result, { a: { b: 1 } });
+		});
+
+		it("空 Map 可以赋值给 undefined 的目标属性", () => {
+			const target = { a: 1 };
+			const source = { b: new Map() };
+			const result = _.merge(target, source);
+			assert.ok(result.b instanceof Map);
+			assert.strictEqual(result.b.size, 0);
+		});
+
+		it("非空 Map 覆盖非 Map 值", () => {
+			const target = { a: { b: 1 } };
+			const source = { a: new Map([["x", 1]]) };
+			const result = _.merge(target, source);
+			assert.ok(result.a instanceof Map);
+			assert.deepStrictEqual(result.a, new Map([["x", 1]]));
+		});
+	});
+
+	describe("Set 处理", () => {
+		it("应该合并两个 Set（取并集）", () => {
+			const target = { a: new Set([1, 2, 3]) };
+			const source = { a: new Set([3, 4, 5]) };
+			const result = _.merge(target, source);
+			assert.deepStrictEqual(result.a, new Set([1, 2, 3, 4, 5]));
+		});
+
+		it("空 Set 不覆盖已有 Set", () => {
+			const targetSet = new Set([1, 2]);
+			const target = { a: targetSet };
+			const source = { a: new Set() };
+			const result = _.merge(target, source);
+			assert.strictEqual(result.a, targetSet);
+			assert.deepStrictEqual(result.a, new Set([1, 2]));
+		});
+
+		it("空 Set 不覆盖已有非 Set 值", () => {
+			const target = { a: [1, 2, 3] };
+			const source = { a: new Set() };
+			const result = _.merge(target, source);
+			assert.deepStrictEqual(result, { a: [1, 2, 3] });
+		});
+
+		it("空 Set 可以赋值给 undefined 的目标属性", () => {
+			const target = { a: 1 };
+			const source = { b: new Set() };
+			const result = _.merge(target, source);
+			assert.ok(result.b instanceof Set);
+			assert.strictEqual(result.b.size, 0);
+		});
+
+		it("非空 Set 覆盖非 Set 值", () => {
+			const target = { a: [1, 2, 3] };
+			const source = { a: new Set([4, 5]) };
+			const result = _.merge(target, source);
+			assert.ok(result.a instanceof Set);
+			assert.deepStrictEqual(result.a, new Set([4, 5]));
+		});
+	});
+
 	describe("特殊值处理", () => {
 		it("目标对象为 null 时返回 null", () => {
 			const result = _.merge(null, { a: 1 });
