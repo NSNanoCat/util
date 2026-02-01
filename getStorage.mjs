@@ -32,7 +32,7 @@ export function getStorage(key, names, database) {
 			const argument = {};
 			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
 			//Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
-			Store.Settings = { ...Store.Settings, ...argument };
+			_.merge(Store.Settings, argument);
 			break;
 		}
 		case "undefined":
@@ -44,14 +44,14 @@ export function getStorage(key, names, database) {
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
 	const BoxJs = Storage.getItem(key);
 	if (BoxJs) {
-		//Console.debug("BoxJs", `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`);
+		Console.debug("BoxJs", `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`);
 		names.forEach(name => {
 			switch (typeof BoxJs?.[name]?.Settings) {
 				// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
 				case "string":
 					BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
 				case "object":
-					Store.Settings = { ...Store.Settings, ...BoxJs[name].Settings };
+					_.merge(Store.Settings, BoxJs[name].Settings);
 					break;
 				case "undefined":
 					break;
@@ -61,13 +61,13 @@ export function getStorage(key, names, database) {
 				case "string":
 					BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
 				case "object":
-					Store.Caches = { ...Store.Caches, ...BoxJs[name].Caches };
+					_.merge(Store.Caches, BoxJs[name].Caches);
 					break;
 				case "undefined":
 					break;
 			}
 		});
-		//Console.debug("BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+		Console.debug("BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	}
 	/***************** traverseObject *****************/
 	traverseObject(Store.Settings, (key, value) => {
@@ -81,7 +81,7 @@ export function getStorage(key, names, database) {
 		}
 		return value;
 	});
-	//Console.debug("✅ traverseObject", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	Console.debug("✅ traverseObject", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	return Store;
 }
 
