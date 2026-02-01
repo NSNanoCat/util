@@ -6,23 +6,13 @@ on:
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 16
-      - run: npm ci
-      - run: npm test
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
 
-  publish-gpr:
-    needs: build
+jobs:
+  publish:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Update local package.json version from release tag
@@ -33,9 +23,9 @@ jobs:
           ignore-semver-check: "false" # If set to "true", will not check if the version number is a valid semver version.
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
       - run: npm ci
+      - run: npm run build --if-present
+      - run: npm test
       - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
