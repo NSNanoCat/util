@@ -12,6 +12,7 @@ import { Storage } from "./polyfill/Storage.mjs";
  * @return {object} { Settings, Caches, Configs }
  */
 export function getStorage(key, names, database) {
+	if (database?.Default?.Settings?.LogLevel) Console.logLevel = database.Default.Settings.LogLevel;
 	Console.debug("☑️ getStorage");
 	names = [names].flat(Number.POSITIVE_INFINITY);
 	/***************** Default *****************/
