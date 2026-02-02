@@ -18,11 +18,12 @@
 	"scripts": {
 		"tsc:build": "npx tsc",
 		"test": "node --test test/*.test.js",
-		"test:merge": "node --test test/Lodash.merge.test.js"
+		"test:merge": "node --test test/Lodash.merge.test.js",
+		"deprecate": "npm deprecate -f '@nsnanocat/util@0.0.0-preview' \"this package has been deprecated\""
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/NSNanoCat/util.git"
+		"url": "git+https://github.com/NSNanoCat/util.git"
 	},
 	"files": [
 		"index.js",
@@ -32,5 +33,9 @@
 	],
 	"devDependencies": {
 		"typescript": "^5.6.3"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"access": "public"
 	}
 }
