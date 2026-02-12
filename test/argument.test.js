@@ -4,16 +4,16 @@ import { afterEach, describe, it } from "node:test";
 let importSeed = 0;
 const argumentModule = new URL("../lib/argument.mjs", import.meta.url);
 const importWithArgument = async value => {
-	if (typeof value === "undefined") delete globalThis.$argument;
+	if (typeof value === "undefined") globalThis.$argument = undefined;
 	else globalThis.$argument = value;
 	importSeed += 1;
-	const { $argument } = await import(`${argumentModule}?test=${importSeed}`);
-	return $argument;
+	await import(`${argumentModule}?test=${importSeed}`);
+	return globalThis.$argument;
 };
 
 describe("argument", () => {
 	afterEach(() => {
-		delete globalThis.$argument;
+		globalThis.$argument = undefined;
 	});
 
 	it("应该解析字符串参数", async () => {
