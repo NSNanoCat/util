@@ -1,4 +1,4 @@
-import { argument } from "./lib/argument.mjs";
+import { $argument } from "./lib/argument.mjs";
 import { Console } from "./polyfill/Console.mjs";
 import { Lodash as _ } from "./polyfill/Lodash.mjs";
 import { Storage } from "./polyfill/Storage.mjs";
@@ -42,7 +42,7 @@ export function getStorage(key, names, database) {
 		_.merge(Store.Configs, database?.[name]?.Configs);
 		_.merge(Store.Caches, BoxJs?.[name]?.Caches);
 	});
-	_.merge(Store.Settings, argument);
+	_.merge(Store.Settings, $argument);
 	if (Store.Settings.LogLevel) Console.logLevel = Store.Settings.LogLevel;
 	Console.debug("✅ Merge", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** traverseObject *****************/

@@ -7,8 +7,8 @@ const importWithArgument = async value => {
 	if (typeof value === "undefined") delete globalThis.$argument;
 	else globalThis.$argument = value;
 	importSeed += 1;
-	const { argument } = await import(`${argumentModule}?test=${importSeed}`);
-	return argument;
+	const { $argument } = await import(`${argumentModule}?test=${importSeed}`);
+	return $argument;
 };
 
 describe("argument", () => {
@@ -19,27 +19,31 @@ describe("argument", () => {
 	it("应该解析字符串参数", async () => {
 		const result = await importWithArgument("foo=bar&count=1");
 		assert.deepStrictEqual(result, { foo: "bar", count: "1" });
+		assert.deepStrictEqual(globalThis.$argument, { foo: "bar", count: "1" });
 	});
 
 	it("应该解析点号路径参数", async () => {
 		const result = await importWithArgument("a.b.c=123&a.d=456");
 		assert.deepStrictEqual(result, { a: { b: { c: "123" }, d: "456" } });
+		assert.deepStrictEqual(globalThis.$argument, { a: { b: { c: "123" }, d: "456" } });
 	});
 
 	it("应该解析带双引号的参数值", async () => {
 		const result = await importWithArgument('a.b.c="[1,2,3]"&a.d="456"');
 		assert.deepStrictEqual(result, { a: { b: { c: "[1,2,3]" }, d: "456" } });
+		assert.deepStrictEqual(globalThis.$argument, { a: { b: { c: "[1,2,3]" }, d: "456" } });
 	});
 
 	it("应该处理对象参数", async () => {
 		const result = await importWithArgument({ "nested.value": "ok" });
 		assert.deepStrictEqual(result, { nested: { value: "ok" } });
-		assert.deepStrictEqual(globalThis.$argument, { "nested.value": "ok" });
+		assert.deepStrictEqual(globalThis.$argument, { nested: { value: "ok" } });
 	});
 
 	it("应该处理未定义参数", async () => {
 		const result = await importWithArgument();
-		assert.deepStrictEqual(result, {});
+		assert.strictEqual(result, undefined);
+		assert.strictEqual(globalThis.$argument, undefined);
 	});
 
 	it("应该支持全局 $argument", async () => {
