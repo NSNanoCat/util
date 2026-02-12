@@ -21,6 +21,16 @@ describe("argument", () => {
 		assert.deepStrictEqual(result, { foo: "bar", count: "1" });
 	});
 
+	it("应该解析点号路径参数", async () => {
+		const result = await importWithArgument("a.b.c=123&a.d=456");
+		assert.deepStrictEqual(result, { a: { b: { c: "123" }, d: "456" } });
+	});
+
+	it("应该解析带双引号的参数值", async () => {
+		const result = await importWithArgument('a.b.c="[1,2,3]"&a.d="456"');
+		assert.deepStrictEqual(result, { a: { b: { c: "[1,2,3]" }, d: "456" } });
+	});
+
 	it("应该处理对象参数", async () => {
 		const result = await importWithArgument({ "nested.value": "ok" });
 		assert.deepStrictEqual(result, { nested: { value: "ok" } });
