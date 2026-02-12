@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { describe, it } from "node:test";
+import { afterEach, describe, it } from "node:test";
 
 let importSeed = 0;
 const loadArgument = async value => {
@@ -11,6 +11,10 @@ const loadArgument = async value => {
 };
 
 describe("argument", () => {
+	afterEach(() => {
+		delete globalThis.$argument;
+	});
+
 	it("应该解析字符串参数", async () => {
 		const result = await loadArgument("foo=bar&count=1");
 		assert.deepStrictEqual(result, { foo: "bar", count: "1" });
@@ -31,6 +35,5 @@ describe("argument", () => {
 		const result = await loadArgument("mode=on");
 		assert.deepStrictEqual(result, { mode: "on" });
 		assert.deepStrictEqual(globalThis.$argument, { mode: "on" });
-		delete globalThis.$argument;
 	});
 });
