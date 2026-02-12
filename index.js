@@ -1,4 +1,5 @@
 export * from "./lib/app.mjs";
+export * from "./lib/argument.mjs";
 export * from "./lib/done.mjs";
 export * from "./lib/notification.mjs";
 export * from "./lib/time.mjs";
