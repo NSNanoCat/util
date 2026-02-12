@@ -3,7 +3,7 @@ import { afterEach, describe, it } from "node:test";
 
 let importSeed = 0;
 const argumentModule = new URL("../lib/argument.mjs", import.meta.url);
-const loadArgument = async value => {
+const importArgumentWithGlobal = async value => {
 	if (typeof value === "undefined") delete globalThis.$argument;
 	else globalThis.$argument = value;
 	importSeed += 1;
@@ -17,22 +17,22 @@ describe("argument", () => {
 	});
 
 	it("应该解析字符串参数", async () => {
-		const result = await loadArgument("foo=bar&count=1");
+		const result = await importArgumentWithGlobal("foo=bar&count=1");
 		assert.deepStrictEqual(result, { foo: "bar", count: "1" });
 	});
 
 	it("应该处理对象参数", async () => {
-		const result = await loadArgument({ "nested.value": "ok" });
+		const result = await importArgumentWithGlobal({ "nested.value": "ok" });
 		assert.deepStrictEqual(result, { nested: { value: "ok" } });
 	});
 
 	it("应该处理未定义参数", async () => {
-		const result = await loadArgument();
+		const result = await importArgumentWithGlobal();
 		assert.deepStrictEqual(result, {});
 	});
 
 	it("应该支持全局 $argument", async () => {
-		const result = await loadArgument("mode=on");
+		const result = await importArgumentWithGlobal("mode=on");
 		assert.deepStrictEqual(result, { mode: "on" });
 	});
 });
