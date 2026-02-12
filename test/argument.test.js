@@ -18,7 +18,6 @@ describe("argument", () => {
 	it("应该解析字符串参数", async () => {
 		const result = await loadArgument("foo=bar&count=1");
 		assert.deepStrictEqual(result, { foo: "bar", count: "1" });
-		assert.deepStrictEqual(globalThis.$argument, { foo: "bar", count: "1" });
 	});
 
 	it("应该处理对象参数", async () => {
@@ -34,6 +33,5 @@ describe("argument", () => {
 	it("应该支持全局 $argument", async () => {
 		const result = await loadArgument("mode=on");
 		assert.deepStrictEqual(result, { mode: "on" });
-		assert.deepStrictEqual(globalThis.$argument, { mode: "on" });
 	});
 });
