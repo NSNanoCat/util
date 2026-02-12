@@ -12,4 +12,17 @@ describe("argument", () => {
 		const result = argument({ "nested.value": "ok" });
 		assert.deepStrictEqual(result, { nested: { value: "ok" } });
 	});
+
+	it("应该处理未定义参数", () => {
+		const result = argument();
+		assert.deepStrictEqual(result, {});
+	});
+
+	it("应该支持全局 $argument", () => {
+		globalThis.$argument = "mode=on";
+		const result = argument();
+		assert.deepStrictEqual(result, { mode: "on" });
+		assert.deepStrictEqual(globalThis.$argument, { mode: "on" });
+		delete globalThis.$argument;
+	});
 });
