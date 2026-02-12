@@ -1,3 +1,4 @@
+import { argument as parseArgument } from "./lib/argument.mjs";
 import { Console } from "./polyfill/Console.mjs";
 import { Lodash as _ } from "./polyfill/Lodash.mjs";
 import { Storage } from "./polyfill/Storage.mjs";
@@ -19,20 +20,7 @@ export function getStorage(key, names, database) {
 	const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
 	Console.debug("Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** Argument *****************/
-	Console.debug(`☑️ $argument`);
-	const argument = {};
-	switch (typeof $argument) {
-		// biome-ignore lint/suspicious/noFallthroughSwitchClause: <explanation>
-		case "string":
-			$argument = Object.fromEntries($argument.split("&").map(item => item.split("=", 2).map(i => i.replace(/\"/g, ""))));
-		case "object":
-			Object.keys($argument).forEach(key => _.set(argument, key, $argument[key]));
-			break;
-		case "undefined":
-			break;
-	}
-	if (argument.LogLevel) Console.logLevel = argument.LogLevel;
-	Console.debug(`✅ $argument`, `argument: ${JSON.stringify(argument)}`);
+	const argument = parseArgument();
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
