@@ -2,11 +2,12 @@ import assert from "node:assert";
 import { afterEach, describe, it } from "node:test";
 
 let importSeed = 0;
+const argumentModule = new URL("../lib/argument.mjs", import.meta.url);
 const loadArgument = async value => {
 	if (typeof value === "undefined") delete globalThis.$argument;
 	else globalThis.$argument = value;
 	importSeed += 1;
-	const { argument } = await import(`../lib/argument.mjs?test=${importSeed}`);
+	const { argument } = await import(`${argumentModule}?test=${importSeed}`);
 	return argument;
 };
 
