@@ -34,5 +34,6 @@ describe("argument", () => {
 	it("应该支持全局 $argument", async () => {
 		const result = await importArgumentWithGlobal("mode=on");
 		assert.deepStrictEqual(result, { mode: "on" });
+		assert.deepStrictEqual(globalThis.$argument, { mode: "on" });
 	});
 });
