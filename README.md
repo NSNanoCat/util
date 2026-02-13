@@ -198,6 +198,7 @@ console.log(globalThis.$argument); // { mode: "on", a: { b: "1" } }
 不可用/差异点：
 - `policy` 在 Egern / Shadowrocket 分支不做映射。
 - Quantumult X 会丢弃未在白名单内的字段。
+- Quantumult X 的 `status` 在部分场景要求完整状态行（如 `HTTP/1.1 200 OK`），本库会在传入数字状态码时自动拼接（依赖 `StatusTexts`）。
 - Node.js 不调用 `$done`，而是直接退出进程，且退出码固定为 `1`。
 
 ### `lib/notification.mjs`
@@ -308,6 +309,11 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 
 ### `polyfill/fetch.mjs`
 
+`fetch` 是仿照 Web API `Window.fetch` 设计的跨平台适配实现：
+- 参考文档：https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch
+- 中文文档：https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch
+- 目标：尽量保持 Web `fetch` 调用习惯，同时补齐各平台扩展参数映射
+
 #### `fetch(resource, options = {})`
 - 签名：`fetch(resource: object | string, options?: object): Promise<object>`
 - 参数合并：
@@ -356,8 +362,14 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - `policy` 在 Surge / Egern / Node.js 分支没有额外适配逻辑。
 - `redirection` 在部分平台会映射为 `auto-redirect` 或 `opts.redirection`。
 - Node.js 分支依赖 `globalThis.fetch` / `globalThis.fetchCookie` 或 `node-fetch` + `fetch-cookie`。
+- 返回结构是统一兼容结构，不等同于浏览器 `Response` 对象。
 
 ### `polyfill/Storage.mjs`
+
+`Storage` 是仿照 Web Storage 接口（`Storage`）设计的跨平台持久化适配器：
+- 参考文档：https://developer.mozilla.org/en-US/docs/Web/API/Storage
+- 中文文档：https://developer.mozilla.org/zh-CN/docs/Web/API/Storage
+- 目标：统一 VPN App 脚本环境中的持久化读写接口，并尽量贴近 Web Storage 行为
 
 #### `Storage.getItem(keyName, defaultValue = null)`
 - 支持普通 key：按平台读持久化。
@@ -380,6 +392,11 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - 数据文件默认：`box.dat`。
 - 读取路径优先级：当前目录 -> `process.cwd()`。
 
+与 Web Storage 的行为差异：
+- 支持 `@key.path` 深路径读写（Web Storage 原生不支持）。
+- `removeItem/clear` 仅部分平台可用（目前主要是 Quantumult X）。
+- `getItem` 会尝试 `JSON.parse`，`setItem` 写入对象会 `JSON.stringify`。
+
 平台后端映射：
 
 | 平台 | 读写接口 |
@@ -395,6 +412,21 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 #### 日志级别
 - `Console.logLevel` 可读写。
 - 支持：`OFF(0)` / `ERROR(1)` / `WARN(2)` / `INFO(3)` / `DEBUG(4)` / `ALL(5)`。
+
+`logLevel` 用法示例：
+
+```js
+import { Console } from "@nsnanocat/util";
+
+Console.logLevel = "debug"; // 或 4
+Console.debug("debug message");
+
+Console.logLevel = 2; // WARN
+Console.info("won't print at WARN level");
+Console.warn("will print");
+
+console.log(Console.logLevel); // "WARN"
+```
 
 #### 方法
 - `clear()`
@@ -437,7 +469,11 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 
 ### `polyfill/Lodash.mjs`
 
-`Lodash` 为轻量实现，包含：
+`Lodash` 为“部分方法的简化实现”，不是完整 Lodash。各方法语义可参考：
+- https://www.lodashjs.com
+- https://lodash.com
+
+当前实现包含：
 - `escape(string)`
 - `unescape(string)`
 - `toPath(value)`
@@ -474,6 +510,8 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 #### `StatusTexts`
 - 类型：`Record<number, string>`
 - 内容：HTTP 状态码到状态文本映射（100~511 的常见码）。
+- 主要用途：给 Quantumult X 的 `$done` 状态行补全文本（如 `HTTP/1.1 200 OK`）。
+- 参考示例：https://github.com/crossutility/Quantumult-X/raw/refs/heads/master/sample-rewrite-response-header.js
 
 ## 平台差异总览
 
@@ -517,9 +555,18 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - [crossutility/Quantumult-X - sample-task.js](https://raw.githubusercontent.com/crossutility/Quantumult-X/master/sample-task.js)
 - [crossutility/Quantumult-X - sample-rewrite-with-script.js](https://raw.githubusercontent.com/crossutility/Quantumult-X/master/sample-rewrite-with-script.js)
 - [crossutility/Quantumult-X - sample-fetch-opts-policy.js](https://raw.githubusercontent.com/crossutility/Quantumult-X/master/sample-fetch-opts-policy.js)
+- [crossutility/Quantumult-X - sample-rewrite-response-header.js](https://github.com/crossutility/Quantumult-X/raw/refs/heads/master/sample-rewrite-response-header.js)
 
 ### Node.js
 - [Node.js Globals - fetch](https://nodejs.org/api/globals.html#fetch)
+
+### Web API / Lodash
+- [MDN - Window.fetch](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch)
+- [MDN（中文）- Window.fetch](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch)
+- [MDN - Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage)
+- [MDN（中文）- Storage](https://developer.mozilla.org/zh-CN/docs/Web/API/Storage)
+- [Lodash Docs](https://www.lodashjs.com)
+- [lodash.com](https://lodash.com)
 
 ### Egern / Shadowrocket
 - [Egern Docs - Scriptings 配置](https://egernapp.com/docs/configuration/scriptings)

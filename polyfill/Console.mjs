@@ -3,6 +3,18 @@ import { $app } from "../lib/app.mjs";
 /**
  * 统一日志工具，兼容各脚本平台与 Node.js。
  * Unified logger compatible with script platforms and Node.js.
+ *
+ * logLevel 用法:
+ * logLevel usage:
+ * - 可读: `Console.logLevel` 返回 `OFF|ERROR|WARN|INFO|DEBUG|ALL`
+ * - Read: `Console.logLevel` returns `OFF|ERROR|WARN|INFO|DEBUG|ALL`
+ * - 可写: 数字 `0~5` 或字符串 `off/error/warn/info/debug/all`
+ * - Write: number `0~5` or string `off/error/warn/info/debug/all`
+ *
+ * @example
+ * Console.logLevel = "debug";
+ * Console.debug("only shown when level >= DEBUG");
+ * Console.logLevel = 2; // WARN
  */
 export class Console {
 	static #counts = new Map([]);

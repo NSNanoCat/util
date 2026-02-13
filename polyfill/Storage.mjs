@@ -5,6 +5,13 @@ import { Lodash as _ } from "./Lodash.mjs";
  * 跨平台持久化存储适配器。
  * Cross-platform persistent storage adapter.
  *
+ * 设计目标:
+ * Design goal:
+ * - 仿照 Web Storage (`Storage`) 接口设计
+ * - Modeled after Web Storage (`Storage`) interface
+ * - 统一 VPN App 脚本环境中的持久化读写接口
+ * - Unify persistence APIs across VPN app script environments
+ *
  * 支持后端:
  * Supported backends:
  * - Surge/Loon/Stash/Egern/Shadowrocket: `$persistentStore`
@@ -16,7 +23,17 @@ import { Lodash as _ } from "./Lodash.mjs";
  * Supports path key:
  * - `@root.path.to.value`
  *
- * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Storage/setItem
+ * 与 Web Storage 的已知差异:
+ * Known differences from Web Storage:
+ * - 支持 `@key.path` 深路径读写（Web Storage 原生不支持）
+ * - Supports `@key.path` deep-path access (not native in Web Storage)
+ * - `removeItem/clear` 并非所有平台都可用
+ * - `removeItem/clear` are not available on every platform
+ * - 读取时会尝试 `JSON.parse`，写入对象会 `JSON.stringify`
+ * - Reads try `JSON.parse`, writes stringify objects
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/Storage
+ * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Storage
  */
 export class Storage {
 	/**

@@ -38,6 +38,13 @@ import { StatusTexts } from "./StatusTexts.mjs";
  * 跨平台 `fetch` 适配层。
  * Cross-platform `fetch` adapter.
  *
+ * 设计目标:
+ * Design goal:
+ * - 仿照 Web API `fetch`（`Window.fetch`）接口设计
+ * - Modeled after Web API `fetch` (`Window.fetch`)
+ * - 统一 VPN App 与 Node.js 环境中的请求调用
+ * - Unify request calls across VPN apps and Node.js
+ *
  * 功能:
  * Features:
  * - 统一 Quantumult X / Loon / Surge / Stash / Egern / Shadowrocket / Node.js 请求接口
@@ -45,7 +52,17 @@ import { StatusTexts } from "./StatusTexts.mjs";
  * - 统一返回体字段（`ok/status/statusText/body/bodyBytes`）
  * - Normalize response fields (`ok/status/statusText/body/bodyBytes`)
  *
- * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API
+ * 与 Web `fetch` 的已知差异:
+ * Known differences from Web `fetch`:
+ * - 支持 `policy`、`auto-redirect` 等平台扩展字段
+ * - Supports platform extension fields like `policy` and `auto-redirect`
+ * - 非浏览器平台通过 `$httpClient/$task` 实现，不是原生 Fetch 实现
+ * - Non-browser platforms use `$httpClient/$task` instead of native Fetch engine
+ * - 返回结构包含 `statusCode/bodyBytes` 等兼容字段
+ * - Response includes compatibility fields like `statusCode/bodyBytes`
+ *
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch
+ * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch
  * @async
  * @param {FetchRequest|string} resource 请求对象或 URL / Request object or URL string.
  * @param {Partial<FetchRequest>} [options={}] 追加参数 / Extra options.

@@ -2,6 +2,18 @@
 /**
  * 轻量 Lodash 工具集。
  * Lightweight Lodash-like utilities.
+ *
+ * 说明:
+ * Notes:
+ * - 这是 Lodash 的“部分方法”简化实现，不等价于完整 Lodash
+ * - This is a simplified subset, not a full Lodash implementation
+ * - 各方法语义可参考 Lodash 官方文档
+ * - Method semantics can be referenced from official Lodash docs
+ *
+ * 参考:
+ * Reference:
+ * - https://www.lodashjs.com
+ * - https://lodash.com
  */
 export class Lodash {
 	/**

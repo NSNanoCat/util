@@ -2,6 +2,17 @@
  * HTTP 状态码文本映射表。
  * HTTP status code to status text map.
  *
+ * 主要用途:
+ * Primary usage:
+ * - 为 Quantumult X 的 `$done` 状态行拼接提供状态文本
+ * - Provide status text for Quantumult X `$done` status-line composition
+ * - QX 在部分场景要求 `status` 为完整状态行（如 `HTTP/1.1 200 OK`）
+ * - QX may require full status line (e.g. `HTTP/1.1 200 OK`) in some cases
+ *
+ * 参考:
+ * Reference:
+ * - https://github.com/crossutility/Quantumult-X/raw/refs/heads/master/sample-rewrite-response-header.js
+ *
  * @type {Record<number, string>}
  */
 export const StatusTexts = {
