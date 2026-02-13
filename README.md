@@ -56,17 +56,16 @@ npm i @nsnanocat/util@latest
 
 ```js
 import {
-  $app,
-  $argument, // 已标准化的 $argument 快照（由包入口自动处理）
-  done,
-  fetch,
-  notification,
-  time,
-  wait,
-  Console,
-  Lodash,
-  Storage,
-  getStorage,
+  $app,       // 当前平台名（如 "Surge" / "Loon" / "Quantumult X" / "Node.js"）
+  $argument,  // 已标准化的模块参数对象（导入包时自动处理字符串 -> 对象）
+  done,       // 统一结束脚本函数（内部自动适配各平台 $done 差异）
+  fetch,      // 统一 HTTP 请求函数（内部自动适配 $httpClient / $task / Node fetch）
+  notification, // 统一通知函数（内部自动适配 $notify / $notification.post）
+  time,       // 时间格式化工具
+  wait,       // 延时等待工具（Promise）
+  Console,    // 统一日志工具（支持 logLevel）
+  Lodash,     // 内置的 Lodash 部分方法实现
+  Storage,    // 统一持久化存储接口（适配 $prefs / $persistentStore / 文件）
 } from "@nsnanocat/util";
 ```
 
@@ -84,11 +83,11 @@ import {
 - `polyfill/Lodash.mjs`
 - `polyfill/StatusTexts.mjs`
 - `polyfill/Storage.mjs`
-- `getStorage.mjs`
 
 ### 仓库中存在但未从主入口导出
 - `lib/environment.mjs`
 - `lib/runScript.mjs`
+- `getStorage.mjs`（薯条项目自用，仅当你的存储结构与薯条项目一致时再使用）
 
 ## 模块依赖关系
 
@@ -306,6 +305,9 @@ await runScript("$done({})", { timeout: 20 });
 
 ### `getStorage.mjs`
 
+⚠️ 注意：该模块主要为薯条项目的存储结构设计，不作为通用默认 API。  
+仅当你的持久化结构与薯条项目一致时才建议使用。
+
 #### `getStorage(key, names, database)`
 - 签名：
   - `key: string`（持久化主键）
@@ -326,6 +328,8 @@ await runScript("$done({})", { timeout: 20 });
 
 示例：
 ```js
+import { getStorage } from "@nsnanocat/util/getStorage.mjs";
+
 const store = getStorage("@my_box", ["YouTube", "Global"], database);
 ```
 

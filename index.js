@@ -9,7 +9,6 @@ export * from "./polyfill/fetch.mjs";
 export * from "./polyfill/Lodash.mjs";
 export * from "./polyfill/StatusTexts.mjs";
 export * from "./polyfill/Storage.mjs";
-export * from "./getStorage.mjs";
 
 /**
  * 已标准化的 `$argument` 快照。
