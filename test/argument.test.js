@@ -42,8 +42,8 @@ describe("argument", () => {
 
 	it("应该处理未定义参数", async () => {
 		const result = await importWithArgument();
-		assert.strictEqual(result, undefined);
-		assert.strictEqual(globalThis.$argument, undefined);
+		assert.deepStrictEqual(result, {});
+		assert.deepStrictEqual(globalThis.$argument, {});
 	});
 
 	it("应该支持全局 $argument", async () => {
