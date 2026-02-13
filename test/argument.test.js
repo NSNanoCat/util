@@ -4,7 +4,7 @@ import { afterEach, describe, it } from "node:test";
 let importSeed = 0;
 const argumentModule = new URL("../lib/argument.mjs", import.meta.url);
 const importWithArgument = async value => {
-	if (typeof value === "undefined") globalThis.$argument = undefined;
+	if (typeof value === "undefined") globalThis.$argument = {};
 	else globalThis.$argument = value;
 	importSeed += 1;
 	await import(`${argumentModule}?test=${importSeed}`);
@@ -13,7 +13,7 @@ const importWithArgument = async value => {
 
 describe("argument", () => {
 	afterEach(() => {
-		globalThis.$argument = undefined;
+		globalThis.$argument = {};
 	});
 
 	it("应该解析字符串参数", async () => {
@@ -36,8 +36,8 @@ describe("argument", () => {
 
 	it("应该处理对象参数", async () => {
 		const result = await importWithArgument({ "nested.value": "ok" });
-		assert.deepStrictEqual(result, { nested: { value: "ok" } });
-		assert.deepStrictEqual(globalThis.$argument, { nested: { value: "ok" } });
+		assert.deepStrictEqual(result, { "nested.value": "ok", nested: { value: "ok" } });
+		assert.deepStrictEqual(globalThis.$argument, { "nested.value": "ok", nested: { value: "ok" } });
 	});
 
 	it("应该处理未定义参数", async () => {
