@@ -1,12 +1,29 @@
 import { $app } from "../lib/app.mjs";
 
+/**
+ * 统一日志工具，兼容各脚本平台与 Node.js。
+ * Unified logger compatible with script platforms and Node.js.
+ */
 export class Console {
 	static #counts = new Map([]);
 	static #groups = [];
 	static #times = new Map([]);
 
+	/**
+	 * 清空控制台（当前为空实现）。
+	 * Clear console (currently a no-op).
+	 *
+	 * @returns {void}
+	 */
 	static clear = () => {};
 
+	/**
+	 * 增加计数器并打印当前值。
+	 * Increment counter and print the current value.
+	 *
+	 * @param {string} [label="default"] 计数器名称 / Counter label.
+	 * @returns {void}
+	 */
 	static count = (label = "default") => {
 		switch (Console.#counts.has(label)) {
 			case true:
@@ -19,6 +36,13 @@ export class Console {
 		Console.log(`${label}: ${Console.#counts.get(label)}`);
 	};
 
+	/**
+	 * 重置计数器。
+	 * Reset a counter.
+	 *
+	 * @param {string} [label="default"] 计数器名称 / Counter label.
+	 * @returns {void}
+	 */
 	static countReset = (label = "default") => {
 		switch (Console.#counts.has(label)) {
 			case true:
@@ -31,12 +55,26 @@ export class Console {
 		}
 	};
 
+	/**
+	 * 输出调试日志。
+	 * Print debug logs.
+	 *
+	 * @param {...any} msg 日志内容 / Log messages.
+	 * @returns {void}
+	 */
 	static debug = (...msg) => {
 		if (Console.#level < 4) return;
 		msg = msg.map(m => `🅱️ ${m}`);
 		Console.log(...msg);
 	};
 
+	/**
+	 * 输出错误日志。
+	 * Print error logs.
+	 *
+	 * @param {...any} msg 日志内容 / Log messages.
+	 * @returns {void}
+	 */
 	static error(...msg) {
 		if (Console.#level < 1) return;
 		switch ($app) {
@@ -56,12 +94,39 @@ export class Console {
 		Console.log(...msg);
 	}
 
+	/**
+	 * `error` 的别名。
+	 * Alias of `error`.
+	 *
+	 * @param {...any} msg 日志内容 / Log messages.
+	 * @returns {void}
+	 */
 	static exception = (...msg) => Console.error(...msg);
 
+	/**
+	 * 进入日志分组。
+	 * Enter a log group.
+	 *
+	 * @param {string} label 分组名 / Group label.
+	 * @returns {number}
+	 */
 	static group = label => Console.#groups.unshift(label);
 
+	/**
+	 * 退出日志分组。
+	 * Exit the latest log group.
+	 *
+	 * @returns {*}
+	 */
 	static groupEnd = () => Console.#groups.shift();
 
+	/**
+	 * 输出信息日志。
+	 * Print info logs.
+	 *
+	 * @param {...any} msg 日志内容 / Log messages.
+	 * @returns {void}
+	 */
 	static info(...msg) {
 		if (Console.#level < 3) return;
 		msg = msg.map(m => `ℹ️ ${m}`);
@@ -70,6 +135,12 @@ export class Console {
 
 	static #level = 3;
 
+	/**
+	 * 获取日志级别文本。
+	 * Get current log level text.
+	 *
+	 * @returns {"OFF"|"ERROR"|"WARN"|"INFO"|"DEBUG"|"ALL"}
+	 */
 	static get logLevel() {
 		switch (Console.#level) {
 			case 0:
@@ -88,6 +159,12 @@ export class Console {
 		}
 	}
 
+	/**
+	 * 设置日志级别。
+	 * Set current log level.
+	 *
+	 * @param {number|string} level 级别值 / Level value.
+	 */
 	static set logLevel(level) {
 		switch (typeof level) {
 			case "string":
@@ -130,6 +207,13 @@ export class Console {
 		}
 	}
 
+	/**
+	 * 输出通用日志。
+	 * Print generic logs.
+	 *
+	 * @param {...any} msg 日志内容 / Log messages.
+	 * @returns {void}
+	 */
 	static log = (...msg) => {
 		if (Console.#level === 0) return;
 		msg = msg.map(log => {
@@ -157,16 +241,44 @@ export class Console {
 		console.log(msg.join("\n"));
 	};
 
+	/**
+	 * 开始计时。
+	 * Start timer.
+	 *
+	 * @param {string} [label="default"] 计时器名称 / Timer label.
+	 * @returns {Map<string, number>}
+	 */
 	static time = (label = "default") => Console.#times.set(label, Date.now());
 
+	/**
+	 * 结束计时并移除计时器。
+	 * End timer and remove it.
+	 *
+	 * @param {string} [label="default"] 计时器名称 / Timer label.
+	 * @returns {boolean}
+	 */
 	static timeEnd = (label = "default") => Console.#times.delete(label);
 
+	/**
+	 * 输出当前计时器耗时。
+	 * Print elapsed time for a timer.
+	 *
+	 * @param {string} [label="default"] 计时器名称 / Timer label.
+	 * @returns {void}
+	 */
 	static timeLog = (label = "default") => {
 		const time = Console.#times.get(label);
 		if (time) Console.log(`${label}: ${Date.now() - time}ms`);
 		else Console.warn(`Timer "${label}" doesn’t exist`);
 	};
 
+	/**
+	 * 输出警告日志。
+	 * Print warning logs.
+	 *
+	 * @param {...any} msg 日志内容 / Log messages.
+	 * @returns {void}
+	 */
 	static warn(...msg) {
 		if (Console.#level < 2) return;
 		msg = msg.map(m => `⚠️ ${m}`);

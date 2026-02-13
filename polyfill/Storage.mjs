@@ -2,36 +2,53 @@ import { $app } from "../lib/app.mjs";
 import { Lodash as _ } from "./Lodash.mjs";
 
 /**
- * Storage
+ * 跨平台持久化存储适配器。
+ * Cross-platform persistent storage adapter.
+ *
+ * 支持后端:
+ * Supported backends:
+ * - Surge/Loon/Stash/Egern/Shadowrocket: `$persistentStore`
+ * - Quantumult X: `$prefs`
+ * - Node.js: 本地 `box.dat`
+ * - Node.js: local `box.dat`
+ *
+ * 支持路径键:
+ * Supports path key:
+ * - `@root.path.to.value`
  *
  * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Storage/setItem
- * @export
- * @class Storage
- * @typedef {Storage}
  */
 export class Storage {
 	/**
-	 * data
+	 * Node.js 环境下的内存数据缓存。
+	 * In-memory data cache for Node.js runtime.
 	 *
-	 * @static
-	 * @type {file}
+	 * @type {Record<string, any>|null}
 	 */
 	static data = null;
-	static dataFile = "box.dat";
+
 	/**
-	 * nameRegex
+	 * Node.js 持久化文件名。
+	 * Data file name used in Node.js.
 	 *
-	 * @static
-	 * @type {regexp}
+	 * @type {string}
+	 */
+	static dataFile = "box.dat";
+
+	/**
+	 * `@key.path` 解析正则。
+	 * Regex for `@key.path` parsing.
+	 *
+	 * @type {RegExp}
 	 */
 	static #nameRegex = /^@(?<key>[^.]+)(?:\.(?<path>.*))?$/;
 
 	/**
-	 * getItem
+	 * 读取存储值。
+	 * Read value from persistent storage.
 	 *
-	 * @static
-	 * @param {string} keyName
-	 * @param {*} [defaultValue]
+	 * @param {string} keyName 键名或路径键 / Key or path key.
+	 * @param {*} [defaultValue=null] 默认值 / Default value when key is missing.
 	 * @returns {*}
 	 */
 	static getItem(keyName, defaultValue = null) {
@@ -80,11 +97,11 @@ export class Storage {
 	}
 
 	/**
-	 * setItem
+	 * 写入存储值。
+	 * Write value into persistent storage.
 	 *
-	 * @static
-	 * @param {string} keyName
-	 * @param {*} keyValue
+	 * @param {string} keyName 键名或路径键 / Key or path key.
+	 * @param {*} keyValue 写入值 / Value to store.
 	 * @returns {boolean}
 	 */
 	static setItem(keyName = new String(), keyValue = new String()) {
@@ -135,10 +152,10 @@ export class Storage {
 	}
 
 	/**
-	 * removeItem
+	 * 删除存储值。
+	 * Remove value from persistent storage.
 	 *
-	 * @static
-	 * @param {string} keyName
+	 * @param {string} keyName 键名或路径键 / Key or path key.
 	 * @returns {boolean}
 	 */
 	static removeItem(keyName) {
@@ -178,9 +195,9 @@ export class Storage {
 	}
 
 	/**
-	 * clear
+	 * 清空存储（仅 Quantumult X 支持）。
+	 * Clear storage (supported by Quantumult X only).
 	 *
-	 * @static
 	 * @returns {boolean}
 	 */
 	static clear() {
@@ -207,10 +224,12 @@ export class Storage {
 	}
 
 	/**
-	 * #loaddata
+	 * 从 Node.js 数据文件加载 JSON。
+	 * Load JSON data from Node.js data file.
 	 *
-	 * @param {string} dataFile
-	 * @returns {*}
+	 * @private
+	 * @param {string} dataFile 数据文件名 / Data file name.
+	 * @returns {Record<string, any>}
 	 */
 	static #loaddata = dataFile => {
 		if ($app === "Node.js") {
@@ -232,9 +251,12 @@ export class Storage {
 	};
 
 	/**
-	 * #writedata
+	 * 将内存数据写入 Node.js 数据文件。
+	 * Persist in-memory data to Node.js data file.
 	 *
-	 * @param {string} [dataFile=this.dataFile]
+	 * @private
+	 * @param {string} [dataFile=this.dataFile] 数据文件名 / Data file name.
+	 * @returns {void}
 	 */
 	static #writedata = (dataFile = this.dataFile) => {
 		if ($app === "Node.js") {

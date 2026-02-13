@@ -1,3 +1,9 @@
+/**
+ * HTTP 状态码文本映射表。
+ * HTTP status code to status text map.
+ *
+ * @type {Record<number, string>}
+ */
 export const StatusTexts = {
 	100: "Continue",
 	101: "Switching Protocols",

@@ -4,13 +4,32 @@ import { Lodash as _ } from "./polyfill/Lodash.mjs";
 import { Storage } from "./polyfill/Storage.mjs";
 
 /**
- * Get Storage Variables
+ * 存储配置读取与合并结果。
+ * Merged storage result object.
+ *
+ * @typedef {object} StorageProfile
+ * @property {Record<string, any>} Settings 运行设置 / Runtime settings.
+ * @property {Record<string, any>} Configs 静态配置 / Static configs.
+ * @property {Record<string, any>} Caches 缓存数据 / Runtime caches.
+ */
+
+/**
+ * 读取并合并默认配置、持久化配置与 `$argument`。
+ * Read and merge default config, persisted config and `$argument`.
+ *
+ * 合并顺序:
+ * Merge order:
+ * 1) `database.Default`
+ * 2) BoxJS persisted value
+ * 3) `database[name]` + `BoxJs[name]`
+ * 4) `$argument`
+ *
  * @link https://github.com/NanoCat-Me/utils/blob/main/getStorage.mjs
  * @author VirgilClyne
- * @param {string} key - Persistent Store Key
- * @param {array | string} names - Platform Names
- * @param {object} database - Default Database
- * @return {object} { Settings, Caches, Configs }
+ * @param {string} key 持久化主键 / Persistent store key.
+ * @param {string|string[]|Array<string|string[]>} names 目标配置名 / Target profile names.
+ * @param {Record<string, any>} database 默认数据库 / Default database object.
+ * @returns {StorageProfile}
  */
 export function getStorage(key, names, database) {
 	if (database?.Default?.Settings?.LogLevel) Console.logLevel = database.Default.Settings.LogLevel;
@@ -62,6 +81,14 @@ export function getStorage(key, names, database) {
 	return Store;
 }
 
+/**
+ * 深度遍历对象并用回调替换叶子值。
+ * Deep-walk an object and replace leaf values using callback.
+ *
+ * @param {Record<string, any>} o 目标对象 / Target object.
+ * @param {(key: string, value: any) => any} c 处理回调 / Transformer callback.
+ * @returns {Record<string, any>}
+ */
 function traverseObject(o, c) {
 	for (const t in o) {
 		const n = o[t];
@@ -69,6 +96,14 @@ function traverseObject(o, c) {
 	}
 	return o;
 }
+
+/**
+ * 将纯数字字符串转换为数字。
+ * Convert integer-like string into number.
+ *
+ * @param {string} string 输入字符串 / Input string.
+ * @returns {string|number}
+ */
 function string2number(string) {
 	if (/^\d+$/.test(string)) string = Number.parseInt(string, 10);
 	return string;

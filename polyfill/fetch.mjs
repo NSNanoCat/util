@@ -4,14 +4,52 @@ import { Lodash as _ } from "./Lodash.mjs";
 import { StatusTexts } from "./StatusTexts.mjs";
 
 /**
- * fetch
+ * 统一请求参数。
+ * Unified request payload.
+ *
+ * @typedef {object} FetchRequest
+ * @property {string} url 请求地址 / Request URL.
+ * @property {string} [method] 请求方法 / HTTP method.
+ * @property {Record<string, any>} [headers] 请求头 / Request headers.
+ * @property {string|ArrayBuffer|ArrayBufferView|object} [body] 请求体 / Request body.
+ * @property {ArrayBuffer} [bodyBytes] 二进制请求体 / Binary request body.
+ * @property {number|string} [timeout] 超时（秒或毫秒）/ Timeout (seconds or milliseconds).
+ * @property {string} [policy] 指定策略 / Preferred policy.
+ * @property {boolean} [redirection] 是否跟随重定向 / Whether to follow redirects.
+ * @property {boolean} ["auto-redirect"] 平台重定向字段 / Platform redirect flag.
+ * @property {Record<string, any>} [opts] 平台扩展字段 / Platform extension fields.
+ */
+
+/**
+ * 统一响应结构。
+ * Unified response payload.
+ *
+ * @typedef {object} FetchResponse
+ * @property {boolean} ok 请求是否成功 / Whether request is successful.
+ * @property {number} status 状态码 / HTTP status code.
+ * @property {number} [statusCode] 状态码别名 / Status code alias.
+ * @property {string} [statusText] 状态文本 / HTTP status text.
+ * @property {Record<string, any>} [headers] 响应头 / Response headers.
+ * @property {string|ArrayBuffer} [body] 响应体 / Response body.
+ * @property {ArrayBuffer} [bodyBytes] 二进制响应体 / Binary response body.
+ */
+
+/**
+ * 跨平台 `fetch` 适配层。
+ * Cross-platform `fetch` adapter.
+ *
+ * 功能:
+ * Features:
+ * - 统一 Quantumult X / Loon / Surge / Stash / Egern / Shadowrocket / Node.js 请求接口
+ * - Normalize request APIs across Quantumult X / Loon / Surge / Stash / Egern / Shadowrocket / Node.js
+ * - 统一返回体字段（`ok/status/statusText/body/bodyBytes`）
+ * - Normalize response fields (`ok/status/statusText/body/bodyBytes`)
  *
  * @link https://developer.mozilla.org/zh-CN/docs/Web/API/Fetch_API
- * @export
  * @async
- * @param {object|string} resource
- * @param {object} [options]
- * @returns {Promise<object>}
+ * @param {FetchRequest|string} resource 请求对象或 URL / Request object or URL string.
+ * @param {Partial<FetchRequest>} [options={}] 追加参数 / Extra options.
+ * @returns {Promise<FetchResponse>}
  */
 export async function fetch(resource, options = {}) {
 	// 初始化参数
