@@ -3,6 +3,7 @@ import { afterEach, describe, it } from "node:test";
 
 let importSeed = 0;
 const argumentModule = new URL("../lib/argument.mjs", import.meta.url);
+const packageEntryModule = new URL("../index.js", import.meta.url);
 const importWithArgument = async value => {
 	if (typeof value === "undefined") globalThis.$argument = {};
 	else globalThis.$argument = value;
@@ -50,5 +51,14 @@ describe("argument", () => {
 		const result = await importWithArgument("mode=on");
 		assert.deepStrictEqual(result, { mode: "on" });
 		assert.deepStrictEqual(globalThis.$argument, { mode: "on" });
+	});
+
+	it("应该从包入口导出 $argument 快照", async () => {
+		globalThis.$argument = "a.b=1";
+		importSeed += 1;
+		const mod = await import(`${packageEntryModule}?test=${importSeed}`);
+		assert.deepStrictEqual(mod.$argument, { a: { b: "1" } });
+		assert.deepStrictEqual(mod.argument, { a: { b: "1" } });
+		assert.deepStrictEqual(globalThis.$argument, { a: { b: "1" } });
 	});
 });

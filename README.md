@@ -57,6 +57,7 @@ npm i @nsnanocat/util@latest
 ```js
 import {
   $app,
+  $argument, // 已标准化的 $argument 快照（由包入口自动处理）
   done,
   fetch,
   notification,
@@ -73,7 +74,7 @@ import {
 
 ### 包主入口（`index.js`）已导出
 - `lib/app.mjs`
-- `lib/argument.mjs`（`$argument` 参数标准化模块，无导出）
+- `lib/argument.mjs`（`$argument` 参数标准化模块，导入时自动执行）
 - `lib/done.mjs`
 - `lib/notification.mjs`
 - `lib/time.mjs`
@@ -163,10 +164,10 @@ console.log(environment()); // 当前环境对象
 此文件无显式导出；`import` 后立即执行。这是为了统一各平台 `$argument` 的输入差异。
 
 #### 行为
-- 单独使用时可直接格式化全局 `$argument`：
-  - `await import("@nsnanocat/util/lib/argument.mjs")`
-- 通过包入口导入（`import ... from "@nsnanocat/util"`）时也会执行本模块：
-  - 读取到的 `$argument` 会按 URL Params 样式格式化为对象，并支持深路径。
+- 通过包入口导入（`import ... from "@nsnanocat/util"`）时会自动执行本模块。
+- JSCore 环境不支持 `await import`，请使用静态导入或直接走包入口导入。
+- 读取到的 `$argument` 会按 URL Params 样式格式化为对象，并支持深路径。
+- 你也可以通过 `import { $argument } from "@nsnanocat/util"` 读取当前已标准化的 `$argument` 快照。
 - 平台输入差异说明：
   - Surge / Stash / Egern：脚本参数通常以字符串形式传入（如 `a=1&b=2`）。
   - Loon：支持字符串和对象两种 `$argument` 形式。
@@ -182,9 +183,10 @@ console.log(environment()); // 当前环境对象
 
 #### 用法
 ```js
-globalThis.$argument = "mode=on&a.b=1";
-await import("@nsnanocat/util/lib/argument.mjs");
-console.log(globalThis.$argument); // { mode: "on", a: { b: "1" } }
+import { $argument } from "@nsnanocat/util";
+
+// $argument = "mode=on&a.b=1"; // 示例入参，实际由模块参数注入
+console.log($argument); // { mode: "on", a: { b: "1" } }
 ```
 
 ### `lib/done.mjs`
