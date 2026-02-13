@@ -22,16 +22,36 @@
 - npm（推荐）：[https://www.npmjs.com/package/@nsnanocat/util](https://www.npmjs.com/package/@nsnanocat/util)
 - GitHub Packages（同步发布）：[https://github.com/NSNanoCat/util/pkgs/npm/util](https://github.com/NSNanoCat/util/pkgs/npm/util)
 
+如果你不确定该选哪个，直接用 npm 源即可。
 如果你从 GitHub Packages 安装，需要先配置 GitHub 认证（PAT Token）。
 
-```bash
-npm i @nsnanocat/util
-```
+### 1) 使用 npm 源（推荐，最省事）
 
 ```bash
-# GitHub Packages 示例（需先配置认证）
-npm config set @nsnanocat:registry https://npm.pkg.github.com
+# 首次安装：拉取并安装这个包
 npm i @nsnanocat/util
+
+# 更新到最新版本：升级已安装的 util
+npm i @nsnanocat/util@latest
+# 你也可以使用 update（效果类似）
+# npm update @nsnanocat/util
+```
+
+### 2) 使用 GitHub Packages 源（同步源，需要 GitHub 鉴权）
+
+```bash
+# 把 @nsnanocat 作用域的包下载源切到 GitHub Packages
+npm config set @nsnanocat:registry https://npm.pkg.github.com
+
+# 配置 GitHub Token（用于下载 GitHub Packages）
+# 建议把 YOUR_GITHUB_PAT 换成你的真实 Token，再执行
+# echo "//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT" >> ~/.npmrc
+
+# 首次安装：从 GitHub Packages 安装 util
+npm i @nsnanocat/util
+
+# 更新到最新版本：从 GitHub Packages 拉取最新 util
+npm i @nsnanocat/util@latest
 ```
 
 ```js
