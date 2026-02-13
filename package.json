@@ -19,6 +19,7 @@
 		"tsc:build": "npx tsc",
 		"test": "node --test test/*.test.js",
 		"test:merge": "node --test test/Lodash.merge.test.js",
+		"test:argument": "node --test test/argument.test.js",
 		"deprecate": "npm deprecate -f '@nsnanocat/util@0.0.0-preview' \"this package has been deprecated\""
 	},
 	"repository": {

@@ -36,8 +36,8 @@ describe("argument", () => {
 
 	it("应该处理对象参数", async () => {
 		const result = await importWithArgument({ "nested.value": "ok" });
-		assert.deepStrictEqual(result, { "nested.value": "ok", nested: { value: "ok" } });
-		assert.deepStrictEqual(globalThis.$argument, { "nested.value": "ok", nested: { value: "ok" } });
+		assert.deepStrictEqual(result, { nested: { value: "ok" } });
+		assert.deepStrictEqual(globalThis.$argument, { nested: { value: "ok" } });
 	});
 
 	it("应该处理未定义参数", async () => {
