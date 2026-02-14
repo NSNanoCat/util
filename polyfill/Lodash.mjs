@@ -9,6 +9,8 @@
  * - This is a simplified subset, not a full Lodash implementation
  * - 各方法语义可参考 Lodash 官方文档
  * - Method semantics can be referenced from official Lodash docs
+ * - 导入时建议使用 `Lodash as _`，遵循 lodash 官方示例惯例
+ * - Use `Lodash as _` when importing, following official lodash example convention
  *
  * 参考:
  * Reference:
@@ -22,6 +24,8 @@ export class Lodash {
 	 *
 	 * @param {string} string 输入文本 / Input text.
 	 * @returns {string}
+	 * @see {@link https://lodash.com/docs/#escape lodash.escape}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.escape lodash.escape (中文)}
 	 */
 	static escape(string) {
 		const map = {
@@ -42,6 +46,8 @@ export class Lodash {
 	 * @param {string|string[]} [path=""] 路径 / Path.
 	 * @param {*} [defaultValue=undefined] 默认值 / Default value.
 	 * @returns {*}
+	 * @see {@link https://lodash.com/docs/#get lodash.get}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.get lodash.get (中文)}
 	 */
 	static get(object = {}, path = "", defaultValue = undefined) {
 		// translate array case to dot case, then split with .
@@ -80,6 +86,8 @@ export class Lodash {
 	 * @param {...object} sources - Source objects.
 	 * @returns {object} 返回合并后的目标对象
 	 * @returns {object} Merged target object.
+	 * @see {@link https://lodash.com/docs/#merge lodash.merge}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.merge lodash.merge (中文)}
 	 * @example
 	 * const target = { a: { b: 1 }, c: 2 };
 	 * const source = { a: { d: 3 }, e: 4 };
@@ -141,6 +149,8 @@ export class Lodash {
 	 * @param {*} value - Value to check.
 	 * @returns {boolean} 如果是普通对象返回 true
 	 * @returns {boolean} Returns true when value is a plain object.
+	 * @see {@link https://lodash.com/docs/#isPlainObject lodash.isPlainObject}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.isPlainObject lodash.isPlainObject (中文)}
 	 */
 	static #isPlainObject(value) {
 		if (value === null || typeof value !== "object") return false;
@@ -155,6 +165,8 @@ export class Lodash {
 	 * @param {object} [object={}] 目标对象 / Target object.
 	 * @param {string|string[]} [paths=[]] 要删除的路径 / Paths to remove.
 	 * @returns {object}
+	 * @see {@link https://lodash.com/docs/#omit lodash.omit}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.omit lodash.omit (中文)}
 	 */
 	static omit(object = {}, paths = []) {
 		if (!Array.isArray(paths)) paths = [paths.toString()];
@@ -169,6 +181,8 @@ export class Lodash {
 	 * @param {object} [object={}] 目标对象 / Target object.
 	 * @param {string|string[]} [paths=[]] 需要保留的键 / Keys to keep.
 	 * @returns {object}
+	 * @see {@link https://lodash.com/docs/#pick lodash.pick}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.pick lodash.pick (中文)}
 	 */
 	static pick(object = {}, paths = []) {
 		if (!Array.isArray(paths)) paths = [paths.toString()];
@@ -184,6 +198,8 @@ export class Lodash {
 	 * @param {string|string[]} path 路径 / Path.
 	 * @param {*} value 写入值 / Value.
 	 * @returns {object}
+	 * @see {@link https://lodash.com/docs/#set lodash.set}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.set lodash.set (中文)}
 	 */
 	static set(object, path, value) {
 		if (!Array.isArray(path)) path = Lodash.toPath(path);
@@ -197,6 +213,8 @@ export class Lodash {
 	 *
 	 * @param {string} value 路径字符串 / Path string.
 	 * @returns {string[]}
+	 * @see {@link https://lodash.com/docs/#toPath lodash.toPath}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.toPath lodash.toPath (中文)}
 	 */
 	static toPath(value) {
 		return value
@@ -211,6 +229,8 @@ export class Lodash {
 	 *
 	 * @param {string} string 输入文本 / Input text.
 	 * @returns {string}
+	 * @see {@link https://lodash.com/docs/#unescape lodash.unescape}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.unescape lodash.unescape (中文)}
 	 */
 	static unescape(string) {
 		const map = {
@@ -230,6 +250,8 @@ export class Lodash {
 	 * @param {object} [object={}] 目标对象 / Target object.
 	 * @param {string|string[]} [path=""] 路径 / Path.
 	 * @returns {boolean}
+	 * @see {@link https://lodash.com/docs/#unset lodash.unset}
+	 * @see {@link https://www.lodashjs.com/docs/lodash.unset lodash.unset (中文)}
 	 */
 	static unset(object = {}, path = "") {
 		if (!Array.isArray(path)) path = Lodash.toPath(path);

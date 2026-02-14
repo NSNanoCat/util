@@ -64,7 +64,7 @@ import {
   time,       // 时间格式化工具
   wait,       // 延时等待工具（Promise）
   Console,    // 统一日志工具（支持 logLevel）
-  Lodash,     // 内置的 Lodash 部分方法实现
+  Lodash as _, // Lodash 建议按官方示例惯例使用 `_` 作为工具对象别名
   Storage,    // 统一持久化存储接口（适配 $prefs / $persistentStore / 文件）
 } from "@nsnanocat/util";
 ```
@@ -499,6 +499,28 @@ console.log(Console.logLevel); // "WARN"
 - https://www.lodashjs.com
 - https://lodash.com
 
+导入约定（建议）：
+- 这是 lodash 官方示例中常见的惯例写法：使用 `_` 作为工具对象别名。
+
+```js
+import { Lodash as _ } from "@nsnanocat/util";
+
+const data = {};
+_.set(data, "a.b", 1);
+console.log(data); // { a: { b: 1 } }
+
+const value = _.get(data, "a.b", 0);
+console.log(value); // 1
+```
+
+示例对应的 lodash 官方文档页面：
+- `set(object, path, value)`
+  - 官方文档：https://lodash.com/docs/#set
+  - 中文文档：https://www.lodashjs.com/docs/lodash.set
+- `get(object, path, defaultValue)`
+  - 官方文档：https://lodash.com/docs/#get
+  - 中文文档：https://www.lodashjs.com/docs/lodash.get
+
 当前实现包含：
 - `escape(string)`
 - `unescape(string)`
@@ -509,6 +531,35 @@ console.log(Console.logLevel); // "WARN"
 - `pick(object, paths)`
 - `omit(object, paths)`
 - `merge(object, ...sources)`
+
+对应 lodash 官方文档页面：
+- `escape(string)`
+  - 官方文档：https://lodash.com/docs/#escape
+  - 中文文档：https://www.lodashjs.com/docs/lodash.escape
+- `unescape(string)`
+  - 官方文档：https://lodash.com/docs/#unescape
+  - 中文文档：https://www.lodashjs.com/docs/lodash.unescape
+- `toPath(value)`
+  - 官方文档：https://lodash.com/docs/#toPath
+  - 中文文档：https://www.lodashjs.com/docs/lodash.toPath
+- `get(object, path, defaultValue)`
+  - 官方文档：https://lodash.com/docs/#get
+  - 中文文档：https://www.lodashjs.com/docs/lodash.get
+- `set(object, path, value)`
+  - 官方文档：https://lodash.com/docs/#set
+  - 中文文档：https://www.lodashjs.com/docs/lodash.set
+- `unset(object, path)`
+  - 官方文档：https://lodash.com/docs/#unset
+  - 中文文档：https://www.lodashjs.com/docs/lodash.unset
+- `pick(object, paths)`
+  - 官方文档：https://lodash.com/docs/#pick
+  - 中文文档：https://www.lodashjs.com/docs/lodash.pick
+- `omit(object, paths)`
+  - 官方文档：https://lodash.com/docs/#omit
+  - 中文文档：https://www.lodashjs.com/docs/lodash.omit
+- `merge(object, ...sources)`
+  - 官方文档：https://lodash.com/docs/#merge
+  - 中文文档：https://www.lodashjs.com/docs/lodash.merge
 
 参数与返回值：
 
