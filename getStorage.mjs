@@ -17,6 +17,9 @@ import { Storage } from "./polyfill/Storage.mjs";
  * 读取并合并默认配置、持久化配置与 `$argument`。
  * Read and merge default config, persisted config and `$argument`.
  *
+ * 注意：`Configs` 与 `Caches` 始终按每个 profile（`names`）合并；`Settings` 的合并顺序由 `$argument.Storage` 控制。
+ * Note: `Configs` and `Caches` are always merged per-profile (`names`); the merge order for `Settings` is controlled by `$argument.Storage`.
+ *
  * 合并来源与顺序由 `$argument.Storage` 控制:
  * Merge source order is controlled by `$argument.Storage`:
  * - `undefined`(默认): `database[name]` -> `$argument` -> `PersistentStore[name]`
@@ -24,6 +27,7 @@ import { Storage } from "./polyfill/Storage.mjs";
  * - `PersistentStore` / `BoxJs`: `database[name]` -> `PersistentStore[name]`
  * - `database`: 仅 `database[name]`
  *
+ * @since 2.1.2
  * @link https://github.com/NanoCat-Me/utils/blob/main/getStorage.mjs
  * @author VirgilClyne
  * @param {string} key 持久化主键 / Persistent store key.
@@ -57,25 +61,38 @@ export function getStorage(key, names, database) {
 	}
 	/***************** Merge *****************/
 	names.forEach(name => {
-		switch ($argument.Storage) {
-			case "$argument":
-				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings, $argument);
-				break;
-			case "BoxJs":
-			case "PersistentStore":
-				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings);
-				break;
-			case "database":
-				_.merge(Root.Settings, database?.[name]?.Settings);
-				break;
-			default:
-			case undefined:
-				_.merge(Root.Settings, database?.[name]?.Settings, $argument, PersistentStore?.[name]?.Settings);
-				break;
-		}
 		_.merge(Root.Configs, database?.[name]?.Configs);
 		_.merge(Root.Caches, PersistentStore?.[name]?.Caches);
 	});
+	switch ($argument.Storage) {
+		case "$argument":
+			names.forEach(name => {
+				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings);
+			});
+			_.merge(Root.Settings, $argument);
+			break;
+		case "BoxJs":
+		case "PersistentStore":
+			names.forEach(name => {
+				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings);
+			});
+			break;
+		case "database":
+			names.forEach(name => {
+				_.merge(Root.Settings, database?.[name]?.Settings);
+			});
+			break;
+		default:
+		case undefined:
+			names.forEach(name => {
+				_.merge(Root.Settings, database?.[name]?.Settings);
+			});
+			_.merge(Root.Settings, $argument);
+			names.forEach(name => {
+				_.merge(Root.Settings, PersistentStore?.[name]?.Settings);
+			});
+			break;
+	}
 	if (Root.Settings.LogLevel) Console.logLevel = Root.Settings.LogLevel;
 	Console.debug("✅ Merge", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
 	/***************** traverseObject *****************/

@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
-## [2.1.2] - 2026-02-20
+## [2.1.3] - 2026-02-20
 
 ### Fixed / 修复
 - `fix(argument)`: Normalize `globalThis.$argument` and guard `null`; 标准化 `globalThis.$argument` 并处理 `null` 场景（`c475e76`）。
@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed / 变更
 - `refactor(getStorage)`: Rename `Store` to `Root` and align debug output; 重命名 `Store` 为 `Root` 并同步调试输出字段（`570a75c`）。
+- `refactor(getStorage)`: Centralize `Settings` merge controlled by `$argument.Storage`; ensure `Configs`/`Caches` are merged per-profile (`names`)（`17747ae`）。
 
 ### Docs / 文档
 - Sync README/JSDoc with recent behavior changes for `argument` / `getStorage` / `Storage`; 同步 `argument` / `getStorage` / `Storage` 的 README 与 JSDoc 说明（`2b13601`）。

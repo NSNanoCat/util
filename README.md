@@ -321,6 +321,8 @@ await runScript("$done({})", { timeout: 20 });
 3. `PersistentStore` / `BoxJs`：`database[name]` -> `PersistentStore[name]`
 4. `database`：仅 `database[name]`
 
+注意：`Configs` 与 `Caches` 始终按每个 `name` 合并（与 `$argument.Storage` 无关）。
+
 自动类型转换（`Root.Settings`）：
 - 字符串 `"true"/"false"` -> `boolean`
 - 纯数字字符串 -> `number`
