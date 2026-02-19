@@ -57,11 +57,11 @@ export function getStorage(key, names, database) {
 	}
 	/***************** Merge *****************/
 	names.forEach(name => {
-		_.merge(Store.Settings, database?.[name]?.Settings, BoxJs?.[name]?.Settings);
+		_.merge(Store.Settings, database?.[name]?.Settings, $argument, BoxJs?.[name]?.Settings);
 		_.merge(Store.Configs, database?.[name]?.Configs);
 		_.merge(Store.Caches, BoxJs?.[name]?.Caches);
 	});
-	_.merge(Store.Settings, $argument);
+	if ($argument.Storage === "$argument")  _.merge(Store.Settings, $argument);
 	if (Store.Settings.LogLevel) Console.logLevel = Store.Settings.LogLevel;
 	Console.debug("✅ Merge", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
 	/***************** traverseObject *****************/
