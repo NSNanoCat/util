@@ -36,8 +36,8 @@ export function getStorage(key, names, database) {
 	Console.debug("☑️ getStorage");
 	names = [names].flat(Number.POSITIVE_INFINITY);
 	/***************** Default *****************/
-	const Store = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
-	Console.debug("Default", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	const Root = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
+	Console.debug("Default", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
 	/***************** BoxJs *****************/
 	// 包装为局部变量，用完释放内存
 	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
@@ -53,19 +53,19 @@ export function getStorage(key, names, database) {
 			}
 		});
 		if (BoxJs.LogLevel) Console.logLevel = BoxJs.LogLevel;
-		Console.debug("✅ BoxJs", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+		Console.debug("✅ BoxJs", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
 	}
 	/***************** Merge *****************/
 	names.forEach(name => {
-		_.merge(Store.Settings, database?.[name]?.Settings, $argument, BoxJs?.[name]?.Settings);
-		_.merge(Store.Configs, database?.[name]?.Configs);
-		_.merge(Store.Caches, BoxJs?.[name]?.Caches);
+		_.merge(Root.Settings, database?.[name]?.Settings, $argument, BoxJs?.[name]?.Settings);
+		_.merge(Root.Configs, database?.[name]?.Configs);
+		_.merge(Root.Caches, BoxJs?.[name]?.Caches);
 	});
-	if ($argument.Storage === "$argument")  _.merge(Store.Settings, $argument);
-	if (Store.Settings.LogLevel) Console.logLevel = Store.Settings.LogLevel;
-	Console.debug("✅ Merge", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	if ($argument.Storage === "$argument")  _.merge(Root.Settings, $argument);
+	if (Root.Settings.LogLevel) Console.logLevel = Root.Settings.LogLevel;
+	Console.debug("✅ Merge", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
 	/***************** traverseObject *****************/
-	traverseObject(Store.Settings, (key, value) => {
+	traverseObject(Root.Settings, (key, value) => {
 		Console.debug("☑️ traverseObject", `${key}: ${typeof value}`, `${key}: ${JSON.stringify(value)}`);
 		if (value === "true" || value === "false")
 			value = JSON.parse(value); // 字符串转Boolean
@@ -76,9 +76,9 @@ export function getStorage(key, names, database) {
 		}
 		return value;
 	});
-	Console.debug("✅ traverseObject", `Store.Settings类型: ${typeof Store.Settings}`, `Store.Settings: ${JSON.stringify(Store.Settings)}`);
+	Console.debug("✅ traverseObject", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
 	Console.debug("✅ getStorage");
-	return Store;
+	return Root;
 }
 
 /**
