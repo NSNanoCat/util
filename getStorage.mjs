@@ -17,12 +17,12 @@ import { Storage } from "./polyfill/Storage.mjs";
  * 读取并合并默认配置、持久化配置与 `$argument`。
  * Read and merge default config, persisted config and `$argument`.
  *
- * 合并顺序:
- * Merge order:
- * 1) `database.Default`
- * 2) BoxJS persisted value
- * 3) `database[name]` + `BoxJs[name]`
- * 4) `$argument`
+ * 合并来源与顺序由 `$argument.Storage` 控制:
+ * Merge source order is controlled by `$argument.Storage`:
+ * - `undefined`(默认): `database[name]` -> `$argument` -> `PersistentStore[name]`
+ * - `$argument`: `database[name]` -> `PersistentStore[name]` -> `$argument`
+ * - `PersistentStore` / `BoxJs`: `database[name]` -> `PersistentStore[name]`
+ * - `database`: 仅 `database[name]`
  *
  * @link https://github.com/NanoCat-Me/utils/blob/main/getStorage.mjs
  * @author VirgilClyne
@@ -38,42 +38,43 @@ export function getStorage(key, names, database) {
 	/***************** Default *****************/
 	const Root = { Settings: database?.Default?.Settings || {}, Configs: database?.Default?.Configs || {}, Caches: {} };
 	Console.debug("Default", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
-	/***************** BoxJs *****************/
+	/***************** PersistentStore *****************/
 	// 包装为局部变量，用完释放内存
-	// BoxJs的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
-	const BoxJs = Storage.getItem(key);
-	if (BoxJs) {
-		Console.debug("☑️ BoxJs", `BoxJs类型: ${typeof BoxJs}`, `BoxJs内容: ${JSON.stringify(BoxJs || {})}`);
+	// BoxJs 的清空操作返回假值空字符串, 逻辑或操作符会在左侧操作数为假值时返回右侧操作数。
+	const PersistentStore = Storage.getItem(key, {});
+	if (PersistentStore) {
+		Console.debug("☑️ PersistentStore", `PersistentStore类型: ${typeof PersistentStore}`, `PersistentStore内容: ${JSON.stringify(PersistentStore || {})}`);
 		names.forEach(name => {
-			if (typeof BoxJs?.[name]?.Settings === "string") {
-				BoxJs[name].Settings = JSON.parse(BoxJs[name].Settings || "{}");
+			if (typeof PersistentStore?.[name]?.Settings === "string") {
+				PersistentStore[name].Settings = JSON.parse(PersistentStore[name].Settings || "{}");
 			}
-			if (typeof BoxJs?.[name]?.Caches === "string") {
-				BoxJs[name].Caches = JSON.parse(BoxJs[name].Caches || "{}");
+			if (typeof PersistentStore?.[name]?.Caches === "string") {
+				PersistentStore[name].Caches = JSON.parse(PersistentStore[name].Caches || "{}");
 			}
 		});
-		if (BoxJs.LogLevel) Console.logLevel = BoxJs.LogLevel;
-		Console.debug("✅ BoxJs", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
+		if (PersistentStore.LogLevel) Console.logLevel = PersistentStore.LogLevel;
+		Console.debug("✅ PersistentStore", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
 	}
 	/***************** Merge *****************/
 	names.forEach(name => {
 		switch ($argument.Storage) {
 			case "$argument":
-				_.merge(Root.Settings, database?.[name]?.Settings, BoxJs?.[name]?.Settings, $argument);
+				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings, $argument);
 				break;
 			case "BoxJs":
-				_.merge(Root.Settings, database?.[name]?.Settings, BoxJs?.[name]?.Settings);
+			case "PersistentStore":
+				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings);
 				break;
 			case "database":
 				_.merge(Root.Settings, database?.[name]?.Settings);
 				break;
 			default:
 			case undefined:
-				_.merge(Root.Settings, database?.[name]?.Settings, $argument, BoxJs?.[name]?.Settings);
+				_.merge(Root.Settings, database?.[name]?.Settings, $argument, PersistentStore?.[name]?.Settings);
 				break;
 		}
 		_.merge(Root.Configs, database?.[name]?.Configs);
-		_.merge(Root.Caches, BoxJs?.[name]?.Caches);
+		_.merge(Root.Caches, PersistentStore?.[name]?.Caches);
 	});
 	if (Root.Settings.LogLevel) Console.logLevel = Root.Settings.LogLevel;
 	Console.debug("✅ Merge", `Root.Settings类型: ${typeof Root.Settings}`, `Root.Settings: ${JSON.stringify(Root.Settings)}`);
