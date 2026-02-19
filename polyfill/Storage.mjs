@@ -172,6 +172,12 @@ export class Storage {
 	 * 删除存储值。
 	 * Remove value from persistent storage.
 	 *
+	 * 平台说明:
+	 * Platform notes:
+	 * - Quantumult X: `$prefs.removeValueForKey`
+	 * - Surge: 通过 `$persistentStore.write(null, keyName)` 删除
+	 * - 其余平台当前返回 `false`
+	 *
 	 * @param {string} keyName 键名或路径键 / Key or path key.
 	 * @returns {boolean}
 	 */
@@ -190,6 +196,8 @@ export class Storage {
 			default:
 				switch ($app) {
 					case "Surge":
+						result = $persistentStore.write(null, keyName);
+						break;
 					case "Loon":
 					case "Stash":
 					case "Egern":
