@@ -177,7 +177,7 @@ console.log(environment()); // 当前环境对象
   - 使用点路径展开对象（`a.b=1 -> { a: { b: "1" } }`）。
 - 当全局 `$argument` 为 `object` 时：
   - 将 key 当路径写回新对象（`{"a.b":"1"}` -> `{a:{b:"1"}}`）。
-- 当 `$argument` 为 `undefined`：不处理。
+- 当 `$argument` 为 `null` 或 `undefined`：会归一化为 `{}`。
 - 若 `$argument.LogLevel` 存在：同步到 `Console.logLevel`。
 
 #### 用法
@@ -315,13 +315,13 @@ await runScript("$done({})", { timeout: 20 });
   - `database: object`（默认数据库）
 - 返回：`{ Settings, Configs, Caches }`
 
-合并顺序：
-1. `database.Default` -> 初始 `Store`
-2. 持久化中的 BoxJS 值（`Storage.getItem(key)`）
-3. 按 `names` 合并 `database[name]` + `BoxJs[name]`
-4. 最后合并 `$argument`
+合并顺序由 `$argument.Storage` 控制（持久化读取统一使用 `PersistentStore = Storage.getItem(key, {})`）：
+1. 默认（`undefined`）：`database[name]` -> `$argument` -> `PersistentStore[name]`
+2. `$argument`：`database[name]` -> `PersistentStore[name]` -> `$argument`
+3. `PersistentStore` / `BoxJs`：`database[name]` -> `PersistentStore[name]`
+4. `database`：仅 `database[name]`
 
-自动类型转换（`Store.Settings`）：
+自动类型转换（`Root.Settings`）：
 - 字符串 `"true"/"false"` -> `boolean`
 - 纯数字字符串 -> `number`
 - 含逗号字符串 -> `array`，并尝试逐项转数字
@@ -408,7 +408,8 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 
 #### `Storage.removeItem(keyName)`
 - Quantumult X：可用（`$prefs.removeValueForKey`）。
-- Surge / Loon / Stash / Egern / Shadowrocket / Node.js：返回 `false`。
+- Surge：通过 `$persistentStore.write(null, keyName)` 删除。
+- Loon / Stash / Egern / Shadowrocket / Node.js：返回 `false`。
 
 #### `Storage.clear()`
 - Quantumult X：可用（`$prefs.removeAllValues`）。
@@ -420,7 +421,7 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 
 与 Web Storage 的行为差异：
 - 支持 `@key.path` 深路径读写（Web Storage 原生不支持）。
-- `removeItem/clear` 仅部分平台可用（目前主要是 Quantumult X）。
+- `removeItem/clear` 仅部分平台可用（目前为 Quantumult X，以及 Surge 的 `removeItem`）。
 - `getItem` 会尝试 `JSON.parse`，`setItem` 写入对象会 `JSON.stringify`。
 
 平台后端映射：
@@ -600,7 +601,7 @@ console.log(value); // 1
 | 通知 | `$notify` | `$notification.post` | `$notification.post` | `$notification.post` | `$notification.post` | `$notification.post` | 无 |
 | 持久化 | `$prefs` | `$persistentStore` | `$persistentStore` | `$persistentStore` | `$persistentStore` | `$persistentStore` | `box.dat` |
 | 结束脚本 | `$done` | `$done` | `$done` | `$done` | `$done` | `$done` | `process.exit(1)` |
-| `removeItem/clear` | 可用 | 不可用 | 不可用 | 不可用 | 不可用 | 不可用 | 不可用 |
+| `removeItem/clear` | 可用 | 不可用 | `removeItem` 可用 / `clear` 不可用 | 不可用 | 不可用 | 不可用 | 不可用 |
 | `policy` 注入（`fetch/done`） | `opts.policy` | `node` | `X-Surge-Policy`(done) | `X-Stash-Selected-Proxy` | 无专门映射 | `X-Surge-Proxy`(fetch) | 无 |
 
 ## 已知限制与注意事项
