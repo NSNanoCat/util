@@ -316,9 +316,9 @@ await runScript("$done({})", { timeout: 20 });
 - 返回：`{ Settings, Configs, Caches }`
 
 合并顺序由 `$argument.Storage` 控制（持久化读取统一使用 `PersistentStore = Storage.getItem(key, {})`）：
-1. 默认（`undefined`）：`database[name]` -> `$argument` -> `PersistentStore[name]`
+1. `undefined`：`database[name]` -> `PersistentStore[name]`（不再自动合并 `$argument`）
 2. `$argument`：`database[name]` -> `PersistentStore[name]` -> `$argument`
-3. `PersistentStore` / `BoxJs`：`database[name]` -> `PersistentStore[name]`
+3. 默认`PersistentStore` / `BoxJs`：`database[name]` -> `PersistentStore[name]`
 4. `database`：仅 `database[name]`
 
 注意：`Configs` 与 `Caches` 始终按每个 `name` 合并（与 `$argument.Storage` 无关）。

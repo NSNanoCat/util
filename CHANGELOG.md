@@ -26,4 +26,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Docs / 文档
 - Sync README/JSDoc with recent behavior changes for `argument` / `getStorage` / `Storage`; 同步 `argument` / `getStorage` / `Storage` 的 README 与 JSDoc 说明（`2b13601`）。
 
+[2.1.3]: https://github.com/NSNanoCat/util/compare/main...dev
+
 [2.1.2]: https://github.com/NSNanoCat/util/compare/main...dev

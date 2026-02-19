@@ -22,12 +22,12 @@ import { Storage } from "./polyfill/Storage.mjs";
  *
  * 合并来源与顺序由 `$argument.Storage` 控制:
  * Merge source order is controlled by `$argument.Storage`:
- * - `undefined`(默认): `database[name]` -> `$argument` -> `PersistentStore[name]`
+ * - `undefined`: `database[name]` -> `$argument` -> `PersistentStore[name]`
  * - `$argument`: `database[name]` -> `PersistentStore[name]` -> `$argument`
- * - `PersistentStore` / `BoxJs`: `database[name]` -> `PersistentStore[name]`
+ * - `PersistentStore` / `BoxJs`(默认): `database[name]` -> `PersistentStore[name]`
  * - `database`: 仅 `database[name]`
  *
- * @since 2.1.2
+ * @since 2.1.3
  * @link https://github.com/NanoCat-Me/utils/blob/main/getStorage.mjs
  * @author VirgilClyne
  * @param {string} key 持久化主键 / Persistent store key.
@@ -71,6 +71,7 @@ export function getStorage(key, names, database) {
 			});
 			_.merge(Root.Settings, $argument);
 			break;
+		default:
 		case "BoxJs":
 		case "PersistentStore":
 			names.forEach(name => {
@@ -82,7 +83,6 @@ export function getStorage(key, names, database) {
 				_.merge(Root.Settings, database?.[name]?.Settings);
 			});
 			break;
-		default:
 		case undefined:
 			names.forEach(name => {
 				_.merge(Root.Settings, database?.[name]?.Settings);
