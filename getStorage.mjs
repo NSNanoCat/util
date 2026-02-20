@@ -17,15 +17,17 @@ import { Storage } from "./polyfill/Storage.mjs";
  * 读取并合并默认配置、持久化配置与 `$argument`。
  * Read and merge default config, persisted config and `$argument`.
  *
- * 注意：`Configs` 与 `Caches` 始终按每个 profile（`names`）合并；`Settings` 的合并顺序由 `$argument.Storage` 控制。
- * Note: `Configs` and `Caches` are always merged per-profile (`names`); the merge order for `Settings` is controlled by `$argument.Storage`.
+ * 注意：`Configs` 与 `Caches` 始终按每个 profile（`names`）合并；`Settings` 的合并顺序由 `$argument.Storage` 控制（支持别名）。
+ * Note: `Configs` and `Caches` are always merged per-profile (`names`); the merge order for `Settings` is controlled by `$argument.Storage` (aliases supported).
  *
- * 合并来源与顺序由 `$argument.Storage` 控制:
- * Merge source order is controlled by `$argument.Storage`:
+ * 合并来源与顺序由 `$argument.Storage` 控制（支持以下值 / 别名）：
+ * Merge source order is controlled by `$argument.Storage` (accepted values / aliases):
  * - `undefined`: `database[name]` -> `$argument` -> `PersistentStore[name]`
- * - `$argument`: `database[name]` -> `PersistentStore[name]` -> `$argument`
- * - `PersistentStore` / `BoxJs`(默认): `database[name]` -> `PersistentStore[name]`
+ * - `Argument` / `$argument`: `database[name]` -> `PersistentStore[name]` -> `$argument`
+ * - `PersistentStore` / `BoxJs` / `boxjs` / `$persistentStore`（默认）：`database[name]` -> `PersistentStore[name]`
  * - `database`: 仅 `database[name]`
+ *
+ * 注意：字符串比较为精确匹配（区分大小写）。
  *
  * @since 2.1.3
  * @link https://github.com/NanoCat-Me/utils/blob/main/getStorage.mjs
@@ -65,6 +67,7 @@ export function getStorage(key, names, database) {
 		_.merge(Root.Caches, PersistentStore?.[name]?.Caches);
 	});
 	switch ($argument.Storage) {
+		case "Argument":
 		case "$argument":
 			names.forEach(name => {
 				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings);
@@ -73,7 +76,9 @@ export function getStorage(key, names, database) {
 			break;
 		default:
 		case "BoxJs":
+		case "boxjs":
 		case "PersistentStore":
+		case "$persistentStore":
 			names.forEach(name => {
 				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings);
 			});

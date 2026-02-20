@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `fix(getStorage)`: Add merge source control by `$argument.Storage`; 支持通过 `$argument.Storage` 控制合并来源（`8a59892`）。
 - `fix(getStorage)`: Replace `BoxJs` merge source naming/usage with `PersistentStore`; 将合并来源命名/实现统一为 `PersistentStore`（`5fa69e4`）。
 - `fix(Storage)`: Add Surge `removeItem` support via `$persistentStore.write(null, keyName)`; 为 Surge 增加 `removeItem` 删除支持（`23ebecb`）。
+- `fix(getStorage)`: Accept lowercase `boxjs` as alias for `BoxJs`; 支持小写别名 `boxjs`。
 
 ### Changed / 变更
 - `refactor(getStorage)`: Rename `Store` to `Root` and align debug output; 重命名 `Store` 为 `Root` 并同步调试输出字段（`570a75c`）。
@@ -25,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Docs / 文档
 - Sync README/JSDoc with recent behavior changes for `argument` / `getStorage` / `Storage`; 同步 `argument` / `getStorage` / `Storage` 的 README 与 JSDoc 说明（`2b13601`）。
+- `docs(getStorage)`: Document aliases for `$argument.Storage` (`Argument` / `$argument`, `PersistentStore` / `BoxJs` / `$persistentStore`) and correct merge-order in README/JSDoc; 为 `$argument.Storage` 增加别名说明并修正 README 中的合并顺序说明。
 
 [2.1.3]: https://github.com/NSNanoCat/util/compare/main...dev
 
