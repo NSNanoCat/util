@@ -36,8 +36,11 @@ import { Storage } from "./polyfill/Storage.mjs";
  * @param {string|string[]|Array<string|string[]>} names 目标配置名 / Target profile names.
  * @param {Record<string, any>} database 默认数据库 / Default database object.
  * @returns {StorageProfile}
+ *
+ * @module getStorage
+ * @default
  */
-export function getStorage(key, names, database) {
+export default function getStorage(key, names, database) {
 	if (database?.Default?.Settings?.LogLevel) Console.logLevel = database.Default.Settings.LogLevel;
 	Console.debug("☑️ getStorage");
 	names = [names].flat(Number.POSITIVE_INFINITY);

@@ -331,7 +331,7 @@ await runScript("$done({})", { timeout: 20 });
 
 示例：
 ```js
-import { getStorage } from "@nsnanocat/util/getStorage.mjs";
+import getStorage from "@nsnanocat/util/getStorage.mjs";
 
 const store = getStorage("@my_box", ["YouTube", "Global"], database);
 ```
