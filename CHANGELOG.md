@@ -10,6 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.1.5] - 2026-02-21
+
+### Changed / 变更
+- `chore(types)`: add local declarations for `@nsnanocat/util`; 新增本地类型声明并发布类型入口（`3071c12`）。
+
+### Docs / 文档
+- `docs`: update changelog order and reflect export change; 更新 changelog 顺序并反映导出变更（`5a5994a`）。
+
 ## [2.1.4] - 2026-02-20
 
 ### Fixed / 修复
@@ -58,6 +66,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 
 
+[2.1.5]: https://github.com/NSNanoCat/util/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/NSNanoCat/util/compare/v2.1.3...v2.1.4
 [2.1.3]: https://github.com/NSNanoCat/util/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/NSNanoCat/util/compare/v2.1.1...v2.1.2

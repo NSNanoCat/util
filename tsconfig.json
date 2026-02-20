@@ -3,6 +3,7 @@
     "include": [
         "polyfill/URL.mts",
         "polyfill/URLSearchParams.mts",
+        "types/**/*.d.ts",
     ],
     "compilerOptions": {
         // Tells TypeScript to read JS files, as
