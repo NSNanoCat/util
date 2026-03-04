@@ -215,11 +215,11 @@ export async function fetch(resource, options = {}) {
 				}),
 			]);
 		case "Node.js": {
-			const fetch = (() => {
+			const fetch = globalThis.fetch ?? (() => {
 				try {
 					return require("fetch-cookie").default(require("node-fetch"));
 				} catch {
-					return globalThis.fetch;
+					return undefined;
 				}
 			})();
 			if (!fetch) break;
