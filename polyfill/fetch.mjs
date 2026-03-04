@@ -222,6 +222,7 @@ export async function fetch(resource, options = {}) {
 					return globalThis.fetch;
 				}
 			})();
+			if (!fetch) break;
 			// 转换请求参数
 			resource.timeout = resource.timeout * 1000;
 			resource.redirect = resource.redirection ? "follow" : "manual";
