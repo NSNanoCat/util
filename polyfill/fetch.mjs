@@ -215,8 +215,13 @@ export async function fetch(resource, options = {}) {
 				}),
 			]);
 		case "Node.js": {
-			if (!globalThis.fetch) break;
-			const fetch = globalThis.fetch;
+			const fetch = (() => {
+				try {
+					return require("fetch-cookie").default(require("node-fetch"));
+				} catch {
+					return globalThis.fetch;
+				}
+			})();
 			// 转换请求参数
 			resource.timeout = resource.timeout * 1000;
 			resource.redirect = resource.redirection ? "follow" : "manual";
