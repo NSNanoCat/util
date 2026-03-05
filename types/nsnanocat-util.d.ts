@@ -1,5 +1,12 @@
 declare module "@nsnanocat/util" {
-	export type AppName = "Quantumult X" | "Loon" | "Shadowrocket" | "Node.js" | "Egern" | "Surge" | "Stash";
+	export type AppName =
+		| "Quantumult X"
+		| "Loon"
+		| "Shadowrocket"
+		| "Egern"
+		| "Surge"
+		| "Stash"
+		| "Node.js";
 
 	export const $app: AppName | undefined;
 	export const $argument: Record<string, unknown>;

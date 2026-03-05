@@ -116,7 +116,7 @@ import {
 ### `lib/app.mjs` 与 `lib/environment.mjs`（平台识别与环境）
 
 #### `$app`
-- 类型：`"Quantumult X" | "Loon" | "Shadowrocket" | "Node.js" | "Egern" | "Surge" | "Stash" | undefined`
+- 类型：`"Quantumult X" | "Loon" | "Shadowrocket" | "Egern" | "Surge" | "Stash" | "Node.js" | undefined`
 - 角色：核心模块。库内所有存在平台行为差异的模块都会先读取 `$app` 再分流（如 `done`、`notification`、`fetch`、`Storage`、`Console`、`environment`）。
 - 读取方式：
 
@@ -130,10 +130,11 @@ console.log(appName);
 1. 存在 `$task` -> `Quantumult X`
 2. 存在 `$loon` -> `Loon`
 3. 存在 `$rocket` -> `Shadowrocket`
-4. 存在 `module` -> `Node.js`
-5. 存在 `Egern` -> `Egern`
-6. 存在 `$environment` 且有 `surge-version` -> `Surge`
-7. 存在 `$environment` 且有 `stash-version` -> `Stash`
+4. 存在 `Egern` -> `Egern`
+5. 存在 `$environment` 且有 `surge-version` -> `Surge`
+6. 存在 `$environment` 且有 `stash-version` -> `Stash`
+7. 存在 `process.versions.node` -> `Node.js`
+8. 默认回落 -> `undefined`
 
 #### `$environment` / `environment()`
 - 路径：`lib/environment.mjs`（未从包主入口导出）

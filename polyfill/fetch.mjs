@@ -215,13 +215,15 @@ export async function fetch(resource, options = {}) {
 				}),
 			]);
 		case "Node.js": {
-			const fetch = globalThis.fetch ?? (() => {
-				try {
-					return require("fetch-cookie").default(require("node-fetch"));
-				} catch {
-					return undefined;
-				}
-			})();
+			const fetch =
+				globalThis.fetch ??
+				(() => {
+					try {
+						return require("fetch-cookie").default(require("node-fetch"));
+					} catch {
+						return undefined;
+					}
+				})();
 			if (!fetch) break;
 			// 转换请求参数
 			resource.timeout = resource.timeout * 1000;
