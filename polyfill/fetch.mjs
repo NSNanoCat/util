@@ -219,14 +219,31 @@ export async function fetch(resource, options = {}) {
 		case "Node.js": {
 			// Node.js 环境使用 `node-fetch`，并通过 `fetch-cookie` 添加 Cookie 支持
 			if (!globalThis.fetch) globalThis.fetch = require("node-fetch");
-			if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie")(globalThis.fetch);
+			switch (resource["auto-cookie"]) {
+				case undefined:
+				case "true":
+				case true:
+				case "1":
+				case 1:
+				default:
+					if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie")(globalThis.fetch);
+					break;
+				case "false":
+				case false:
+				case "0":
+				case 0:
+				case "-1":
+				case -1:
+					break;
+			}
 			// 转换请求参数
 			resource.timeout = resource.timeout * 1000;
 			resource.redirect = resource.redirection ? "follow" : "manual";
 			const { url, ...options } = resource;
 			// 发送请求
 			return Promise.race([
-				globalThis.fetch(url, options)
+				globalThis
+					.fetch(url, options)
 					.then(async response => {
 						const bodyBytes = await response.arrayBuffer();
 						let headers;
