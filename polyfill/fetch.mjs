@@ -224,7 +224,7 @@ export async function fetch(resource, options = {}) {
 			const { url, ...options } = resource;
 			// 发送请求
 			return Promise.race([
-				await fetch(url, options)
+				globalThis.fetch(url, options)
 					.then(async response => {
 						const bodyBytes = await response.arrayBuffer();
 						let headers;
