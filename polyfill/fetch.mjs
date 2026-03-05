@@ -215,16 +215,9 @@ export async function fetch(resource, options = {}) {
 				}),
 			]);
 		case "Node.js": {
-			const fetch =
-				globalThis.fetch ??
-				(() => {
-					try {
-						return require("fetch-cookie").default(require("node-fetch"));
-					} catch {
-						return undefined;
-					}
-				})();
-			if (!fetch) break;
+			// Node.js 环境使用 `node-fetch`，并通过 `fetch-cookie` 添加 Cookie 支持
+			if (!globalThis.fetch) globalThis.fetch = require("node-fetch");
+			if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie")(globalThis.fetch);
 			// 转换请求参数
 			resource.timeout = resource.timeout * 1000;
 			resource.redirect = resource.redirection ? "follow" : "manual";
