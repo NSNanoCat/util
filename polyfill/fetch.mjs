@@ -157,8 +157,8 @@ export async function fetch(resource, options = {}) {
 					break;
 			}
 			// 发送请求
-			return await new Promise((resolve, reject) => {
-				$httpClient[method](resource, (error, response, body) => {
+			return new Promise((resolve, reject) => {
+				globalThis.$httpClient[method](resource, (error, response, body) => {
 					if (error) reject(error);
 					else {
 						response.ok = /^2\d\d$/.test(response.status);
@@ -186,7 +186,7 @@ export async function fetch(resource, options = {}) {
 			} else if (resource.body) resource.bodyBytes = undefined;
 			// 发送请求
 			return Promise.race([
-				await $task.fetch(resource).then(
+				globalThis.$task.fetch(resource).then(
 					response => {
 						response.ok = /^2\d\d$/.test(response.statusCode);
 						response.status = response.statusCode;
