@@ -226,7 +226,7 @@ export async function fetch(resource, options = {}) {
 				case "1":
 				case 1:
 				default:
-					if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie")(globalThis.fetch);
+					if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie").default(globalThis.fetch);
 					break;
 				case "false":
 				case false:
