@@ -61,6 +61,7 @@ declare module "@nsnanocat/util" {
 		policy?: string;
 		redirection?: boolean;
 		"auto-redirect"?: boolean;
+		"auto-cookie"?: boolean | number | string;
 		opts?: Record<string, unknown>;
 		[key: string]: unknown;
 	}

@@ -1,86 +1,93 @@
-# Changelog
-
-变更日志
-
-All notable changes to this project will be documented in this file.
+# 变更日志
 
 项目中的所有重要变更都会记录在此文件中。
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
+
+## [2.2.0] - 2026-03-06
+
+### 修复
+- `fix(fetch)`: 统一 `fetch` 默认超时为 5 秒，兼容秒/毫秒输入，并为 Quantumult X / Loon / Node.js 正确转换超时单位（`5103305`, `93508a0`, `3433b58`）。
+- `fix(fetch)`: 通过 `globalThis` 访问 `$httpClient` / `$task` / `fetch`，修复 `fetch-cookie` 导入并完善 Node.js 回退逻辑，提升跨运行时兼容性（`1c4fa1c`, `f305091`, `3283f2d`, `c56dc65`）。
+- `fix(fetch)`: Node.js 分支默认启用 Cookie 支持，并允许通过 `auto-cookie` 显式关闭（`03f9a19`, `779a1c1`）。
+
+### 变更
+- `refactor(app)`: 调整 `$app` 识别顺序，优先脚本平台标记并改用 `process.versions.node` 判断 Node.js，避免在 Workers / Vercel 风格运行时误判（`a8e246b`, `b974c7a`）。
+- `fix(done)`: 未识别平台不再默认 `process.exit(1)`，仅 Node.js 分支显式退出进程（`b974c7a`）。
+
+### 新增
+- `test(app)`: 新增 Node.js 平台识别回归测试，覆盖 Cloudflare 风格与类 Web API 全局变量场景（`b974c7a`）。
+
+### 文档
+- 同步 README、声明注释与变更日志，反映最新的 `$app` 与 `fetch` 行为。
 
 ## [2.1.6] - 2026-02-24
 
-### Fixed / 修复
-- `fix(Storage)`: improve `removeItem` / `clear` behavior in Node.js environment; 完善 Node.js 环境下 `removeItem` / `clear` 方法（`47de721`）。
+### 修复
+- `fix(Storage)`: 完善 Node.js 环境下 `removeItem` / `clear` 方法（`47de721`）。
 
-### Added / 新增
-- `feat(getStorage)`: export helper functions with type definitions and docs updates; 导出 `getStorage` 辅助函数并同步类型定义与文档（`ccd91f3`）。
+### 新增
+- `feat(getStorage)`: 导出 `getStorage` 辅助函数并同步类型定义与文档（`ccd91f3`）。
 
-### Changed / 变更
-- `refactor(getStorage)`: rename `string2array` to `value2array` and switch parsing logic to `switch`; 重命名 `string2array` 为 `value2array`，并将解析逻辑调整为 `switch` 语法（`4628920`）。
+### 变更
+- `refactor(getStorage)`: 重命名 `string2array` 为 `value2array`，并将解析逻辑调整为 `switch` 语法（`4628920`）。
 
 ## [2.1.5] - 2026-02-21
 
-### Changed / 变更
-- `chore(types)`: add local declarations for `@nsnanocat/util`; 新增本地类型声明并发布类型入口（`3071c12`）。
+### 变更
+- `chore(types)`: 新增本地类型声明并发布类型入口（`3071c12`）。
 
-### Docs / 文档
-- `docs`: update changelog order and reflect export change; 更新 changelog 顺序并反映导出变更（`5a5994a`）。
+### 文档
+- `docs`: 更新 changelog 顺序并反映导出变更（`5a5994a`）。
 
 ## [2.1.4] - 2026-02-20
 
-### Fixed / 修复
-- `fix(getStorage)`: Accept lowercase `boxjs` as alias for `BoxJs`; 支持小写别名 `boxjs`。（`45f5cd8`）
-- `fix(getStorage)`: Treat undefined `$argument.Storage` the same as `PersistentStore`; 将未定义的 `.Storage` 视为 `PersistentStore` 并更新文档。（`99869a0`）
+### 修复
+- `fix(getStorage)`: 支持小写别名 `boxjs`（`45f5cd8`）。
+- `fix(getStorage)`: 将未定义的 `$argument.Storage` 视为 `PersistentStore` 并同步文档（`99869a0`）。
 
-### Docs / 文档
-- `docs(getStorage)`: Update README/JSDoc to mention undefined `.Storage` defaulting and adjust import example; 在 README/JSDoc 中说明当 `$argument.Storage` 未定义时视为 `PersistentStore`，并修正导入示例。
+### 文档
+- `docs(getStorage)`: 在 README/JSDoc 中说明 `$argument.Storage` 未定义时视为 `PersistentStore`，并修正导入示例。
 
 ## [2.1.3] - 2026-02-20
 
-### Docs / 文档
-- `docs(getStorage)`: clarify Settings/Configs/Caches merge; update JSDoc/README/CHANGELOG (commit 6bccb00)。
+### 文档
+- `docs(getStorage)`: 说明 `Settings` / `Configs` / `Caches` 的合并逻辑，并同步 README、JSDoc 与 CHANGELOG（`6bccb00`）。
 
 ## [2.1.2] - 2026-02-20
 
-### Fixed / 修复
-- `fix(argument)`: Normalize `globalThis.$argument` and guard `null`; 标准化 `globalThis.$argument` 并处理 `null` 场景（`c475e76`）。
-- `fix(getStorage)`: Include `$argument` in merge flow with conditional handling; 修复合并流程以包含 `$argument` 并增加条件控制（`3a1c8bb`）。
-- `fix(getStorage)`: Add merge source control by `$argument.Storage`; 支持通过 `$argument.Storage` 控制合并来源（`8a59892`）。
-- `fix(getStorage)`: Replace `BoxJs` merge source naming/usage with `PersistentStore`; 将合并来源命名/实现统一为 `PersistentStore`（`5fa69e4`）。
-- `fix(Storage)`: Add Surge `removeItem` support via `$persistentStore.write(null, keyName)`; 为 Surge 增加 `removeItem` 删除支持（`23ebecb`）。
+### 修复
+- `fix(argument)`: 标准化 `globalThis.$argument` 并处理 `null` 场景（`c475e76`）。
+- `fix(getStorage)`: 修复合并流程以包含 `$argument` 并增加条件控制（`3a1c8bb`）。
+- `fix(getStorage)`: 支持通过 `$argument.Storage` 控制合并来源（`8a59892`）。
+- `fix(getStorage)`: 将合并来源命名与实现统一为 `PersistentStore`（`5fa69e4`）。
+- `fix(Storage)`: 为 Surge 增加 `removeItem` 删除支持（`23ebecb`）。
 
-### Changed / 变更
-- `refactor(getStorage)`: Rename `Store` to `Root` and align debug output; 重命名 `Store` 为 `Root` 并同步调试输出字段（`570a75c`）。
-- `refactor(getStorage)`: Centralize `Settings` merge controlled by `$argument.Storage`; ensure `Configs`/`Caches` are merged per-profile (`names`)（`17747ae`）。
-- `refactor(getStorage)`: switch to a default export instead of named; 改用默认导出（`export default`）。
+### 变更
+- `refactor(getStorage)`: 重命名 `Store` 为 `Root` 并同步调试输出字段（`570a75c`）。
+- `refactor(getStorage)`: 将 `Settings` 合并逻辑统一交由 `$argument.Storage` 控制，并确保 `Configs` / `Caches` 按配置名（`names`）合并（`17747ae`）。
+- `refactor(getStorage)`: 改用默认导出（`export default`）。
 
-### Docs / 文档
-- Sync README/JSDoc with recent behavior changes for `argument` / `getStorage` / `Storage`; 同步 `argument` / `getStorage` / `Storage` 的 README 与 JSDoc 说明（`2b13601`）。
-- `docs(getStorage)`: Document aliases for `$argument.Storage` (`Argument` / `$argument`, `PersistentStore` / `BoxJs` / `$persistentStore`) and correct merge-order in README/JSDoc; 为 `$argument.Storage` 增加别名说明并修正 README 中的合并顺序说明。
-- `docs(getStorage)`: Update import example and JSDoc to reflect default export; 更新导入示例及 JSDoc 以反映默认导出变更。
+### 文档
+- 同步 `argument` / `getStorage` / `Storage` 的 README 与 JSDoc 说明（`2b13601`）。
+- `docs(getStorage)`: 为 `$argument.Storage` 增加别名说明，并修正 README/JSDoc 中的合并顺序说明。
+- `docs(getStorage)`: 更新导入示例及 JSDoc 以反映默认导出变更。
 
 ## [2.1.1] - 2026-02-20
 
-### Changed / 变更
-- `refactor(getStorage)`: remove default export and clarify usage boundaries; 改为无默认导出并补充使用边界说明（`4105cf2`）。
-- `feat(index)`: re-export `getStorage` from entry point and update docs/tests; 从入口导出并更新文档/测试（`b0a1bd9`）。
+### 变更
+- `refactor(getStorage)`: 移除 `getStorage` 默认导出并补充使用边界说明（`4105cf2`）。
+- `feat(index)`: 从入口导出 `getStorage` 并同步文档与测试（`b0a1bd9`）。
 
-### Docs / 文档
-- `docs`: improve installation/update guidance for newcomers; 优化安装与更新指引面向新手（`ce7c81a`）。
-- `docs`: enhance polyfill descriptions and links; 完善 polyfill 文档说明与引用链接（`b817c07`）。
-- `docs`: fill out README and JSDoc comments; 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
+### 文档
+- `docs`: 面向新手优化安装与更新指引（`ce7c81a`）。
+- `docs`: 完善 polyfill 文档说明与引用链接（`b817c07`）。
+- `docs`: 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
 
-
-
-
-
+[2.2.0]: https://github.com/NSNanoCat/util/compare/v2.1.7...HEAD
 [2.1.6]: https://github.com/NSNanoCat/util/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/NSNanoCat/util/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/NSNanoCat/util/compare/v2.1.3...v2.1.4
 [2.1.3]: https://github.com/NSNanoCat/util/compare/v2.1.2...v2.1.3
 [2.1.2]: https://github.com/NSNanoCat/util/compare/v2.1.1...v2.1.2
 [2.1.1]: https://github.com/NSNanoCat/util/compare/v2.1.0...v2.1.1
-

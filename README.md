@@ -135,6 +135,7 @@ console.log(appName);
 6. 存在 `$environment` 且有 `stash-version` -> `Stash`
 7. 存在 `process.versions.node` -> `Node.js`
 8. 默认回落 -> `undefined`
+- 实现细节：内部使用 `'key' in globalThis` 检测平台标记，避免 `Object.keys(globalThis)` 漏掉不可枚举全局变量；因此在 Workers / Vercel 风格全局对象存在时，只要 `process.versions.node` 可用，仍会识别为 `Node.js`。
 
 #### `$environment` / `environment()`
 - 路径：`lib/environment.mjs`（未从包主入口导出）
@@ -222,6 +223,7 @@ console.log($argument); // { mode: "on", a: { b: "1" } }
 - Quantumult X 会丢弃未在白名单内的字段。
 - Quantumult X 的 `status` 在部分场景要求完整状态行（如 `HTTP/1.1 200 OK`），本库会在传入数字状态码时自动拼接（依赖 `StatusTexts`）。
 - Node.js 不调用 `$done`，而是直接退出进程，且退出码固定为 `1`。
+- 未识别平台（`$app === undefined`）只记录结束日志，不会尝试调用 `$done` 或退出进程。
 
 ### `lib/notification.mjs`
 
@@ -382,6 +384,7 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - `timeout`
 - `policy`
 - `redirection` / `auto-redirect`
+- `auto-cookie`（仅 Node.js 分支识别；默认启用，传入 `false` / `0` / `-1` 可关闭）
 
 说明：下表是各 App 原生 HTTP 接口的差异补充，以及本库 `fetch` 的内部映射方式。调用方使用统一入参即可。
 
@@ -395,7 +398,7 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 | Egern | `$httpClient[method]` | 秒 | 无专门映射 | `auto-redirect` | 同上 |
 | Shadowrocket | `$httpClient[method]` | 秒 | `headers.X-Surge-Proxy` | `auto-redirect` | 同上 |
 | Quantumult X | `$task.fetch` | 毫秒（内部乘 1000） | `opts.policy` | `opts.redirection` | `body(ArrayBuffer/TypedArray)` 转 `bodyBytes`；响应按 `Content-Type` 恢复到 `body` |
-| Node.js | `fetch` + `fetch-cookie` | 毫秒（内部乘 1000） | 无 | `redirect: follow/manual` | 返回 `body`(UTF-8 string) + `bodyBytes`(ArrayBuffer) |
+| Node.js | `globalThis.fetch`（不存在时回退 `node-fetch`）；默认按需包裹 `fetch-cookie` | 毫秒（内部乘 1000） | 无 | `redirect: follow/manual` | 返回 `body`(UTF-8 string) + `bodyBytes`(ArrayBuffer) |
 
 返回对象（统一后）常见字段：
 - `ok`
@@ -409,7 +412,8 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 不可用/差异点：
 - `policy` 在 Surge / Egern / Node.js 分支没有额外适配逻辑。
 - `redirection` 在部分平台会映射为 `auto-redirect` 或 `opts.redirection`。
-- Node.js 分支依赖 `globalThis.fetch` / `globalThis.fetchCookie` 或 `node-fetch` + `fetch-cookie`。
+- Node.js 分支优先复用 `globalThis.fetch`；若不存在则回退到 `node-fetch`，并在 `auto-cookie` 未关闭时按需包裹 `fetch-cookie`。
+- 传入 `timeout` 时，`5` 和 `5000` 都会被接受；库会先将用户输入归一化，再按平台要求转换为秒或毫秒。
 - 返回结构是统一兼容结构，不等同于浏览器 `Response` 对象。
 
 ### `polyfill/Storage.mjs`
@@ -632,7 +636,6 @@ console.log(value); // 1
 
 - `lib/argument.mjs` 为 `$argument` 标准化模块，`import` 时会按规则重写全局 `$argument`。
 - `lib/done.mjs` 在 Node.js 固定 `process.exit(1)`。
-- `polyfill/fetch.mjs` 的超时保护使用了 `Promise.race`，但当前实现里请求 Promise 先被 `await`，可能导致超时行为与预期不完全一致。
 - `Storage.removeItem("@a.b")` 分支存在未声明变量写入风险；如要大量使用路径删除，建议先本地验证。
 - `lib/runScript.mjs` 未从包主入口导出，需要按文件路径直接导入。
 
