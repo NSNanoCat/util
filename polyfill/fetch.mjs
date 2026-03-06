@@ -93,8 +93,9 @@ export async function fetch(resource, options = {}) {
 	delete resource.headers?.["content-length"];
 	// 定义请求方法（小写）
 	const method = resource.method.toLocaleLowerCase();
-	// 转换请求超时时间参数
+	// 默认请求超时时间为 5 秒
 	if (!resource.timeout) resource.timeout = 5;
+	// 智能矫正请求超时时间，兼容用户输入的秒或毫秒
 	if (resource.timeout) {
 		resource.timeout = Number.parseInt(resource.timeout, 10);
 		// 转换为秒，大于500视为毫秒，小于等于500视为秒
@@ -112,9 +113,9 @@ export async function fetch(resource, options = {}) {
 			if (resource.timeout) {
 				switch ($app) {
 					case "Loon":
-						resource.timeout = resource.timeout * 1000;
-						break;
 					case "Quantumult X":
+					case "Node.js":
+						// 转换请求超时时间参数（秒 -> 毫秒）
 						resource.timeout = resource.timeout * 1000;
 						break;
 					case "Shadowrocket":
@@ -237,7 +238,6 @@ export async function fetch(resource, options = {}) {
 					break;
 			}
 			// 转换请求参数
-			resource.timeout = resource.timeout * 1000;
 			resource.redirect = resource.redirection ? "follow" : "manual";
 			const { url, ...options } = resource;
 			// 发送请求
