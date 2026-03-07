@@ -111,6 +111,25 @@ export async function fetch(resource, options = {}) {
 		// Convert to seconds first and treat values above 500 as milliseconds.
 		if (resource.timeout > 500) resource.timeout = Math.round(resource.timeout / 1000);
 	}
+	// 某些平台要求毫秒级超时，进行二次换算。
+	// Some platforms expect timeout in milliseconds, so convert again.
+	if (resource.timeout) {
+		switch ($app) {
+			case "Loon":
+			case "Quantumult X":
+			case "Node.js":
+				// 这些平台要求毫秒，因此把秒重新换算为毫秒。
+				// These platforms expect milliseconds, so convert seconds back to milliseconds.
+				resource.timeout = resource.timeout * 1000;
+				break;
+			case "Shadowrocket":
+			case "Stash":
+			case "Egern":
+			case "Surge":
+			default:
+				break;
+		}
+	}
 	// 根据当前平台选择请求实现。
 	// Select the request engine for the current platform.
 	switch ($app) {
@@ -122,23 +141,6 @@ export async function fetch(resource, options = {}) {
 		default:
 			// 转换通用请求参数到 `$httpClient` 语义。
 			// Map shared request fields to `$httpClient` semantics.
-			if (resource.timeout) {
-				switch ($app) {
-					case "Loon":
-					case "Quantumult X":
-					case "Node.js":
-						// 这些平台要求毫秒，因此把秒重新换算为毫秒。
-						// These platforms expect milliseconds, so convert seconds back to milliseconds.
-						resource.timeout = resource.timeout * 1000;
-						break;
-					case "Shadowrocket":
-					case "Stash":
-					case "Egern":
-					case "Surge":
-					default:
-						break;
-				}
-			}
 			if (resource.policy) {
 				switch ($app) {
 					case "Loon":
