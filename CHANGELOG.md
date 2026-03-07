@@ -4,6 +4,15 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.2.1] - 2026-03-08
+
+### 修复
+- `fix(fetch)`: 增加对特定平台的超时参数处理，确保毫秒级超时兼容性（`9a13625`）。
+- `fix(biome)`: 更新 Biome schema 版本并调整文件包含规则（`01e8422`）。
+
+### 变更
+- `fix(deps)`: 添加 `@biomejs/biome` 依赖并更新 `pnpm-lock.yaml`（`4a395b7`）。
+
 ## [2.2.0] - 2026-03-06
 
 ### 修复
@@ -84,7 +93,8 @@
 - `docs`: 完善 polyfill 文档说明与引用链接（`b817c07`）。
 - `docs`: 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
 
-[2.2.0]: https://github.com/NSNanoCat/util/compare/v2.1.7...HEAD
+[2.2.1]: https://github.com/NSNanoCat/util/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/NSNanoCat/util/compare/v2.1.7...v2.2.0
 [2.1.6]: https://github.com/NSNanoCat/util/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/NSNanoCat/util/compare/v2.1.4...v2.1.5
 [2.1.4]: https://github.com/NSNanoCat/util/compare/v2.1.3...v2.1.4
