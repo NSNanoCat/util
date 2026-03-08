@@ -29,6 +29,7 @@ jobs:
           version: ${{ github.ref_name }}
           keep-v: "false" # If set to "true", will not remove any 'v' prefix from the version number.
           ignore-semver-check: "false" # If set to "true", will not check if the version number is a valid semver version.
+      - uses: oven-sh/setup-bun@v2
       - uses: actions/setup-node@v4
         with:
           registry-url: 'https://npm.pkg.github.com'
