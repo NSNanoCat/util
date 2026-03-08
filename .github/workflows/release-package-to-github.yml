@@ -11,11 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 16
-      - run: npm ci
-      - run: npm test
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun test
 
   publish-gpr:
     needs: build
@@ -34,7 +32,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           registry-url: 'https://npm.pkg.github.com'
-      - run: npm ci
-      - run: npm publish
+      - run: bun install
+      - run: bun publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
