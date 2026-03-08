@@ -23,6 +23,5 @@ jobs:
           ignore-semver-check: "false" # If set to "true", will not check if the version number is a valid semver version.
       - uses: oven-sh/setup-bun@v2
       - run: bun install
-      - run: bun build
       - run: bun test
       - run: bun publish --access public
