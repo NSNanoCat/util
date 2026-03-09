@@ -28,4 +28,21 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test
-      - run: npm publish --access public
+      - name: Resolve npm dist-tag
+        id: npm_tag
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *-* ]]; then
+            PRERELEASE=${VERSION#*-}
+            TAG=${PRERELEASE%%.*}
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Publish to npm
+        run: |
+          if [[ "${{ steps.npm_tag.outputs.tag }}" == "latest" ]]; then
+            npm publish --access public
+          else
+            npm publish --access public --tag "${{ steps.npm_tag.outputs.tag }}"
+          fi
