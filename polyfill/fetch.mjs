@@ -245,9 +245,7 @@ export async function fetch(resource, options = {}) {
 		case "Node.js": {
 			// Worker 复用宿主 `fetch`；Node.js 优先复用原生 `fetch`，缺失时再回退到 `node-fetch`。
 			// Worker reuses host `fetch`; Node.js reuses native `fetch` first and falls back to `node-fetch`.
-			if (!globalThis.fetch) {
-				globalThis.fetch = require("node-fetch");
-			}
+			if (!globalThis.fetch) globalThis.fetch = require("node-fetch");
 			switch (resource["auto-cookie"]) {
 				case undefined:
 				case "true":
