@@ -6,6 +6,7 @@ declare module "@nsnanocat/util" {
 		| "Egern"
 		| "Surge"
 		| "Stash"
+		| "Worker"
 		| "Node.js";
 
 	export const $app: AppName | undefined;

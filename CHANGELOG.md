@@ -4,7 +4,24 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
-## [2.2.1] - 2026-03-08
+## [2.2.4] - 2026-03-13
+
+### 新增
+- `feat(app)`: 为 `$app` 增加 `Worker` 运行时类型，并以 `Cloudflare` 全局标记识别 Worker。
+- `feat(environment)`: 为 `environment()` 增加 `Worker` 环境对象输出。
+- `test(app)`: 增加 Worker 运行时识别回归测试。
+
+### 变更
+- `refactor(done)`: 为 Worker 增加独立结束分支，仅记录日志，不调用 `$done` 或退出进程。
+- `refactor(fetch)`: 为 Worker 接入与 Node.js 并列的 `fetch` 分支，并同步超时与返回结构说明。
+- `refactor(Storage)`: 为 Worker 增加基于内存缓存的 `getItem` / `setItem` / `removeItem` / `clear` 支持。
+- `refactor(Console)`: 将 Worker 纳入 `Console.error` 的栈输出分支。
+- `refactor(notification)`: 将 Worker 纳入非 iOS 通知日志分支。
+
+### 文档
+- `docs`: 同步 README、JSDoc、类型声明与变更日志，反映 Worker 运行时支持与版本号更新。
+
+## [2.2.3] - 2026-03-08
 
 ### 修复
 - `fix(fetch)`: 增加对特定平台的超时参数处理，确保毫秒级超时兼容性（`9a13625`）。
@@ -93,7 +110,8 @@
 - `docs`: 完善 polyfill 文档说明与引用链接（`b817c07`）。
 - `docs`: 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
 
-[2.2.1]: https://github.com/NSNanoCat/util/compare/v2.2.0...HEAD
+[2.2.4]: https://github.com/NSNanoCat/util/compare/v2.2.3...HEAD
+[2.2.3]: https://github.com/NSNanoCat/util/compare/v2.2.0...v2.2.3
 [2.2.0]: https://github.com/NSNanoCat/util/compare/v2.1.7...v2.2.0
 [2.1.6]: https://github.com/NSNanoCat/util/compare/v2.1.5...v2.1.6
 [2.1.5]: https://github.com/NSNanoCat/util/compare/v2.1.4...v2.1.5

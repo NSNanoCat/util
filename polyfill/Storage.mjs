@@ -16,6 +16,8 @@ import { Lodash as _ } from "./Lodash.mjs";
  * Supported backends:
  * - Surge/Loon/Stash/Egern/Shadowrocket: `$persistentStore`
  * - Quantumult X: `$prefs`
+ * - Worker: 内存缓存（非持久化）
+ * - Worker: in-memory cache (non-persistent)
  * - Node.js: 本地 `box.dat`
  * - Node.js: local `box.dat`
  *
@@ -37,8 +39,8 @@ import { Lodash as _ } from "./Lodash.mjs";
  */
 export class Storage {
 	/**
-	 * Node.js 环境下的内存数据缓存。
-	 * In-memory data cache for Node.js runtime.
+	 * Worker / Node.js 环境下的内存数据缓存。
+	 * In-memory data cache for Worker / Node.js runtime.
 	 *
 	 * @type {Record<string, any>|null}
 	 */
@@ -94,6 +96,10 @@ export class Storage {
 						break;
 					case "Quantumult X":
 						keyValue = $prefs.valueForKey(keyName);
+						break;
+					case "Worker":
+						Storage.data = Storage.data ?? {};
+						keyValue = Storage.data[keyName];
 						break;
 					case "Node.js":
 						Storage.data = Storage.#loaddata(Storage.dataFile);
@@ -153,6 +159,11 @@ export class Storage {
 					case "Quantumult X":
 						result = $prefs.setValueForKey(keyValue, keyName);
 						break;
+					case "Worker":
+						Storage.data = Storage.data ?? {};
+						Storage.data[keyName] = keyValue;
+						result = true;
+						break;
 					case "Node.js":
 						Storage.data = Storage.#loaddata(Storage.dataFile);
 						Storage.data[keyName] = keyValue;
@@ -207,6 +218,11 @@ export class Storage {
 					case "Quantumult X":
 						result = $prefs.removeValueForKey(keyName);
 						break;
+					case "Worker":
+						Storage.data = Storage.data ?? {};
+						delete Storage.data[keyName];
+						result = true;
+						break;
 					case "Node.js":
 						// result = false;
 						Storage.data = Storage.#loaddata(Storage.dataFile);
@@ -224,8 +240,8 @@ export class Storage {
 	}
 
 	/**
-	 * 清空存储（仅 Quantumult X 支持）。
-	 * Clear storage (supported by Quantumult X only).
+	 * 清空存储。
+	 * Clear storage.
 	 *
 	 * @returns {boolean}
 	 */
@@ -241,6 +257,10 @@ export class Storage {
 				break;
 			case "Quantumult X":
 				result = $prefs.removeAllValues();
+				break;
+			case "Worker":
+				Storage.data = {};
+				result = true;
 				break;
 			case "Node.js":
 				// result = false;

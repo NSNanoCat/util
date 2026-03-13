@@ -1,8 +1,8 @@
 import { $app } from "../lib/app.mjs";
 
 /**
- * 统一日志工具，兼容各脚本平台与 Node.js。
- * Unified logger compatible with script platforms and Node.js.
+ * 统一日志工具，兼容各脚本平台、Worker 与 Node.js。
+ * Unified logger compatible with script platforms, Worker, and Node.js.
  *
  * logLevel 用法:
  * logLevel usage:
@@ -99,8 +99,9 @@ export class Console {
 			default:
 				msg = msg.map(m => `❌ ${m}`);
 				break;
+			case "Worker":
 			case "Node.js":
-				msg = msg.map(m => `❌ ${m.stack}`);
+				msg = msg.map(m => `❌ ${m?.stack ?? m}`);
 				break;
 		}
 		Console.log(...msg);

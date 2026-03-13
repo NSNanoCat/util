@@ -44,12 +44,24 @@ describe("app", () => {
 		assert.strictEqual(app, "Node.js");
 	});
 
-	it("存在 Cloudflare 风格 userAgent 时仍应识别为 Node.js", async () => {
+	it("仅存在 Cloudflare 风格 userAgent 时仍应识别为 Node.js", async () => {
 		patchGlobal("navigator", { userAgent: "Cloudflare-Workers" });
 		patchGlobal("process", { versions: { node: "22.0.0" } });
 
 		const app = await importApp();
 		assert.strictEqual(app, "Node.js");
+	});
+
+	it("存在 Cloudflare Workers 全局标记时应优先识别为 Worker", async () => {
+		patchGlobal("Cloudflare", {});
+		patchGlobal("ServiceWorkerGlobalScope", class ServiceWorkerGlobalScope {});
+		patchGlobal("self", globalThis);
+		patchGlobal("caches", {});
+		patchGlobal("scheduler", {});
+		patchGlobal("process", { versions: { node: "22.0.0" } });
+
+		const app = await importApp();
+		assert.strictEqual(app, "Worker");
 	});
 
 	it("存在 WebSocketPair/caches 标记时仍应识别为 Node.js", async () => {
