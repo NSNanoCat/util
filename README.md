@@ -5,7 +5,7 @@
 核心目标：
 - 统一不同平台的 HTTP、通知、持久化、结束脚本等调用方式。
 - 在一个脚本里尽量少写平台分支。
-- 提供一组可直接复用的 polyfill（`fetch` / `Storage` / `KV` / `Console` / `Lodash`）。
+- 提供一组可直接复用的 polyfill（`fetch` / `Storage` / `KV` / `Console` / `Lodash` / `qs`）。
 
 ## 目录
 - [安装与导入](#安装与导入)
@@ -66,6 +66,7 @@ import {
   Console,    // 统一日志工具（支持 logLevel）
   Lodash as _, // Lodash 建议按官方示例惯例使用 `_` 作为工具对象别名
   KV,         // Cloudflare Workers KV 异步适配器（显式传入 namespace binding）
+  qs,         // 查询字符串工具（parse / stringify）
   Storage,    // 统一持久化存储接口（适配 $prefs / $persistentStore / 内存 / 文件）
 } from "@nsnanocat/util";
 ```
@@ -83,6 +84,7 @@ import {
 - `polyfill/fetch.mjs`
 - `polyfill/KV.mjs`
 - `polyfill/Lodash.mjs`
+- `polyfill/qs.mjs`
 - `polyfill/StatusTexts.mjs`
 - `polyfill/Storage.mjs`
 
@@ -101,7 +103,7 @@ import {
 | --- | --- | --- | --- |
 | `lib/app.mjs` | 无 | 无 | 核心平台识别源头，供其他差异模块分流 |
 | `lib/environment.mjs` | `lib/app.mjs` | `$app` | 按平台生成统一 `$environment`（尤其补齐 `app` 字段） |
-| `lib/argument.mjs` | `polyfill/Console.mjs`, `polyfill/Lodash.mjs` | `Console.debug`, `Console.logLevel`, `Lodash.set` | 统一 `$argument` 结构并支持深路径写入 |
+| `lib/argument.mjs` | `polyfill/Console.mjs`, `polyfill/qs.mjs` | `Console.debug`, `Console.logLevel`, `qs.parse` | 统一 `$argument` 结构，并委托 `qs.parse` 处理字符串/对象/空值输入 |
 | `lib/done.mjs` | `lib/app.mjs`, `polyfill/Console.mjs`, `polyfill/Lodash.mjs`, `polyfill/StatusTexts.mjs` | `$app`, `Console.log`, `Lodash.set`, `Lodash.pick`, `StatusTexts` | 将各平台 `$done` 参数格式拉平并兼容状态码/策略字段 |
 | `lib/notification.mjs` | `lib/app.mjs`, `polyfill/Console.mjs` | `$app`, `Console.group`, `Console.log`, `Console.groupEnd`, `Console.error` | 将通知参数映射到各平台通知接口并统一日志输出 |
 | `lib/runScript.mjs` | `polyfill/Console.mjs`, `polyfill/fetch.mjs`, `polyfill/Storage.mjs`, `polyfill/Lodash.mjs` | `Console.error`, `fetch`, `Storage.getItem`（`Lodash` 当前版本未实际调用） | 读取 BoxJS 配置并发起统一 HTTP 调用执行脚本 |
@@ -111,6 +113,7 @@ import {
 | `polyfill/KV.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs`, `polyfill/Storage.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset`, `Storage` | 为 Cloudflare Workers KV 提供异步适配，并在非 Worker 平台回退到 `Storage` |
 | `polyfill/Storage.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset` | 按平台选持久化后端并支持 `@key.path` 读写 |
 | `polyfill/Lodash.mjs` | 无 | 无 | 提供路径/合并等基础能力，被多个模块复用 |
+| `polyfill/qs.mjs` | `polyfill/Lodash.mjs` | `Lodash.get`, `Lodash.set`, `Lodash.toPath` | 提供查询字符串与对象之间的解析/序列化能力 |
 | `polyfill/StatusTexts.mjs` | 无 | 无 | 提供 HTTP 状态文案，供 `fetch/done` 使用 |
 | `index.js` / `lib/index.js` / `polyfill/index.js` | 多个模块 | `export *` | 聚合导出，不含业务逻辑 |
 
@@ -173,6 +176,7 @@ console.log(environment()); // 当前环境对象
 - 通过包入口导入（`import ... from "@nsnanocat/util"`）时会自动执行本模块。
 - JSCore 环境不支持 `await import`，请使用静态导入或直接走包入口导入。
 - 读取到的 `$argument` 会按 URL Params 样式格式化为对象，并支持深路径。
+- 内部实现统一委托给 `qs.parse(globalThis.$argument)`。
 - 你也可以通过 `import { $argument } from "@nsnanocat/util"` 读取当前已标准化的 `$argument` 快照。
 - 平台输入差异说明：
   - Surge / Stash / Egern：脚本参数通常以字符串形式传入（如 `a=1&b=2`）。
@@ -657,6 +661,53 @@ console.log(value); // 1
 - Map/Set 支持同类型合并；空 Map/Set 不覆盖已存在值。
 - `undefined` 不覆盖，`null` 会覆盖。
 - 直接修改目标对象（mutates target）。
+
+### `polyfill/qs.mjs`
+
+当前实现为项目内使用的轻量子集，不追求与官方 `qs` 完全一致。
+
+#### `qs.parse(query)`
+- 签名：`qs.parse(query?: string | object | null): object`
+- 作用：将查询字符串或对象输入归一化为支持深路径的对象。
+- 依赖：内部使用 `Lodash.set` 展开路径。
+
+当前行为：
+- 当 `query` 为 `string` 时：
+  - 按 `&` / `=` 切分。
+  - 去掉值中的双引号。
+  - 使用点路径或数组下标路径展开对象。
+- 当 `query` 为 `object` 时：
+  - 将 key 当路径写入新对象（`{"a.b":"1"}` -> `{ a: { b: "1" } }`）。
+- 当 `query` 为 `null` 或 `undefined` 时：
+  - 返回 `{}`。
+
+```js
+import { qs } from "@nsnanocat/util";
+
+console.log(qs.parse("mode=on&a.b=1"));
+// { mode: "on", a: { b: "1" } }
+
+console.log(qs.parse({ "list[0]": "x", "list[1]": "y" }));
+// { list: ["x", "y"] }
+```
+
+#### `qs.stringify(object)`
+- 签名：`qs.stringify(object?: object): string`
+- 作用：将对象按深路径展开为查询字符串。
+- 依赖：内部使用 `Lodash.get` 与 `Lodash.toPath` 读取并格式化路径。
+
+当前行为：
+- 普通对象输出为点路径（`a.b=1`）。
+- 数组输出为索引路径（`list[0]=x`）。
+- 值始终执行 `encodeURIComponent` 编码。
+- `null` 会序列化为空值（`key=`），`undefined` 会跳过。
+
+```js
+import { qs } from "@nsnanocat/util";
+
+console.log(qs.stringify({ a: { b: "1" }, list: ["x", "y"] }));
+// a.b=1&list%5B0%5D=x&list%5B1%5D=y
+```
 
 ### `polyfill/StatusTexts.mjs`
 

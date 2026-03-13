@@ -30,5 +30,11 @@ declare module "@nsnanocat/util" {
 		static unset(object?: Record<string, unknown>, path?: string | string[]): boolean;
 	}
 
+	export class qs {
+		static parse(query?: string | Record<string, unknown> | null): Record<string, unknown>;
+
+		static stringify(object?: Record<string, unknown>): string;
+	}
+
 	export const StatusTexts: Record<number, string>;
 }

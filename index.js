@@ -8,6 +8,7 @@ export * from "./polyfill/Console.mjs";
 export * from "./polyfill/fetch.mjs";
 export * from "./polyfill/KV.mjs";
 export * from "./polyfill/Lodash.mjs";
+export * from "./polyfill/qs.mjs";
 export * from "./polyfill/StatusTexts.mjs";
 export * from "./polyfill/Storage.mjs";
 

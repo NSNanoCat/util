@@ -5,8 +5,7 @@ let importSeed = 0;
 const argumentModule = new URL("../lib/argument.mjs", import.meta.url);
 const packageEntryModule = new URL("../index.js", import.meta.url);
 const importWithArgument = async value => {
-	if (typeof value === "undefined") globalThis.$argument = {};
-	else globalThis.$argument = value;
+	globalThis.$argument = value;
 	importSeed += 1;
 	await import(`${argumentModule}?test=${importSeed}`);
 	return globalThis.$argument;

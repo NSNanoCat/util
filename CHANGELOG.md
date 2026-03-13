@@ -4,6 +4,19 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.4.0] - 2026-03-13
+
+### 新增
+- `feat(qs)`: 新增 `polyfill/qs.mjs`，提供 `qs.parse()` 与 `qs.stringify()` 查询字符串工具。
+- `test(qs)`: 增加 `qs` 回归测试，覆盖字符串、对象、空值与序列化路径场景。
+
+### 变更
+- `refactor(argument)`: 将 `$argument` 标准化逻辑迁移到 `qs.parse()`，`lib/argument.mjs` 改为统一委托 `qs.parse(globalThis.$argument)`。
+- `refactor(index)`: 从主入口与 `polyfill/index.js` 导出 `qs`。
+
+### 文档
+- `docs(qs)`: 更新 README 与变更日志，补充 `qs` 模块导出、依赖关系与 API 说明。
+
 ## [2.3.1] - 2026-03-13
 
 ### 变更
@@ -122,7 +135,9 @@
 - `docs`: 完善 polyfill 文档说明与引用链接（`b817c07`）。
 - `docs`: 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
 
-[2.2.4]: https://github.com/NSNanoCat/util/compare/v2.2.3...HEAD
+[2.4.0]: https://github.com/NSNanoCat/util/compare/v2.3.1...HEAD
+[2.3.1]: https://github.com/NSNanoCat/util/compare/v2.3.0...v2.3.1
+[2.3.0]: https://github.com/NSNanoCat/util/compare/v2.2.3...v2.3.0
 [2.2.3]: https://github.com/NSNanoCat/util/compare/v2.2.0...v2.2.3
 [2.2.0]: https://github.com/NSNanoCat/util/compare/v2.1.7...v2.2.0
 [2.1.6]: https://github.com/NSNanoCat/util/compare/v2.1.5...v2.1.6
