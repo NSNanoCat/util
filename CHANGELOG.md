@@ -4,6 +4,14 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.3.1] - 2026-03-13
+
+### 变更
+- `refactor(KV)`: 移除 `KV` 内部的 `#getNamespace()` 私有方法，Worker 分支直接调用实例上的 namespace binding，不再做额外检测。
+
+### 文档
+- `docs(KV)`: 补充本次 `KV` 内部实现调整的版本记录。
+
 ## [2.3.0] - 2026-03-13
 
 ### 新增

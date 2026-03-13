@@ -75,7 +75,7 @@ export class KV {
 			default:
 				switch ($app) {
 					case "Worker":
-						keyValue = await this.#getNamespace().get(keyName);
+						keyValue = await this.namespace.get(keyName);
 						break;
 					default:
 						keyValue = Storage.getItem(keyName, defaultValue);
@@ -111,7 +111,7 @@ export class KV {
 			default:
 				switch ($app) {
 					case "Worker":
-						await this.#getNamespace().put(keyName, keyValue);
+						await this.namespace.put(keyName, keyValue);
 						result = true;
 						break;
 					default:
@@ -145,7 +145,7 @@ export class KV {
 			default:
 				switch ($app) {
 					case "Worker":
-						await this.#getNamespace().delete(keyName);
+						await this.namespace.delete(keyName);
 						result = true;
 						break;
 					default:
@@ -176,33 +176,11 @@ export class KV {
 	 */
 	async list(options = {}) {
 		switch ($app) {
-			case "Worker": {
-				const namespace = this.#getNamespace();
-				if (typeof namespace.list !== "function") throw new TypeError("KV namespace binding with list() is required in Worker runtime.");
-				return await namespace.list(options);
-			}
+			case "Worker":
+				return await this.namespace.list(options);
 			default:
 				throw new TypeError("KV.list() is only supported in Worker runtime.");
 		}
-	}
-
-	/**
-	 * 解析 Worker 所需的 namespace 绑定。
-	 * Resolve the namespace binding required by Workers.
-	 *
-	 * @private
-	 * @returns {{ get(key: string): Promise<string|null>; put(key: string, value: string): Promise<void>; delete(key: string): Promise<void>; list?(options?: { prefix?: string; limit?: number; cursor?: string }): Promise<{ keys: { name: string; expiration?: number; metadata?: object }[]; list_complete: boolean; cursor: string }> }}
-	 */
-	#getNamespace() {
-		if (
-			!this.namespace ||
-			typeof this.namespace.get !== "function" ||
-			typeof this.namespace.put !== "function" ||
-			typeof this.namespace.delete !== "function"
-		) {
-			throw new TypeError("KV namespace binding is required in Worker runtime.");
-		}
-		return this.namespace;
 	}
 
 	/**
