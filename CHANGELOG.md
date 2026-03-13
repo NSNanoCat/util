@@ -20,6 +20,7 @@
 - `refactor(Storage)`: 为 Worker 增加基于内存缓存的 `getItem` / `setItem` / `removeItem` / `clear` 支持。
 - `refactor(Console)`: 将 Worker 纳入 `Console.error` 的栈输出分支。
 - `refactor(notification)`: 将 Worker 纳入非 iOS 通知日志分支。
+- `refactor(types)`: 将 `types/nsnanocat-util.d.ts` 拆分为单入口加多模块声明文件，保持现有 `types` 入口不变。
 
 ### 文档
 - `docs`: 同步 README、JSDoc、类型声明与变更日志，反映 Worker 运行时支持、`KV` 适配器与版本号更新。
