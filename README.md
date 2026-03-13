@@ -5,7 +5,7 @@
 核心目标：
 - 统一不同平台的 HTTP、通知、持久化、结束脚本等调用方式。
 - 在一个脚本里尽量少写平台分支。
-- 提供一组可直接复用的 polyfill（`fetch` / `Storage` / `Console` / `Lodash`）。
+- 提供一组可直接复用的 polyfill（`fetch` / `Storage` / `KV` / `Console` / `Lodash`）。
 
 ## 目录
 - [安装与导入](#安装与导入)
@@ -65,6 +65,7 @@ import {
   wait,       // 延时等待工具（Promise）
   Console,    // 统一日志工具（支持 logLevel）
   Lodash as _, // Lodash 建议按官方示例惯例使用 `_` 作为工具对象别名
+  KV,         // Cloudflare Workers KV 异步适配器（显式传入 namespace binding）
   Storage,    // 统一持久化存储接口（适配 $prefs / $persistentStore / 内存 / 文件）
 } from "@nsnanocat/util";
 ```
@@ -80,6 +81,7 @@ import {
 - `lib/wait.mjs`
 - `polyfill/Console.mjs`
 - `polyfill/fetch.mjs`
+- `polyfill/KV.mjs`
 - `polyfill/Lodash.mjs`
 - `polyfill/StatusTexts.mjs`
 - `polyfill/Storage.mjs`
@@ -106,6 +108,7 @@ import {
 | `getStorage.mjs` | `lib/argument.mjs`, `polyfill/Console.mjs`, `polyfill/Lodash.mjs`, `polyfill/Storage.mjs` | `Console.debug`, `Console.logLevel`, `Lodash.merge`, `Storage.getItem` | 先标准化 `$argument`，再合并默认配置/持久化配置/运行参数 |
 | `polyfill/Console.mjs` | `lib/app.mjs` | `$app` | 日志在 Worker / Node.js 与 iOS 脚本环境使用不同错误输出策略 |
 | `polyfill/fetch.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs`, `polyfill/StatusTexts.mjs`, `polyfill/Console.mjs` | `$app`, `Lodash.set`, `StatusTexts`（`Console` 当前版本未实际调用） | 按平台选请求引擎并做参数映射、响应结构统一 |
+| `polyfill/KV.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs`, `polyfill/Storage.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset`, `Storage` | 为 Cloudflare Workers KV 提供异步适配，并在非 Worker 平台回退到 `Storage` |
 | `polyfill/Storage.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset` | 按平台选持久化后端并支持 `@key.path` 读写 |
 | `polyfill/Lodash.mjs` | 无 | 无 | 提供路径/合并等基础能力，被多个模块复用 |
 | `polyfill/StatusTexts.mjs` | 无 | 无 | 提供 HTTP 状态文案，供 `fetch/done` 使用 |
@@ -470,6 +473,39 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 | Quantumult X | `$prefs.valueForKey/setValueForKey` |
 | Worker | 进程内内存缓存 |
 | Node.js | 本地 `box.dat` |
+
+### `polyfill/KV.mjs`
+
+`KV` 是面向 Cloudflare Workers KV 的异步适配器：
+- 调用方显式传入 namespace binding：`new KV(env.NAMESPACE)`
+- Worker 分支直接调用 `namespace.get/put/delete/list`
+- `get()` 不传 `type`，默认按 Cloudflare 行为读取字符串
+- 非 Worker 平台会回退到 `Storage.getItem/setItem/removeItem`
+- `list()` 仅支持 Worker，返回 Cloudflare KV 原生列举结果
+- `clear()` 始终返回 `false`
+
+#### `new KV(namespace)`
+- `namespace` 需提供 `get(key)` / `put(key, value)` / `delete(key)`。
+
+#### `await kv.getItem(keyName, defaultValue = null)`
+- 支持普通 key。
+- 支持路径 key：`@root.path.to.key`。
+- 读取后会尝试 `JSON.parse`。
+
+#### `await kv.setItem(keyName, keyValue)`
+- 支持普通 key 与路径 key。
+- `keyValue` 为对象时自动 `JSON.stringify`。
+
+#### `await kv.removeItem(keyName)`
+- 支持普通 key 与路径 key。
+
+#### `await kv.list(options = {})`
+- 仅支持 Worker。
+- 透传 `prefix` / `limit` / `cursor` 到 `namespace.list(options)`。
+- 返回 Cloudflare KV 的原生结果：`keys` / `list_complete` / `cursor`。
+
+#### `await kv.clear()`
+- 始终返回 `false`。
 
 ### `polyfill/Console.mjs`
 
