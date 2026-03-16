@@ -1,24 +1,23 @@
 {
-    // Change this to match your project
+    // 按项目实际情况调整这里的包含范围。
+    // Change this include list to match your project.
     "include": [
+        "polyfill/KV.mts",
         "polyfill/URL.mts",
         "polyfill/URLSearchParams.mts",
         "types/**/*.d.ts",
     ],
     "compilerOptions": {
-        // Tells TypeScript to read JS files, as
-        // normally they are ignored as source files
-        "allowJs": true,
-        // Generate d.ts files
-        "declaration": true,
-        // This compiler run should
-        // only output d.ts files
+        // 当前编译仅产出运行时 .mjs 文件。
+        // This compiler run emits runtime .mjs only.
+        "declaration": false,
+        // 当前编译不只输出类型声明文件。
+        // This compiler run does not emit declaration files only.
         "emitDeclarationOnly": false,
-        // go to js file when using IDE functions like
-        // "Go to Definition" in VSCode
-        "declarationMap": true,
+        // 让输出只聚焦运行时代码。
+        // Keep the output focused on runtime files.
+        "declarationMap": false,
         "target": "ESNext",
         "module": "ESNext",
-        "allowImportingTsExtensions": true,
     },
 }

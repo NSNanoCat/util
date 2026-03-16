@@ -480,16 +480,23 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 
 ### `polyfill/KV.mjs`
 
-`KV` 是面向 Cloudflare Workers KV 的异步适配器：
-- 调用方显式传入 namespace binding：`new KV(env.NAMESPACE)`
-- Worker 分支直接调用 `namespace.get/put/delete/list`
+`KV` 是面向 Cloudflare Workers KV 的异步适配器，也支持 Node.js 通过 REST API 访问指定 namespace：
+- Worker / 自定义 namespace binding：`new KV(env.NAMESPACE)`
+- Node.js REST：`new KV({ apiEmail, apiKey, accountId, namespaceId })`
+- Node.js 后端优先级：`namespace -> REST -> Storage`
+- Worker 或显式 namespace 分支直接调用 `namespace.get/put/delete/list`
 - `get()` 不传 `type`，默认按 Cloudflare 行为读取字符串
-- 非 Worker 平台会回退到 `Storage.getItem/setItem/removeItem`
-- `list()` 仅支持 Worker，返回 Cloudflare KV 原生列举结果
+- Node.js 在 REST 配置完整时调用 Cloudflare KV REST API
+- 其他情况回退到 `Storage.getItem/setItem/removeItem`
+- `list()` 仅支持 namespace 后端或 Node.js REST 后端
 - `clear()` 始终返回 `false`
 
-#### `new KV(namespace)`
+#### `new KV(namespaceOrConfig)`
 - `namespace` 需提供 `get(key)` / `put(key, value)` / `delete(key)`。
+- Cloudflare Workers 中声明为 `KVNamespace` 的 `env.YOUR_NAMESPACE` 可直接传入。
+- Node.js REST 配置支持 `apiEmail` / `apiKey` / `accountId` / `namespaceId`。
+- REST 配置缺失字段时，会回退读取环境变量 `CLOUDFLARE_EMAIL` / `CLOUDFLARE_API_KEY` / `ACCOUNT_ID` / `NAMESPACE_ID`。
+- Node.js 下若既没有 namespace binding、REST 配置也不完整，则回退到 `Storage`。
 
 #### `await kv.getItem(keyName, defaultValue = null)`
 - 支持普通 key。
@@ -504,9 +511,10 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - 支持普通 key 与路径 key。
 
 #### `await kv.list(options = {})`
-- 仅支持 Worker。
-- 透传 `prefix` / `limit` / `cursor` 到 `namespace.list(options)`。
-- 返回 Cloudflare KV 的原生结果：`keys` / `list_complete` / `cursor`。
+- 仅支持 namespace 后端或 Node.js REST 后端。
+- namespace 后端会透传 `prefix` / `limit` / `cursor` 到 `namespace.list(options)`。
+- Node.js REST 后端会透传 `prefix` / `limit` / `cursor` 到 Cloudflare `GET /keys`。
+- 返回统一结构：`keys` / `list_complete` / `cursor`。
 
 #### `await kv.clear()`
 - 始终返回 `false`。
