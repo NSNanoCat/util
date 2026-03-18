@@ -2,7 +2,6 @@
     // 按项目实际情况调整这里的包含范围。
     // Change this include list to match your project.
     "include": [
-        "polyfill/KV.mts",
         "polyfill/URL.mts",
         "polyfill/URLSearchParams.mts",
         "types/**/*.d.ts",
