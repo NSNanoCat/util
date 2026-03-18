@@ -4,6 +4,14 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [3.5.0] - 2026-03-18
+
+### 变更
+- `chore(KV)`: 移除 `KV` 相关实现、测试、类型和文档说明。
+
+### 文档
+- `docs(KV)`: 保留历史日志，仅删除 `KV` 新增内容；如有需求请改用 [Auraflare/shared](https://github.com/Auraflare/shared)。
+
 ## [2.4.0] - 2026-03-13
 
 ### 新增
@@ -17,12 +25,23 @@
 ### 文档
 - `docs(qs)`: 更新 README 与变更日志，补充 `qs` 模块导出、依赖关系与 API 说明。
 
+## [2.3.1] - 2026-03-13
+
+### 变更
+- `refactor(KV)`: 移除 `KV` 内部的 `#getNamespace()` 私有方法，Worker 分支直接调用实例上的 namespace binding，不再做额外检测。
+
+### 文档
+- `docs(KV)`: 补充本次 `KV` 内部实现调整的版本记录。
+
 ## [2.3.0] - 2026-03-13
 
 ### 新增
 - `feat(app)`: 为 `$app` 增加 `Worker` 运行时类型，并以 `Cloudflare` 全局标记识别 Worker。
 - `feat(environment)`: 为 `environment()` 增加 `Worker` 环境对象输出。
+- `feat(KV)`: 新增基于 Cloudflare Workers KV namespace binding 的异步 `KV` 适配器，并从主入口导出。
+- `feat(KV)`: 为 `KV` 补充 `list()` 方法，并对齐 Cloudflare Workers KV 的原生列举返回结构。
 - `test(app)`: 增加 Worker 运行时识别回归测试。
+- `test(KV)`: 增加 `KV` 在 Worker 与非 Worker 平台下的行为回归测试。
 
 ### 变更
 - `refactor(done)`: 为 Worker 增加独立结束分支，仅记录日志，不调用 `$done` 或退出进程。
@@ -33,7 +52,7 @@
 - `refactor(types)`: 将 `types/nsnanocat-util.d.ts` 拆分为单入口加多模块声明文件，保持现有 `types` 入口不变。
 
 ### 文档
-- `docs`: 同步 README、JSDoc、类型声明与变更日志，反映 Worker 运行时支持与版本号更新。
+- `docs`: 同步 README、JSDoc、类型声明与变更日志，反映 Worker 运行时支持、`KV` 适配器与版本号更新。
 
 ## [2.2.3] - 2026-03-08
 
