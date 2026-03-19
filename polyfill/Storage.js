@@ -284,24 +284,22 @@ export class Storage {
 	 * @param {string} dataFile 数据文件名 / Data file name.
 	 * @returns {Record<string, any>}
 	 */
-	static #loaddata = dataFile => {
-		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("node:fs");
-			this.path = this.path ? this.path : require("node:path");
-			const curDirDataFilePath = this.path.resolve(dataFile);
-			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
-			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
-			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
-			if (isCurDirDataFile || isRootDirDataFile) {
-				const datPath = isCurDirDataFile ? curDirDataFilePath : rootDirDataFilePath;
-				try {
-					return JSON.parse(this.fs.readFileSync(datPath));
-				} catch (e) {
-					return {};
-				}
-			} else return {};
-		} else return {};
-	};
+	static #loaddata(dataFile) {
+		if ($app !== "Node.js") return {};
+		// 优先复用全局运行时对象，不存在时再按需加载。
+		// Prefer reusing global runtime modules and lazily require when missing.
+		if (!globalThis.fs) globalThis.fs = require("node:fs");
+		if (!globalThis.path) globalThis.path = require("node:path");
+		const dataFilePathCandidates = [...new Set([globalThis.path.resolve(dataFile), globalThis.path.resolve(process.cwd(), dataFile)])];
+		const dataFilePath = dataFilePathCandidates.find(filePath => globalThis.fs.existsSync(filePath));
+		if (!dataFilePath) return {};
+		try {
+			const jsonData = globalThis.fs.readFileSync(dataFilePath, "utf8");
+			return jsonData ? JSON.parse(jsonData) : {};
+		} catch (e) {
+			return {};
+		}
+	}
 
 	/**
 	 * 将内存数据写入 Node.js 数据文件。
@@ -311,22 +309,15 @@ export class Storage {
 	 * @param {string} [dataFile=this.dataFile] 数据文件名 / Data file name.
 	 * @returns {void}
 	 */
-	static #writedata = (dataFile = this.dataFile) => {
-		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("node:fs");
-			this.path = this.path ? this.path : require("node:path");
-			const curDirDataFilePath = this.path.resolve(dataFile);
-			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
-			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
-			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
-			const jsondata = JSON.stringify(this.data);
-			if (isCurDirDataFile) {
-				this.fs.writeFileSync(curDirDataFilePath, jsondata);
-			} else if (isRootDirDataFile) {
-				this.fs.writeFileSync(rootDirDataFilePath, jsondata);
-			} else {
-				this.fs.writeFileSync(curDirDataFilePath, jsondata);
-			}
-		}
-	};
+	static #writedata(dataFile = this.dataFile) {
+		if ($app !== "Node.js") return;
+		// 优先复用全局运行时对象，不存在时再按需加载。
+		// Prefer reusing global runtime modules and lazily require when missing.
+		if (!globalThis.fs) globalThis.fs = require("node:fs");
+		if (!globalThis.path) globalThis.path = require("node:path");
+		const dataFilePathCandidates = [...new Set([globalThis.path.resolve(dataFile), globalThis.path.resolve(process.cwd(), dataFile)])];
+		const dataFilePath = dataFilePathCandidates.find(filePath => globalThis.fs.existsSync(filePath)) ?? dataFilePathCandidates[0];
+		const jsonData = JSON.stringify(this.data);
+		globalThis.fs.writeFileSync(dataFilePath, jsonData);
+	}
 }
