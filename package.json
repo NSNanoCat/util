@@ -15,7 +15,6 @@
 	"bugs": "https://github.com/NSNanoCat/util/issues",
 	"main": "index.mjs",
 	"types": "types/nsnanocat-util.d.ts",
-	"type": "module",
 	"scripts": {
 		"tsc:build": "npx tsc",
 		"test": "node --test test/*.test.js",
