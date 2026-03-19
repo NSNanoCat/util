@@ -33,11 +33,13 @@ export interface FetchResponse {
 }
 
 /**
- * 跨平台 `fetch` 适配层。
- * Cross-platform `fetch` adapter.
+ * 跨平台 `fetch` 函数签名。
+ * Cross-platform `fetch` function signature.
  *
  * @param resource 请求对象或 URL / Request object or URL string.
  * @param options 追加参数 / Extra options.
  * @returns 统一响应结构 / Normalized response payload.
  */
-export function fetch(resource: FetchRequest | string, options?: Partial<FetchRequest>): Promise<FetchResponse>;
+export type Fetch = (resource: FetchRequest | string, options?: Partial<FetchRequest>) => Promise<FetchResponse>;
+
+export const fetch: Fetch;

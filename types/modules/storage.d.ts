@@ -1,10 +1,7 @@
+import type { Storage as SharedStorage } from "../../polyfill/Storage.d.ts";
+
 declare module "@nsnanocat/util" {
-	export class Storage {
-		static data: Record<string, unknown> | null;
-		static dataFile: string;
-		static getItem<T = unknown>(keyName: string, defaultValue?: T): T;
-		static setItem(keyName: string, keyValue: unknown): boolean;
-		static removeItem(keyName: string): boolean;
-		static clear(): boolean;
-	}
+	export interface Storage extends SharedStorage {}
+
+	export const Storage: typeof import("../../polyfill/Storage.d.ts").Storage;
 }

@@ -4,6 +4,15 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.5.2] - 2026-03-19
+
+### 变更
+- `refactor(types)`: 统一 `polyfill` 类型声明为单一来源，`types/modules` 改为引用 `polyfill/*.d.ts` 进行根入口适配，避免重复维护。
+- `refactor(types)`: 拆分 `types/modules/Lodash.d.ts` 与 `types/modules/qs.d.ts`，并保留 `polyfills` 聚合入口以兼容既有导入方式。
+
+### 文档
+- `docs(types)`: 为 `polyfill/Console.d.ts`、`polyfill/Lodash.d.ts`、`polyfill/qs.d.ts`、`polyfill/StatusTexts.d.ts`、`polyfill/Storage.d.ts` 补充中英双语 JSDoc。
+
 ## [2.5.1] - 2026-03-19
 
 ### 变更
@@ -148,7 +157,8 @@
 - `docs`: 完善 polyfill 文档说明与引用链接（`b817c07`）。
 - `docs`: 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
 
-[2.5.1]: https://github.com/NSNanoCat/util/compare/v2.5.0...HEAD
+[2.5.2]: https://github.com/NSNanoCat/util/compare/v2.5.1...HEAD
+[2.5.1]: https://github.com/NSNanoCat/util/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/NSNanoCat/util/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/NSNanoCat/util/compare/v2.3.1...v2.4.0
 [2.3.1]: https://github.com/NSNanoCat/util/compare/v2.3.0...v2.3.1
