@@ -41,3 +41,5 @@ export interface FetchResponse {
  * @returns 统一响应结构 / Normalized response payload.
  */
 export type Fetch = (resource: FetchRequest | string, options?: Partial<FetchRequest>) => Promise<FetchResponse>;
+
+export const fetch: Fetch;
