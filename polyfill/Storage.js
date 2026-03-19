@@ -288,9 +288,7 @@ export class Storage {
 		if ($app !== "Node.js") return {};
 		// 优先复用全局运行时对象，不存在时再按需加载。
 		// Prefer reusing global runtime modules and lazily require when missing.
-		// eslint-disable-next-line n/no-missing-require, n/prefer-node-protocol
 		if (!globalThis.fs) globalThis.fs = require("fs");
-		// eslint-disable-next-line n/no-missing-require, n/prefer-node-protocol
 		if (!globalThis.path) globalThis.path = require("path");
 		const dataFilePathCandidates = [...new Set([globalThis.path.resolve(dataFile), globalThis.path.resolve(process.cwd(), dataFile)])];
 		const dataFilePath = dataFilePathCandidates.find(filePath => globalThis.fs.existsSync(filePath));
