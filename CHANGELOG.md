@@ -4,7 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
-## [3.5.0] - 2026-03-18
+## [2.5.1] - 2026-03-19
+
+### 变更
+- `chore(fetch)`: 补充 `polyfill/fetch.mts` 与 `polyfill/fetch.d.ts`，完善 `fetch` 子路径导入的类型支持。
+
+## [2.5.0] - 2026-03-18
 
 ### 变更
 - `chore(KV)`: 移除 `KV` 相关实现、测试、类型和文档说明。
@@ -143,7 +148,9 @@
 - `docs`: 完善 polyfill 文档说明与引用链接（`b817c07`）。
 - `docs`: 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
 
-[2.4.0]: https://github.com/NSNanoCat/util/compare/v2.3.1...HEAD
+[2.5.1]: https://github.com/NSNanoCat/util/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/NSNanoCat/util/compare/v2.4.0...v2.5.0
+[2.4.0]: https://github.com/NSNanoCat/util/compare/v2.3.1...v2.4.0
 [2.3.1]: https://github.com/NSNanoCat/util/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/NSNanoCat/util/compare/v2.2.3...v2.3.0
 [2.2.3]: https://github.com/NSNanoCat/util/compare/v2.2.0...v2.2.3
