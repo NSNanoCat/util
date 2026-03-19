@@ -13,7 +13,7 @@
 	],
 	"license": "Apache-2.0",
 	"bugs": "https://github.com/NSNanoCat/util/issues",
-	"main": "index.js",
+	"main": "index.mjs",
 	"types": "types/nsnanocat-util.d.ts",
 	"scripts": {
 		"tsc:build": "npx tsc",
@@ -27,7 +27,7 @@
 		"url": "git+https://github.com/NSNanoCat/util.git"
 	},
 	"files": [
-		"index.js",
+		"index.mjs",
 		"lib",
 		"polyfill",
 		"getStorage.mjs",
