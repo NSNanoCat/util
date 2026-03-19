@@ -3,7 +3,7 @@ import { afterEach, describe, it } from "node:test";
 
 let importSeed = 0;
 const argumentModule = new URL("../lib/argument.mjs", import.meta.url);
-const packageEntryModule = new URL("../index.js", import.meta.url);
+const packageEntryModule = new URL("../index.mjs", import.meta.url);
 const importWithArgument = async value => {
 	globalThis.$argument = value;
 	importSeed += 1;
