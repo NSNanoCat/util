@@ -51,7 +51,7 @@
 				"noUselessElse": "off",
 				"useDefaultParameterLast": "info",
 				"useForOf": "error",
-				"useNodejsImportProtocol": "error",
+				"useNodejsImportProtocol": "off",
 				"useNumberNamespace": "error",
 				"useSingleVarDeclarator": "off"
 			},
