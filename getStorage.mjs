@@ -1,7 +1,7 @@
 import "./lib/argument.mjs";
 import { Console } from "./polyfill/Console.mjs";
 import { Lodash as _ } from "./polyfill/Lodash.mjs";
-import { Storage } from "./polyfill/Storage.js";
+import { Storage } from "./polyfill/Storage.mjs";
 
 /**
  * 存储配置读取与合并结果。
