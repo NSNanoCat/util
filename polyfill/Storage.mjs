@@ -102,7 +102,9 @@ export class Storage {
 						keyValue = Storage.data[keyName];
 						break;
 					case "Node.js":
-						throw new Error(`${Storage.name}.getItem: ESM 版本不支持 Node.js，请改用 CJS 入口`);
+						Storage.data = Storage.#loaddata(Storage.dataFile);
+						keyValue = Storage.data?.[keyName];
+						break;
 					default:
 						keyValue = Storage.data?.[keyName] || null;
 						break;
@@ -163,7 +165,11 @@ export class Storage {
 						result = true;
 						break;
 					case "Node.js":
-						throw new Error(`${Storage.name}.setItem: ESM 版本不支持 Node.js，请改用 CJS 入口`);
+						Storage.data = Storage.#loaddata(Storage.dataFile);
+						Storage.data[keyName] = keyValue;
+						Storage.#writedata(Storage.dataFile);
+						result = true;
+						break;
 					default:
 						result = Storage.data?.[keyName] || null;
 						break;
@@ -218,7 +224,12 @@ export class Storage {
 						result = true;
 						break;
 					case "Node.js":
-						throw new Error(`${Storage.name}.removeItem: ESM 版本不支持 Node.js，请改用 CJS 入口`);
+						// result = false;
+						Storage.data = Storage.#loaddata(Storage.dataFile);
+						delete Storage.data[keyName];
+						Storage.#writedata(Storage.dataFile);
+						result = true;
+						break;
 					default:
 						result = false;
 						break;
@@ -252,7 +263,12 @@ export class Storage {
 				result = true;
 				break;
 			case "Node.js":
-				throw new Error(`${Storage.name}.clear: ESM 版本不支持 Node.js，请改用 CJS 入口`);
+				// result = false;
+				Storage.data = Storage.#loaddata(Storage.dataFile);
+				Storage.data = {};
+				Storage.#writedata(Storage.dataFile);
+				result = true;
+				break;
 			default:
 				result = false;
 				break;
@@ -260,4 +276,57 @@ export class Storage {
 		return result;
 	}
 
+	/**
+	 * 从 Node.js 数据文件加载 JSON。
+	 * Load JSON data from Node.js data file.
+	 *
+	 * @private
+	 * @param {string} dataFile 数据文件名 / Data file name.
+	 * @returns {Record<string, any>}
+	 */
+	static #loaddata = dataFile => {
+		if ($app === "Node.js") {
+			this.fs = this.fs ? this.fs : require("fs");
+			this.path = this.path ? this.path : require("path");
+			const curDirDataFilePath = this.path.resolve(dataFile);
+			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
+			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
+			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
+			if (isCurDirDataFile || isRootDirDataFile) {
+				const datPath = isCurDirDataFile ? curDirDataFilePath : rootDirDataFilePath;
+				try {
+					return JSON.parse(this.fs.readFileSync(datPath));
+				} catch (e) {
+					return {};
+				}
+			} else return {};
+		} else return {};
+	};
+
+	/**
+	 * 将内存数据写入 Node.js 数据文件。
+	 * Persist in-memory data to Node.js data file.
+	 *
+	 * @private
+	 * @param {string} [dataFile=this.dataFile] 数据文件名 / Data file name.
+	 * @returns {void}
+	 */
+	static #writedata = (dataFile = this.dataFile) => {
+		if ($app === "Node.js") {
+			this.fs = this.fs ? this.fs : require("fs");
+			this.path = this.path ? this.path : require("path");
+			const curDirDataFilePath = this.path.resolve(dataFile);
+			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
+			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
+			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
+			const jsondata = JSON.stringify(this.data);
+			if (isCurDirDataFile) {
+				this.fs.writeFileSync(curDirDataFilePath, jsondata);
+			} else if (isRootDirDataFile) {
+				this.fs.writeFileSync(rootDirDataFilePath, jsondata);
+			} else {
+				this.fs.writeFileSync(curDirDataFilePath, jsondata);
+			}
+		}
+	};
 }
