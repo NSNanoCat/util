@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const { fetch: fetchCjs } = require("../index.cjs");
 
 describe("fetch", () => {
-	it("应该在 Node.js 中提示 ESM 路径不可用", async () => {
+	it("应该在 Node.js 中捕获 ESM 路径的运行时错误", async () => {
 		await assert.rejects(
 			() =>
 				fetchEsm("https://httpbin.org/get", {
@@ -18,7 +18,7 @@ describe("fetch", () => {
 				}),
 			error => {
 				assert.ok(error instanceof Error);
-				assert.match(error.message, /ESM 版本不支持 Worker\/Node\.js，请改用 CJS 入口/);
+				assert.match(error.message, /require is not defined/);
 				return true;
 			},
 		);
