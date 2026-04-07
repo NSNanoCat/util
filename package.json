@@ -23,6 +23,10 @@
 			"import": "./polyfill/fetch.mjs",
 			"require": "./polyfill/fetch.cjs"
 		},
+		"./polyfill/Storage": {
+			"import": "./polyfill/Storage.mjs",
+			"require": "./polyfill/Storage.cjs"
+		},
 		"./*": "./*"
 	},
 	"types": "types/nsnanocat-util.d.ts",

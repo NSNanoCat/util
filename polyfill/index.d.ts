@@ -8,4 +8,4 @@ export type { Fetch, FetchRequest, FetchResponse } from "./fetch.d.ts";
 export { Lodash } from "./Lodash.mjs";
 export { qs } from "./qs.mjs";
 export { StatusTexts } from "./StatusTexts.mjs";
-export { Storage } from "./Storage.js";
+export { Storage } from "./Storage.mjs";

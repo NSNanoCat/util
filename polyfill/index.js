@@ -3,4 +3,4 @@ export * from "./fetch.mjs";
 export * from "./Lodash.mjs";
 export * from "./qs.mjs";
 export * from "./StatusTexts.mjs";
-export * from "./Storage.js";
+export * from "./Storage.mjs";
