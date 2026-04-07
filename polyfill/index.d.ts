@@ -3,7 +3,7 @@
  * Aggregated exports for polyfill modules.
  */
 export { Console } from "./Console.mjs";
-export { fetch } from "./fetch.mjs";
+export { fetch } from "./fetch.js";
 export type { Fetch, FetchRequest, FetchResponse } from "./fetch.mjs";
 export { Lodash } from "./Lodash.mjs";
 export { qs } from "./qs.mjs";
