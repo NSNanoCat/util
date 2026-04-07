@@ -286,8 +286,8 @@ export class Storage {
 	 */
 	static #loaddata = dataFile => {
 		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("node:fs");
-			this.path = this.path ? this.path : require("node:path");
+			this.fs = this.fs ? this.fs : require("fs");
+			this.path = this.path ? this.path : require("path");
 			const curDirDataFilePath = this.path.resolve(dataFile);
 			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
 			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
@@ -313,8 +313,8 @@ export class Storage {
 	 */
 	static #writedata = (dataFile = this.dataFile) => {
 		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("node:fs");
-			this.path = this.path ? this.path : require("node:path");
+			this.fs = this.fs ? this.fs : require("fs");
+			this.path = this.path ? this.path : require("path");
 			const curDirDataFilePath = this.path.resolve(dataFile);
 			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
 			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
