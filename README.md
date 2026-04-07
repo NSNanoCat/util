@@ -369,7 +369,11 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 
 ### `polyfill/fetch.mjs`
 
-`fetch` 是仿照 Web API `Window.fetch` 设计的跨平台适配实现：
+`fetch` 现已拆分为 ESM / CJS 两条运行路径：
+- `polyfill/fetch.mjs`：仅用于 iOS 脚本平台（Quantumult X / Loon / Surge / Stash / Egern / Shadowrocket）
+- `polyfill/fetch.cjs`：用于 Worker / Node.js
+
+`polyfill/fetch.mjs` 仍仿照 Web API `Window.fetch` 设计：
 - 参考文档：https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch
 - 中文文档：https://developer.mozilla.org/zh-CN/docs/Web/API/Window/fetch
 - 目标：尽量保持 Web `fetch` 调用习惯，同时补齐各平台扩展参数映射
@@ -394,7 +398,7 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - `timeout`
 - `policy`
 - `redirection` / `auto-redirect`
-- `auto-cookie`（Worker / Node.js 共享分支识别；默认启用，传入 `false` / `0` / `-1` 可关闭）
+- `auto-cookie`（仅 CJS 的 Worker / Node.js 分支识别；默认启用，传入 `false` / `0` / `-1` 可关闭）
 
 说明：下表是各 App 原生 HTTP 接口的差异补充，以及本库 `fetch` 的内部映射方式。调用方使用统一入参即可。
 
@@ -408,8 +412,6 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 | Egern | `$httpClient[method]` | 秒 | 无专门映射 | `auto-redirect` | 同上 |
 | Shadowrocket | `$httpClient[method]` | 秒 | `headers.X-Surge-Proxy` | `auto-redirect` | 同上 |
 | Quantumult X | `$task.fetch` | 毫秒（内部乘 1000） | `opts.policy` | `opts.redirection` | `body(ArrayBuffer/TypedArray)` 转 `bodyBytes`；响应按 `Content-Type` 恢复到 `body` |
-| Worker | `globalThis.fetch`（不存在时回退 `node-fetch`）；共享 `auto-cookie` 处理 | 毫秒（内部乘 1000） | 无 | `redirect: follow/manual` | 返回 `body`(UTF-8 string) + `bodyBytes`(ArrayBuffer) |
-| Node.js | `globalThis.fetch`（不存在时回退 `node-fetch`）；默认按需包裹 `fetch-cookie` | 毫秒（内部乘 1000） | 无 | `redirect: follow/manual` | 返回 `body`(UTF-8 string) + `bodyBytes`(ArrayBuffer) |
 
 返回对象（统一后）常见字段：
 - `ok`
@@ -421,11 +423,14 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - `bodyBytes`
 
 不可用/差异点：
-- `policy` 在 Surge / Egern / Worker / Node.js 分支没有额外适配逻辑。
+- `policy` 在 Surge / Egern 分支没有额外适配逻辑。
 - `redirection` 在部分平台会映射为 `auto-redirect` 或 `opts.redirection`。
-- Worker / Node.js 共享基于 `fetch` 的请求分支；若 `globalThis.fetch` 不存在则回退到 `node-fetch`，并在 `auto-cookie` 未关闭时按需包裹 `fetch-cookie`。
 - 传入 `timeout` 时，`5` 和 `5000` 都会被接受；库会先将用户输入归一化，再按平台要求转换为秒或毫秒。
 - 返回结构是统一兼容结构，不等同于浏览器 `Response` 对象。
+
+Worker / Node.js 使用说明：
+- 请通过 CJS 入口调用：`require("@nsnanocat/util").fetch` 或 `require("@nsnanocat/util/polyfill/fetch").fetch`
+- CJS 分支会处理 `auto-cookie`，并将响应归一化为 `ok/status/statusText/body/bodyBytes`
 
 ### `polyfill/Storage.mjs`
 

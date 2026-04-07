@@ -5,7 +5,7 @@ export * from "./lib/notification.mjs";
 export * from "./lib/time.mjs";
 export * from "./lib/wait.mjs";
 export * from "./polyfill/Console.mjs";
-export * from "./polyfill/fetch.js";
+export * from "./polyfill/fetch.mjs";
 export * from "./polyfill/Lodash.mjs";
 export * from "./polyfill/qs.mjs";
 export * from "./polyfill/StatusTexts.mjs";

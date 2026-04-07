@@ -14,10 +14,23 @@
 	"license": "Apache-2.0",
 	"bugs": "https://github.com/NSNanoCat/util/issues",
 	"main": "index.js",
+	"exports": {
+		".": {
+			"import": "./index.js",
+			"require": "./index.cjs"
+		},
+		"./polyfill/fetch": {
+			"import": "./polyfill/fetch.mjs",
+			"require": "./polyfill/fetch.cjs"
+		},
+		"./*": "./*"
+	},
 	"types": "types/nsnanocat-util.d.ts",
 	"scripts": {
 		"tsc:build": "npx tsc",
 		"test": "node --test test/*.test.js",
+		"test:fetch": "node --test test/fetch.test.js",
+		"test:fetch:cjs": "node --test test/fetch.test.cjs",
 		"test:merge": "node --test test/Lodash.merge.test.js",
 		"test:argument": "node --test test/argument.test.js",
 		"deprecate": "npm deprecate -f '@nsnanocat/util@0.0.0-preview' \"this package has been deprecated\""
@@ -27,12 +40,17 @@
 		"url": "git+https://github.com/NSNanoCat/util.git"
 	},
 	"files": [
+		"index.cjs",
 		"index.js",
 		"lib",
 		"polyfill",
 		"getStorage.mjs",
 		"types"
 	],
+	"dependencies": {
+		"fetch-cookie": "^3.2.0",
+		"node-fetch": "^3.3.2"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "2.4.6",
 		"typescript": "^5.9.3"
