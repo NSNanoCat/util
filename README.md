@@ -655,9 +655,11 @@ console.log(value); // 1
 
 当前行为：
 - 当 `query` 为 `string` 时：
+  - 支持前导 `?`（会先去掉）。
   - 按 `&` / `=` 切分。
+  - key 与 value 都会先执行 URL 解码（`decodeURIComponent`，并将 `+` 视为空格）。
   - 去掉值中的双引号。
-  - 使用点路径或数组下标路径展开对象。
+  - 支持点路径、数组下标路径，以及方括号 key（如 `a[b]`）展开对象。
 - 当 `query` 为 `object` 时：
   - 将 key 当路径写入新对象（`{"a.b":"1"}` -> `{ a: { b: "1" } }`）。
 - 当 `query` 为 `null` 或 `undefined` 时：
@@ -668,6 +670,9 @@ import { qs } from "@nsnanocat/util";
 
 console.log(qs.parse("mode=on&a.b=1"));
 // { mode: "on", a: { b: "1" } }
+
+console.log(qs.parse("a%5Bb%5D=c%20d"));
+// { a: { b: "c d" } }
 
 console.log(qs.parse({ "list[0]": "x", "list[1]": "y" }));
 // { list: ["x", "y"] }

@@ -17,6 +17,12 @@ describe("qs", () => {
 		});
 	});
 
+	it("应该解析 URL 编码后的路径和值", () => {
+		assert.deepStrictEqual(qs.parse("a%5Bb%5D=c%20d"), {
+			a: { b: "c d" },
+		});
+	});
+
 	it("应该解析点号路径", () => {
 		assert.deepStrictEqual(qs.parse("a.b.c=123&name=Virgil"), {
 			a: { b: { c: "123" } },
@@ -58,6 +64,15 @@ describe("qs", () => {
 				list: ["x", "y"],
 			}),
 			"a.b.c=123&list%5B0%5D=x&list%5B1%5D=y",
+		);
+	});
+
+	it("应该对序列化结果进行 URL 编码", () => {
+		assert.strictEqual(
+			qs.stringify({
+				a: { b: "c d" },
+			}),
+			"a.b=c%20d",
 		);
 	});
 });

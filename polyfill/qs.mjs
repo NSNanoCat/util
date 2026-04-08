@@ -31,7 +31,18 @@ export class qs {
 		let result = {};
 		switch (typeof query) {
 			case "string": {
-				const obj = Object.fromEntries(query.split("&").map(item => item.split("=", 2).map(i => i.replace(/\"/g, ""))));
+				const source = query.replace(/^\?/, "");
+				if (!source) break;
+				const obj = Object.fromEntries(
+					source
+						.split("&")
+						.filter(Boolean)
+						.map(item => {
+							const [rawKey = "", rawValue = ""] = item.split("=", 2);
+							const key = qs.#decode(rawKey).replace(/\[([^\[\]]+)\]/g, ".$1");
+							return [key, qs.#decode(rawValue).replace(/\"/g, "")];
+						}),
+				);
 				Object.keys(obj).forEach(key => _.set(result, key, obj[key]));
 				break;
 			}
@@ -138,5 +149,16 @@ export class qs {
 	 */
 	static #encode(value) {
 		return encodeURIComponent(value);
+	}
+
+	/**
+	 * 解码查询字符串片段。
+	 * Decode a query-string fragment.
+	 *
+	 * @param {string} value 编码值 / Encoded value.
+	 * @returns {string}
+	 */
+	static #decode(value) {
+		return decodeURIComponent(value.replace(/\+/g, " "));
 	}
 }
