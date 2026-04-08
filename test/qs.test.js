@@ -23,10 +23,43 @@ describe("qs", () => {
 		});
 	});
 
+	it("应该支持前导问号", () => {
+		assert.deepStrictEqual(qs.parse("?a=1&b=2"), {
+			a: "1",
+			b: "2",
+		});
+	});
+
+	it("应该将加号解析为空格", () => {
+		assert.deepStrictEqual(qs.parse("a+b=c+d"), {
+			"a b": "c d",
+		});
+	});
+
 	it("应该解析点号路径", () => {
 		assert.deepStrictEqual(qs.parse("a.b.c=123&name=Virgil"), {
 			a: { b: { c: "123" } },
 			name: "Virgil",
+		});
+	});
+
+	it("应该解析点号与方括号混合路径", () => {
+		assert.deepStrictEqual(qs.parse("a.b[0].c=1&a.b[1].c=2"), {
+			a: { b: [{ c: "1" }, { c: "2" }] },
+		});
+	});
+
+	it("应该解析方括号数字索引为数组", () => {
+		const parsed = qs.parse("a[0]=x&a[10]=y");
+		assert.ok(Array.isArray(parsed.a));
+		assert.strictEqual(parsed.a.length, 11);
+		assert.strictEqual(parsed.a[0], "x");
+		assert.strictEqual(parsed.a[10], "y");
+	});
+
+	it("应该将方括号字符键按路径展开", () => {
+		assert.deepStrictEqual(qs.parse("a[b.c]=1"), {
+			a: { b: { c: "1" } },
 		});
 	});
 
@@ -73,6 +106,16 @@ describe("qs", () => {
 				a: { b: "c d" },
 			}),
 			"a.b=c%20d",
+		);
+	});
+
+	it("应该序列化 null 并跳过 undefined", () => {
+		assert.strictEqual(
+			qs.stringify({
+				a: null,
+				b: undefined,
+			}),
+			"a=",
 		);
 	});
 });
