@@ -224,11 +224,17 @@ export class Console {
 	 * 输出通用日志。
 	 * Print generic logs.
 	 *
+	 * 说明:
+	 * Notes:
+	 * - 顶层数组参数会按多个独立日志项展开。
+	 * - Top-level array arguments are expanded into multiple log entries.
+	 *
 	 * @param {...any} msg 日志内容 / Log messages.
 	 * @returns {void}
 	 */
 	static log = (...msg) => {
 		if (Console.#level === 0) return;
+		msg = msg.flatMap(log => (Array.isArray(log) ? log : [log]));
 		msg = msg.map(log => {
 			switch (typeof log) {
 				case "object":

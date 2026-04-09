@@ -92,6 +92,11 @@ export class Console {
 	 * 输出普通日志。
 	 * Print standard log messages.
 	 *
+	 * 说明:
+	 * Notes:
+	 * - 顶层数组参数会按多个独立日志项展开。
+	 * - Top-level array arguments are expanded into multiple log entries.
+	 *
 	 * @param msg 日志内容 / Log payloads.
 	 */
 	static log(...msg: unknown[]): void;
