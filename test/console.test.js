@@ -13,26 +13,36 @@ afterEach(() => {
 });
 
 describe("Console.log", () => {
-	it("应该将顶层数组参数展开为多行日志", async () => {
+	it("应该将多行字符串拆分为多行日志并保留空行", async () => {
+		console.log = message => capturedLogs.push(message);
+
+		importSeed += 1;
+		const { Console } = await import(`${consoleModule}?test=${importSeed}`);
+		Console.log("a", "b\nc\r\n\r\nd", "e");
+
+		assert.deepStrictEqual(capturedLogs, ["\na\nb\nc\n\nd\ne"]);
+	});
+
+	it("应该保留数组参数为单个日志项", async () => {
 		console.log = message => capturedLogs.push(message);
 
 		importSeed += 1;
 		const { Console } = await import(`${consoleModule}?test=${importSeed}`);
 		Console.log("a", ["b", "c"], "d");
 
-		assert.deepStrictEqual(capturedLogs, ["\na\nb\nc\nd"]);
+		assert.deepStrictEqual(capturedLogs, ['\na\n["b","c"]\nd']);
 	});
 
-	it("应该在日志分组中保持数组展开后的缩进", async () => {
+	it("应该在日志分组中逐行缩进多行字符串与格式化 JSON", async () => {
 		console.log = message => capturedLogs.push(message);
 
 		importSeed += 1;
 		const { Console } = await import(`${consoleModule}?test=${importSeed}`);
 		Console.group("测试分组");
-		Console.log("a", ["b", "c"], "d");
+		Console.log("title", "body1\nbody2", JSON.stringify({ url: "https://example.com" }, null, 2));
 		Console.groupEnd();
 
-		assert.deepStrictEqual(capturedLogs, ["\n▼ 测试分组:\n  a\n  b\n  c\n  d"]);
+		assert.deepStrictEqual(capturedLogs, ['\n▼ 测试分组:\n  title\n  body1\n  body2\n  {\n    "url": "https://example.com"\n  }']);
 	});
 });
 

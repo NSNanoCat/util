@@ -94,8 +94,8 @@ export class Console {
 	 *
 	 * 说明:
 	 * Notes:
-	 * - 顶层数组参数会按多个独立日志项展开。
-	 * - Top-level array arguments are expanded into multiple log entries.
+	 * - 多行字符串参数会按换行拆分为多个独立日志项。
+	 * - Multi-line string arguments are split into multiple log entries by line breaks.
 	 *
 	 * @param msg 日志内容 / Log payloads.
 	 */

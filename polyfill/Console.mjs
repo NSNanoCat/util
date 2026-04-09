@@ -226,31 +226,28 @@ export class Console {
 	 *
 	 * 说明:
 	 * Notes:
-	 * - 顶层数组参数会按多个独立日志项展开。
-	 * - Top-level array arguments are expanded into multiple log entries.
+	 * - 多行字符串参数会按换行拆分为多个独立日志项。
+	 * - Multi-line string arguments are split into multiple log entries by line breaks.
 	 *
 	 * @param {...any} msg 日志内容 / Log messages.
 	 * @returns {void}
 	 */
 	static log = (...msg) => {
 		if (Console.#level === 0) return;
-		msg = msg.flatMap(log => (Array.isArray(log) ? log : [log]));
-		msg = msg.map(log => {
+		msg = msg.flatMap(log => {
 			switch (typeof log) {
 				case "object":
-					log = JSON.stringify(log);
-					break;
+					return [JSON.stringify(log)];
 				case "bigint":
 				case "number":
 				case "boolean":
+					return [log.toString()];
 				case "string":
-					log = log.toString();
-					break;
+					return log.split(/\r?\n/u);
 				case "undefined":
 				default:
-					break;
+					return [log];
 			}
-			return log;
 		});
 		Console.#groups.forEach(group => {
 			msg = msg.map(log => `  ${log}`);
