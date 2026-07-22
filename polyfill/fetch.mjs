@@ -238,68 +238,89 @@ export async function fetch(resource, options = {}) {
 				}),
 			]);
 		case "Worker":
-		case "Node.js": {
-			// Worker 复用宿主 `fetch`；Node.js 优先复用原生 `fetch`，缺失时再回退到 `node-fetch`。
-			// Worker reuses host `fetch`; Node.js reuses native `fetch` first and falls back to `node-fetch`.
-			if (!globalThis.fetch) globalThis.fetch = require("node-fetch");
-			switch (resource["auto-cookie"]) {
-				case undefined:
-				case "true":
-				case true:
-				case "1":
-				case 1:
-				default:
-					// 仅在尚未包裹 CookieJar 时注入 `fetch-cookie`，避免重复包装。
-					// Inject `fetch-cookie` only once when a cookie jar is not already attached.
-					if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie").default(globalThis.fetch);
+		case "Node.js":
+		default: {
+			let request;
+			let timeout;
+			let shouldWrapError = false;
+			switch ($app) {
+				case "Worker":
+				case "Node.js":
+					// Worker 复用宿主 `fetch`；Node.js 优先复用原生 `fetch`，缺失时再回退到 `node-fetch`。
+					// Worker reuses host `fetch`; Node.js reuses native `fetch` first and falls back to `node-fetch`.
+					if (!globalThis.fetch) globalThis.fetch = require("node-fetch");
+					switch (resource["auto-cookie"]) {
+						case undefined:
+						case "true":
+						case true:
+						case "1":
+						case 1:
+						default:
+							// 仅在尚未包裹 CookieJar 时注入 `fetch-cookie`，避免重复包装。
+							// Inject `fetch-cookie` only once when a cookie jar is not already attached.
+							if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie").default(globalThis.fetch);
+							break;
+						case "false":
+						case false:
+						case "0":
+						case 0:
+						case "-1":
+						case -1:
+							break;
+					}
+					// 将通用字段映射到 Worker / Node.js Fetch 语义。
+					// Map shared fields to Worker / Node.js Fetch semantics.
+					resource.redirect = resource.redirection ? "follow" : "manual";
+					request = resource;
+					timeout = resource.timeout;
+					shouldWrapError = true;
 					break;
-				case "false":
-				case false:
-				case "0":
-				case 0:
-				case "-1":
-				case -1:
+				default: {
+					// 未识别宿主也可使用完整标准 Fetch API；不将能力推断为宿主类型。
+					// An unrecognized host may still use the complete standard Fetch API; capability does not imply a host type.
+					if (typeof globalThis.fetch !== "function" || typeof globalThis.Headers !== "function" || typeof globalThis.Request !== "function" || typeof globalThis.Response !== "function") {
+						throw new Error(`${Function.name}: 当前运行环境不支持 Fetch API`);
+					}
+					const { url, bodyBytes, redirection, timeout: _timeout, policy: _policy, "auto-redirect": _autoRedirect, "auto-cookie": _autoCookie, opts: _opts, ...fetchOptions } = resource;
+					if (bodyBytes !== undefined && fetchOptions.body === undefined) fetchOptions.body = bodyBytes;
+					fetchOptions.redirect = redirection ? "follow" : "manual";
+					request = { url, ...fetchOptions };
+					timeout = resource.timeout * 1000;
 					break;
+				}
 			}
-			// 将通用字段映射到 Worker / Node.js Fetch 语义。
-			// Map shared fields to Worker / Node.js Fetch semantics.
-			resource.redirect = resource.redirection ? "follow" : "manual";
-			const { url, ...options } = resource;
+			const { url, ...options } = request;
 			// 发起请求并归一化响应头、文本与二进制响应体。
 			// Send the request and normalize headers, text, and binary response data.
+			const responsePromise = globalThis.fetch(url, options).then(async response => {
+				const bodyBytes = await response.arrayBuffer();
+				let headers;
+				try {
+					headers = response.headers.raw();
+				} catch {
+					headers = Array.from(response.headers.entries()).reduce((acc, [key, value]) => {
+						acc[key] = acc[key] ? [...acc[key], value] : [value];
+						return acc;
+					}, {});
+				}
+				return {
+					ok: response.ok ?? /^2\d\d$/.test(response.status),
+					status: response.status,
+					statusCode: response.status,
+					statusText: response.statusText,
+					body: new TextDecoder("utf-8").decode(bodyBytes),
+					bodyBytes: bodyBytes,
+					headers: Object.fromEntries(Object.entries(headers).map(([key, value]) => [key, key.toLowerCase() !== "set-cookie" ? value.toString() : value])),
+				};
+			});
 			return Promise.race([
-				globalThis
-					.fetch(url, options)
-					.then(async response => {
-						const bodyBytes = await response.arrayBuffer();
-						let headers;
-						try {
-							headers = response.headers.raw();
-						} catch {
-							headers = Array.from(response.headers.entries()).reduce((acc, [key, value]) => {
-								acc[key] = acc[key] ? [...acc[key], value] : [value];
-								return acc;
-							}, {});
-						}
-						return {
-							ok: response.ok ?? /^2\d\d$/.test(response.status),
-							status: response.status,
-							statusCode: response.status,
-							statusText: response.statusText,
-							body: new TextDecoder("utf-8").decode(bodyBytes),
-							bodyBytes: bodyBytes,
-							headers: Object.fromEntries(Object.entries(headers).map(([key, value]) => [key, key.toLowerCase() !== "set-cookie" ? value.toString() : value])),
-						};
-					})
-					.catch(error => Promise.reject(error.message)),
-				new Promise((resolve, reject) => {
+				shouldWrapError ? responsePromise.catch(error => Promise.reject(error.message)) : responsePromise,
+				new Promise((_resolve, reject) => {
 					setTimeout(() => {
 						reject(new Error(`${Function.name}: 请求超时, 请检查网络后重试`));
-					}, resource.timeout);
+					}, timeout);
 				}),
 			]);
 		}
-		default:
-			throw new Error(`${Function.name}: 当前平台不支持`);
 	}
 }

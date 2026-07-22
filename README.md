@@ -371,7 +371,7 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 ### `polyfill/fetch.mjs`
 
 `fetch` 现已拆分为 ESM / CJS 两条运行路径：
-- `polyfill/fetch.mjs`：仅用于 iOS 脚本平台（Quantumult X / Loon / Surge / Stash / Egern / Shadowrocket）
+- `polyfill/fetch.mjs`：用于 iOS 脚本平台（Quantumult X / Loon / Surge / Stash / Egern / Shadowrocket）；未识别宿主具备完整标准 Fetch API 时，直接使用宿主 `fetch`
 - `polyfill/fetch.cjs`：用于 Worker / Node.js
 
 `polyfill/fetch.mjs` 仍仿照 Web API `Window.fetch` 设计：
@@ -428,6 +428,8 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - `redirection` 在部分平台会映射为 `auto-redirect` 或 `opts.redirection`。
 - 传入 `timeout` 时，`5` 和 `5000` 都会被接受；库会先将用户输入归一化，再按平台要求转换为秒或毫秒。
 - 返回结构是统一兼容结构，不等同于浏览器 `Response` 对象。
+- 未识别宿主但同时存在 `fetch`、`Headers`、`Request` 与 `Response` 时，ESM 路径直接调用宿主 `fetch`；`bodyBytes` 映射为 `body`，`redirection` 映射为 `redirect`，并移除 `timeout`、`policy`、`auto-cookie`、`opts` 等非标准字段。
+- 未识别宿主且缺少完整标准 Fetch API 时，会抛出“当前运行环境不支持 Fetch API”错误。
 
 Worker / Node.js 使用说明：
 - 请通过 CJS 入口调用：`require("@nsnanocat/util").fetch` 或 `require("@nsnanocat/util/polyfill/fetch").fetch`

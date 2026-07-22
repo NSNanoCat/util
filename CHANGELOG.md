@@ -4,6 +4,15 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.7.0] - 2026-07-22
+
+### 修复
+- `fix(fetch)`: 未识别宿主具备完整标准 Fetch API 时，ESM 路径直接使用宿主 `fetch`，不再回落访问 `$httpClient`。
+- `fix(fetch)`: 标准 Fetch 路径映射 `bodyBytes` 与 `redirection`，移除非标准请求字段；缺少完整 Fetch API 时抛出明确错误。
+
+### 新增
+- `test(fetch)`: 增加未知宿主标准 Fetch 回退、缺少能力报错与 CJS CookieJar 的本地 stub 回归测试。
+
 ## [2.5.2] - 2026-03-19
 
 ### 变更
@@ -157,6 +166,7 @@
 - `docs`: 完善 polyfill 文档说明与引用链接（`b817c07`）。
 - `docs`: 补充 README 与 JSDoc 注释说明（`5c5f1f3`）。
 
+[2.7.0]: https://github.com/NSNanoCat/util/compare/v2.6.11...HEAD
 [2.5.2]: https://github.com/NSNanoCat/util/compare/v2.5.1...HEAD
 [2.5.1]: https://github.com/NSNanoCat/util/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/NSNanoCat/util/compare/v2.4.0...v2.5.0
