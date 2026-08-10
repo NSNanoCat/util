@@ -109,7 +109,7 @@ import {
 | `getStorage.mjs` | `lib/argument.mjs`, `polyfill/Console.mjs`, `polyfill/Lodash.mjs`, `polyfill/Storage.mjs` | `Console.debug`, `Console.logLevel`, `Lodash.merge`, `Storage.getItem` | 先标准化 `$argument`，再合并默认配置/持久化配置/运行参数 |
 | `polyfill/Console.mjs` | `lib/app.mjs` | `$app` | 日志在 Worker / Node.js 与 iOS 脚本环境使用不同错误输出策略 |
 | `polyfill/fetch.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs`, `polyfill/StatusTexts.mjs`, `polyfill/Console.mjs` | `$app`, `Lodash.set`, `StatusTexts`（`Console` 当前版本未实际调用） | 按平台选请求引擎并做参数映射、响应结构统一 |
-| `polyfill/Storage.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset` | ESM 路径下按平台选持久化后端并支持 `@key.path` 读写（Node.js 请走 `Storage.cjs`） |
+| `polyfill/Storage.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset` | ESM 路径下按平台选持久化后端并支持 `@key.path` 读写 |
 | `polyfill/Lodash.mjs` | 无 | 无 | 提供路径/合并等基础能力，被多个模块复用 |
 | `polyfill/qs.mjs` | `polyfill/Lodash.mjs` | `Lodash.get`, `Lodash.set`, `Lodash.toPath` | 提供查询字符串与对象之间的解析/序列化能力 |
 | `polyfill/StatusTexts.mjs` | 无 | 无 | 提供 HTTP 状态文案，供 `fetch/done` 使用 |
@@ -438,7 +438,7 @@ Worker / Node.js 使用说明：
 ### `polyfill/Storage.mjs`
 
 `Storage` 已拆分为 ESM / CJS 两条运行路径：
-- `polyfill/Storage.mjs`：用于 iOS 脚本平台 + Worker
+- `polyfill/Storage.mjs`：用于 iOS 脚本平台、Worker 与 Node.js ESM
 - `polyfill/Storage.cjs`：用于 Worker / Node.js（含 `box.dat` 文件读写）
 
 `polyfill/Storage.mjs` 仍仿照 Web Storage 接口（`Storage`）设计：
@@ -459,30 +459,32 @@ Worker / Node.js 使用说明：
 - Quantumult X：可用（`$prefs.removeValueForKey`）。
 - Surge：通过 `$persistentStore.write(null, keyName)` 删除。
 - Worker：可用（仅删除内存缓存中的对应 key，不持久化）。
-- Node.js：ESM 路径不支持，会提示改用 CJS 入口。
+- Node.js：可用，并同步更新数据文件。
 - Loon / Stash / Egern / Shadowrocket：返回 `false`。
 
 #### `Storage.clear()`
 - Quantumult X：可用（`$prefs.removeAllValues`）。
 - Worker：可用（仅清空内存缓存，不持久化）。
-- Node.js：ESM 路径不支持，会提示改用 CJS 入口。
+- Node.js：可用，并同步清空数据文件。
 - 其他平台：返回 `false`。
 
 #### Worker 特性（ESM）
 - Worker：使用进程内内存缓存，不写文件。
 
-#### Node.js 特性（CJS）
+#### Node.js 特性（ESM/CJS）
 - 数据文件默认：`box.dat`。
 - 读取路径优先级：当前目录 -> `process.cwd()`。
+- Vercel Functions 的 ESM 路径改用 `/tmp/box.dat`；该文件只作为实例级临时缓存，不保证跨实例持久化。
 
 Node.js 使用说明：
-- 请通过 CJS 入口调用：`require("@nsnanocat/util").Storage` 或 `require("@nsnanocat/util/polyfill/Storage").Storage`
+- ESM 可通过 `import { Storage } from "@nsnanocat/util"` 调用。
+- CJS 可通过 `require("@nsnanocat/util").Storage` 或 `require("@nsnanocat/util/polyfill/Storage").Storage` 调用。
 - CJS 的 `Storage` 分支支持 `box.dat` 读写与落盘
 
 与 Web Storage 的行为差异：
 - 支持 `@key.path` 深路径读写（Web Storage 原生不支持）。
 - `removeItem/clear` 仅部分平台可用：
-  - ESM 路径：Quantumult X、Worker，以及 Surge 的 `removeItem`
+  - ESM 路径：Quantumult X、Worker、Node.js，以及 Surge 的 `removeItem`
   - CJS 路径：Worker、Node.js
 - `getItem` 会尝试 `JSON.parse`，`setItem` 写入对象会 `JSON.stringify`。
 
@@ -493,7 +495,7 @@ Node.js 使用说明：
 | Surge / Loon / Stash / Egern / Shadowrocket | `$persistentStore.read/write` |
 | Quantumult X | `$prefs.valueForKey/setValueForKey` |
 | Worker（ESM/CJS） | 进程内内存缓存 |
-| Node.js（仅 CJS） | 本地 `box.dat` |
+| Node.js（ESM/CJS） | 本地 `box.dat`；Vercel ESM 使用 `/tmp/box.dat` |
 
 ### `polyfill/Console.mjs`
 

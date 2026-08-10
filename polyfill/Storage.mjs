@@ -18,8 +18,8 @@ import { Lodash as _ } from "./Lodash.mjs";
  * - Quantumult X: `$prefs`
  * - Worker: 内存缓存（非持久化）
  * - Worker: in-memory cache (non-persistent)
- * - Node.js: 本地 `box.dat`
- * - Node.js: local `box.dat`
+ * - Node.js: 本地 `box.dat`（Vercel 使用 `/tmp`）
+ * - Node.js: local `box.dat` (`/tmp` on Vercel)
  *
  * 支持路径键:
  * Supports path key:
@@ -286,9 +286,9 @@ export class Storage {
 	 */
 	static #loaddata = dataFile => {
 		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("fs");
-			this.path = this.path ? this.path : require("path");
-			const curDirDataFilePath = this.path.resolve(dataFile);
+			this.fs ??= globalThis.process.getBuiltinModule("node:fs");
+			this.path ??= globalThis.process.getBuiltinModule("node:path");
+			const curDirDataFilePath = this.path.resolve(globalThis.process.env.VERCEL === "1" ? "/tmp" : ".", dataFile);
 			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
 			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
 			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
@@ -313,14 +313,15 @@ export class Storage {
 	 */
 	static #writedata = (dataFile = this.dataFile) => {
 		if ($app === "Node.js") {
-			this.fs = this.fs ? this.fs : require("fs");
-			this.path = this.path ? this.path : require("path");
-			const curDirDataFilePath = this.path.resolve(dataFile);
+			this.fs ??= globalThis.process.getBuiltinModule("node:fs");
+			this.path ??= globalThis.process.getBuiltinModule("node:path");
+			const isVercel = globalThis.process.env.VERCEL === "1";
+			const curDirDataFilePath = this.path.resolve(isVercel ? "/tmp" : ".", dataFile);
 			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
 			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
 			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
 			const jsondata = JSON.stringify(this.data);
-			if (isCurDirDataFile) {
+			if (isVercel || isCurDirDataFile) {
 				this.fs.writeFileSync(curDirDataFilePath, jsondata);
 			} else if (isRootDirDataFile) {
 				this.fs.writeFileSync(rootDirDataFilePath, jsondata);

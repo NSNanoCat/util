@@ -4,6 +4,15 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.7.2] - 2026-08-10
+
+### 修复
+- `fix(storage)`: ESM 路径通过 `process.getBuiltinModule()` 同步加载 Node.js 内建模块，不再调用未定义的 `require`。
+- `fix(storage)`: Vercel Functions 使用可写的 `/tmp` 存放临时 `box.dat`，避免写入只读的函数代码目录。
+
+### 测试
+- `test(storage)`: 增加 Vercel ESM 环境下从 `/tmp` 读写存储数据的回归测试。
+
 ## [2.7.1] - 2026-08-10
 
 ### 修复
