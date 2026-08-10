@@ -285,22 +285,29 @@ export class Storage {
 	 * @returns {Record<string, any>}
 	 */
 	static #loaddata = dataFile => {
-		if ($app === "Node.js") {
-			this.fs ??= globalThis.process.getBuiltinModule("node:fs");
-			this.path ??= globalThis.process.getBuiltinModule("node:path");
-			const curDirDataFilePath = this.path.resolve(globalThis.process.env.VERCEL === "1" ? "/tmp" : ".", dataFile);
-			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
-			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
-			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
-			if (isCurDirDataFile || isRootDirDataFile) {
-				const datPath = isCurDirDataFile ? curDirDataFilePath : rootDirDataFilePath;
+		this.fs ??= globalThis.process.getBuiltinModule("node:fs");
+		this.path ??= globalThis.process.getBuiltinModule("node:path");
+		const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
+		let dataFilePaths;
+		switch (globalThis.process.env.VERCEL) {
+			case "1":
+				dataFilePaths = [this.path.resolve("/tmp", dataFile), rootDirDataFilePath];
+				break;
+			default:
+				dataFilePaths = [this.path.resolve(".", dataFile), rootDirDataFilePath];
+				break;
+		}
+		const dataFilePath = dataFilePaths.find(dataPath => this.fs.existsSync(dataPath));
+		switch (dataFilePath) {
+			case undefined:
+				return {};
+			default:
 				try {
-					return JSON.parse(this.fs.readFileSync(datPath));
-				} catch (e) {
+					return JSON.parse(this.fs.readFileSync(dataFilePath));
+				} catch {
 					return {};
 				}
-			} else return {};
-		} else return {};
+		}
 	};
 
 	/**
@@ -312,22 +319,19 @@ export class Storage {
 	 * @returns {void}
 	 */
 	static #writedata = (dataFile = this.dataFile) => {
-		if ($app === "Node.js") {
-			this.fs ??= globalThis.process.getBuiltinModule("node:fs");
-			this.path ??= globalThis.process.getBuiltinModule("node:path");
-			const isVercel = globalThis.process.env.VERCEL === "1";
-			const curDirDataFilePath = this.path.resolve(isVercel ? "/tmp" : ".", dataFile);
-			const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
-			const isCurDirDataFile = this.fs.existsSync(curDirDataFilePath);
-			const isRootDirDataFile = !isCurDirDataFile && this.fs.existsSync(rootDirDataFilePath);
-			const jsondata = JSON.stringify(this.data);
-			if (isVercel || isCurDirDataFile) {
-				this.fs.writeFileSync(curDirDataFilePath, jsondata);
-			} else if (isRootDirDataFile) {
-				this.fs.writeFileSync(rootDirDataFilePath, jsondata);
-			} else {
-				this.fs.writeFileSync(curDirDataFilePath, jsondata);
-			}
+		this.fs ??= globalThis.process.getBuiltinModule("node:fs");
+		this.path ??= globalThis.process.getBuiltinModule("node:path");
+		const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
+		let dataFilePaths;
+		switch (globalThis.process.env.VERCEL) {
+			case "1":
+				dataFilePaths = [this.path.resolve("/tmp", dataFile)];
+				break;
+			default:
+				dataFilePaths = [this.path.resolve(".", dataFile), rootDirDataFilePath];
+				break;
 		}
+		const dataFilePath = dataFilePaths.find(dataPath => this.fs.existsSync(dataPath)) ?? dataFilePaths[0];
+		this.fs.writeFileSync(dataFilePath, JSON.stringify(this.data));
 	};
 }

@@ -4,6 +4,11 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.7.3] - 2026-08-10
+
+### 重构
+- `refactor(storage)`: 使用 `switch` 组织 Node.js 与 Vercel 文件路径分支，保持 Vercel `/tmp` 写入与本地文件回退行为不变。
+
 ## [2.7.2] - 2026-08-10
 
 ### 修复
