@@ -1,6 +1,6 @@
 {
 	"name": "@nsnanocat/util",
-	"version": "2.7.0",
+	"version": "2.7.1",
 	"description": "Pure JS's util module for well-known iOS network tools",
 	"author": "VirgilClyne <Virgil@nanocat.me>",
 	"homepage": "https://NSNanoCat.github.io/util",
@@ -14,10 +14,11 @@
 	],
 	"license": "Apache-2.0",
 	"bugs": "https://github.com/NSNanoCat/util/issues",
-	"main": "index.js",
+	"type": "module",
+	"main": "./index.cjs",
 	"exports": {
 		".": {
-			"import": "./index.js",
+			"import": "./index.mjs",
 			"require": "./index.cjs"
 		},
 		"./polyfill/fetch": {
@@ -46,7 +47,7 @@
 	},
 	"files": [
 		"index.cjs",
-		"index.js",
+		"index.mjs",
 		"lib",
 		"polyfill",
 		"getStorage.mjs",

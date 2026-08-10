@@ -4,6 +4,15 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.7.1] - 2026-08-10
+
+### 修复
+- `fix(package)`: 使用显式的 `index.mjs` 与 `index.cjs` 双入口，并通过条件导出分别服务 ESM `import` 与 CommonJS `require`。
+- `fix(package)`: 声明 `type: module`，明确包内其余 `.js` 文件的模块语义，避免运行时或构建工具将 ESM 误判为 CommonJS。
+
+### 测试
+- `test(package)`: 增加通过包名从 ESM 入口命名导入 `Console` 的回归测试。
+
 ## [2.7.0] - 2026-07-22
 
 ### 修复

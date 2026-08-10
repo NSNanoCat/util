@@ -13,6 +13,11 @@ afterEach(() => {
 });
 
 describe("Console.log", () => {
+	it("应该从包 ESM 入口命名导出 Console", async () => {
+		const { Console } = await import("@nsnanocat/util");
+		assert.strictEqual(typeof Console, "function");
+	});
+
 	it("应该将多行字符串拆分为多行日志并保留空行", async () => {
 		console.log = message => capturedLogs.push(message);
 

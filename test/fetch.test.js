@@ -3,7 +3,7 @@ import { execFile } from "node:child_process";
 import { createRequire } from "node:module";
 import { describe, it } from "node:test";
 import { promisify } from "node:util";
-import { fetch as fetchEsm } from "../index.js";
+import { fetch as fetchEsm } from "../index.mjs";
 
 const require = createRequire(import.meta.url);
 const { fetch: fetchCjs } = require("../index.cjs");
@@ -53,7 +53,7 @@ describe("fetch", () => {
 	});
 
 	it("未识别宿主但具备标准 Fetch API 时应回落到宿主 Fetch", async () => {
-		const moduleURL = new URL("../index.js", import.meta.url);
+		const moduleURL = new URL("../index.mjs", import.meta.url);
 		const script = `
 			Reflect.deleteProperty(globalThis, "self");
 			Reflect.deleteProperty(globalThis, "window");
@@ -106,7 +106,7 @@ describe("fetch", () => {
 	});
 
 	it("未识别宿主且缺少标准 Fetch API 时应抛出明确错误", async () => {
-		const moduleURL = new URL("../index.js", import.meta.url);
+		const moduleURL = new URL("../index.mjs", import.meta.url);
 		const script = `
 			Reflect.deleteProperty(globalThis, "self");
 			Reflect.deleteProperty(globalThis, "window");

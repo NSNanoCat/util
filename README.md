@@ -72,7 +72,7 @@ import {
 
 ## 导出清单
 
-### 包主入口（`index.js`）已导出
+### 包主入口（`index.mjs`）已导出
 - `lib/app.mjs`
 - `lib/argument.mjs`（`$argument` 参数标准化模块，导入时自动执行）
 - `lib/done.mjs`
@@ -113,7 +113,7 @@ import {
 | `polyfill/Lodash.mjs` | 无 | 无 | 提供路径/合并等基础能力，被多个模块复用 |
 | `polyfill/qs.mjs` | `polyfill/Lodash.mjs` | `Lodash.get`, `Lodash.set`, `Lodash.toPath` | 提供查询字符串与对象之间的解析/序列化能力 |
 | `polyfill/StatusTexts.mjs` | 无 | 无 | 提供 HTTP 状态文案，供 `fetch/done` 使用 |
-| `index.js` / `lib/index.js` / `polyfill/index.js` | 多个模块 | `export *` | 聚合导出，不含业务逻辑 |
+| `index.mjs` / `lib/index.js` / `polyfill/index.js` | 多个模块 | `export *` | 聚合导出，不含业务逻辑 |
 
 ## API 参考（按 mjs 文件）
 
