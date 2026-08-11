@@ -18,10 +18,18 @@
 	"main": "./index.cjs",
 	"exports": {
 		".": {
+			"node": {
+				"import": "./index.node.mjs",
+				"require": "./index.cjs"
+			},
 			"import": "./index.mjs",
 			"require": "./index.cjs"
 		},
 		"./polyfill/fetch": {
+			"node": {
+				"import": "./polyfill/fetch.node.mjs",
+				"require": "./polyfill/fetch.cjs"
+			},
 			"import": "./polyfill/fetch.mjs",
 			"require": "./polyfill/fetch.cjs"
 		},
@@ -48,6 +56,7 @@
 	"files": [
 		"index.cjs",
 		"index.mjs",
+		"index.node.mjs",
 		"lib",
 		"polyfill",
 		"getStorage.mjs",

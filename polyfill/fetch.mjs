@@ -58,8 +58,8 @@ import { StatusTexts } from "./StatusTexts.mjs";
  * - Supports platform extension fields like `policy` and `auto-redirect`
  * - Worker / Node.js 共享基于 `fetch` 的请求分支
  * - Worker / Node.js share the `fetch`-based request branch
- * - `auto-cookie` 在 Worker / Node.js 共享分支中识别
- * - `auto-cookie` is recognized by the shared Worker / Node.js branch
+ * - Node.js ESM 的 `auto-cookie` 由 `fetch.node.mjs` 处理，本文件只使用宿主 `fetch`
+ * - Node.js ESM `auto-cookie` is handled by `fetch.node.mjs`; this module only uses the host `fetch`
  * - 非浏览器平台通过 `$httpClient/$task` 实现，不是原生 Fetch 实现
  * - Non-browser platforms use `$httpClient/$task` instead of native Fetch engine
  * - 返回结构包含 `statusCode/bodyBytes` 等兼容字段
@@ -246,27 +246,11 @@ export async function fetch(resource, options = {}) {
 			switch ($app) {
 				case "Worker":
 				case "Node.js":
-					// Worker 复用宿主 `fetch`；Node.js 优先复用原生 `fetch`，缺失时再回退到 `node-fetch`。
-					// Worker reuses host `fetch`; Node.js reuses native `fetch` first and falls back to `node-fetch`.
-					if (!globalThis.fetch) globalThis.fetch = require("node-fetch");
-					switch (resource["auto-cookie"]) {
-						case undefined:
-						case "true":
-						case true:
-						case "1":
-						case 1:
+					switch (typeof globalThis.fetch) {
+						case "function":
+							break;
 						default:
-							// 仅在尚未包裹 CookieJar 时注入 `fetch-cookie`，避免重复包装。
-							// Inject `fetch-cookie` only once when a cookie jar is not already attached.
-							if (!globalThis.fetch?.cookieJar) globalThis.fetch = require("fetch-cookie").default(globalThis.fetch);
-							break;
-						case "false":
-						case false:
-						case "0":
-						case 0:
-						case "-1":
-						case -1:
-							break;
+							throw new Error(`${Function.name}: 当前运行环境不支持 Fetch API`);
 					}
 					// 将通用字段映射到 Worker / Node.js Fetch 语义。
 					// Map shared fields to Worker / Node.js Fetch semantics.
