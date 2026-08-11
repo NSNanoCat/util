@@ -72,7 +72,14 @@ import {
 
 ## 导出清单
 
-### 包主入口（`index.mjs`）已导出
+### 包主入口
+
+`package.json` 会根据运行时与模块系统选择明确入口：
+- Node.js ESM：`index.node.mjs`
+- 通用 ESM / JavaScriptCore：`index.mjs`
+- CommonJS：`index.cjs`
+
+ESM 主入口已导出：
 - `lib/app.mjs`
 - `lib/argument.mjs`（`$argument` 参数标准化模块，导入时自动执行）
 - `lib/done.mjs`
@@ -109,6 +116,7 @@ import {
 | `getStorage.mjs` | `lib/argument.mjs`, `polyfill/Console.mjs`, `polyfill/Lodash.mjs`, `polyfill/Storage.mjs` | `Console.debug`, `Console.logLevel`, `Lodash.merge`, `Storage.getItem` | 先标准化 `$argument`，再合并默认配置/持久化配置/运行参数 |
 | `polyfill/Console.mjs` | `lib/app.mjs` | `$app` | 日志在 Worker / Node.js 与 iOS 脚本环境使用不同错误输出策略 |
 | `polyfill/fetch.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs`, `polyfill/StatusTexts.mjs`, `polyfill/Console.mjs` | `$app`, `Lodash.set`, `StatusTexts`（`Console` 当前版本未实际调用） | 按平台选请求引擎并做参数映射、响应结构统一 |
+| `polyfill/fetch.node.mjs` | `polyfill/fetch.mjs`, `node-fetch`, `fetch-cookie` | `fetch`, `CookieJar` | 优先使用 Node.js 原生 Fetch，并通过静态 ESM 导入提供回退与 CookieJar |
 | `polyfill/Storage.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset` | ESM 路径下按平台选持久化后端并支持 `@key.path` 读写 |
 | `polyfill/Lodash.mjs` | 无 | 无 | 提供路径/合并等基础能力，被多个模块复用 |
 | `polyfill/qs.mjs` | `polyfill/Lodash.mjs` | `Lodash.get`, `Lodash.set`, `Lodash.toPath` | 提供查询字符串与对象之间的解析/序列化能力 |
@@ -370,9 +378,10 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 
 ### `polyfill/fetch.mjs`
 
-`fetch` 现已拆分为 ESM / CJS 两条运行路径：
-- `polyfill/fetch.mjs`：用于 iOS 脚本平台（Quantumult X / Loon / Surge / Stash / Egern / Shadowrocket）；未识别宿主具备完整标准 Fetch API 时，直接使用宿主 `fetch`
-- `polyfill/fetch.cjs`：用于 Worker / Node.js
+`fetch` 使用三条明确运行路径：
+- `polyfill/fetch.mjs`：用于通用 ESM、JavaScriptCore 与 iOS 脚本平台；只使用宿主请求 API，不导入 Node.js 模块
+- `polyfill/fetch.node.mjs`：用于 Node.js/Vercel ESM；优先使用原生 `fetch`，通过静态 `import` 加载 `node-fetch` 与 `fetch-cookie`
+- `polyfill/fetch.cjs`：用于 CommonJS；通过 `require` 加载 CommonJS 依赖
 
 `polyfill/fetch.mjs` 仍仿照 Web API `Window.fetch` 设计：
 - 参考文档：https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch
@@ -399,7 +408,7 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - `timeout`
 - `policy`
 - `redirection` / `auto-redirect`
-- `auto-cookie`（仅 CJS 的 Worker / Node.js 分支识别；默认启用，传入 `false` / `0` / `-1` 可关闭）
+- `auto-cookie`（Node.js 的 ESM/CJS 分支识别，默认启用，传入 `false` / `0` / `-1` 可关闭；通用 ESM / JavaScriptCore 使用宿主 `fetch`）
 
 说明：下表是各 App 原生 HTTP 接口的差异补充，以及本库 `fetch` 的内部映射方式。调用方使用统一入参即可。
 
@@ -432,8 +441,10 @@ const store = getStorage("@my_box", ["YouTube", "Global"], database);
 - 未识别宿主且缺少完整标准 Fetch API 时，会抛出“当前运行环境不支持 Fetch API”错误。
 
 Worker / Node.js 使用说明：
-- 请通过 CJS 入口调用：`require("@nsnanocat/util").fetch` 或 `require("@nsnanocat/util/polyfill/fetch").fetch`
-- CJS 分支会处理 `auto-cookie`，并将响应归一化为 `ok/status/statusText/body/bodyBytes`
+- Node.js ESM 通过 `import { fetch } from "@nsnanocat/util"` 自动选择 `fetch.node.mjs`。
+- CommonJS 通过 `require("@nsnanocat/util").fetch` 自动选择 `fetch.cjs`。
+- 通用 ESM / JavaScriptCore 选择 `fetch.mjs`，不会解析 `node-fetch`、`fetch-cookie` 或任何 Node.js 模块。
+- 三条路径都会将响应归一化为 `ok/status/statusText/body/bodyBytes`。
 
 ### `polyfill/Storage.mjs`
 

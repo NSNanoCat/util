@@ -4,6 +4,14 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.7.4] - 2026-08-11
+
+### 修复
+- `fix(fetch)`: 增加独立的 `index.node.mjs` 与 `polyfill/fetch.node.mjs`，Node.js/Vercel ESM 通过静态 `import` 加载 `node-fetch` 与 `fetch-cookie`，CommonJS 继续使用 `.cjs`，JavaScriptCore 则保持通用 `.mjs` 路径。
+
+### 测试
+- `test(fetch)`: 增加 Node.js 条件导出与 ESM CookieJar 请求回归测试。
+
 ## [2.7.3] - 2026-08-10
 
 ### 重构
