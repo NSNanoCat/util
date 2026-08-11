@@ -18,8 +18,8 @@ import { Lodash as _ } from "./Lodash.mjs";
  * - Quantumult X: `$prefs`
  * - Worker: 内存缓存（非持久化）
  * - Worker: in-memory cache (non-persistent)
- * - Node.js: 本地 `box.dat`（Vercel 使用 `/tmp`）
- * - Node.js: local `box.dat` (`/tmp` on Vercel)
+ * - Node.js: 由 Node.js ESM 入口注入持久化后端
+ * - Node.js: persistent backend injected by the Node.js ESM entry
  *
  * 支持路径键:
  * Supports path key:
@@ -53,6 +53,14 @@ export class Storage {
 	 * @type {string}
 	 */
 	static dataFile = "box.dat";
+
+	/**
+	 * Node.js ESM 入口注入的存储后端。
+	 * Storage backend injected by the Node.js ESM entry.
+	 *
+	 * @type {{load: (dataFile: string) => Record<string, any>, write: (dataFile: string, data: Record<string, any>) => void}|null}
+	 */
+	static nodeBackend = null;
 
 	/**
 	 * `@key.path` 解析正则。
@@ -102,7 +110,7 @@ export class Storage {
 						keyValue = Storage.data[keyName];
 						break;
 					case "Node.js":
-						Storage.data = Storage.#loaddata(Storage.dataFile);
+						Storage.data = Storage.nodeBackend.load(Storage.dataFile);
 						keyValue = Storage.data?.[keyName];
 						break;
 					default:
@@ -165,9 +173,9 @@ export class Storage {
 						result = true;
 						break;
 					case "Node.js":
-						Storage.data = Storage.#loaddata(Storage.dataFile);
+						Storage.data = Storage.nodeBackend.load(Storage.dataFile);
 						Storage.data[keyName] = keyValue;
-						Storage.#writedata(Storage.dataFile);
+						Storage.nodeBackend.write(Storage.dataFile, Storage.data);
 						result = true;
 						break;
 					default:
@@ -225,9 +233,9 @@ export class Storage {
 						break;
 					case "Node.js":
 						// result = false;
-						Storage.data = Storage.#loaddata(Storage.dataFile);
+						Storage.data = Storage.nodeBackend.load(Storage.dataFile);
 						delete Storage.data[keyName];
-						Storage.#writedata(Storage.dataFile);
+						Storage.nodeBackend.write(Storage.dataFile, Storage.data);
 						result = true;
 						break;
 					default:
@@ -264,9 +272,9 @@ export class Storage {
 				break;
 			case "Node.js":
 				// result = false;
-				Storage.data = Storage.#loaddata(Storage.dataFile);
+				Storage.data = Storage.nodeBackend.load(Storage.dataFile);
 				Storage.data = {};
-				Storage.#writedata(Storage.dataFile);
+				Storage.nodeBackend.write(Storage.dataFile, Storage.data);
 				result = true;
 				break;
 			default:
@@ -275,63 +283,4 @@ export class Storage {
 		}
 		return result;
 	}
-
-	/**
-	 * 从 Node.js 数据文件加载 JSON。
-	 * Load JSON data from Node.js data file.
-	 *
-	 * @private
-	 * @param {string} dataFile 数据文件名 / Data file name.
-	 * @returns {Record<string, any>}
-	 */
-	static #loaddata = dataFile => {
-		this.fs ??= globalThis.process.getBuiltinModule("node:fs");
-		this.path ??= globalThis.process.getBuiltinModule("node:path");
-		const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
-		let dataFilePaths;
-		switch (globalThis.process.env.VERCEL) {
-			case "1":
-				dataFilePaths = [this.path.resolve("/tmp", dataFile), rootDirDataFilePath];
-				break;
-			default:
-				dataFilePaths = [this.path.resolve(".", dataFile), rootDirDataFilePath];
-				break;
-		}
-		const dataFilePath = dataFilePaths.find(dataPath => this.fs.existsSync(dataPath));
-		switch (dataFilePath) {
-			case undefined:
-				return {};
-			default:
-				try {
-					return JSON.parse(this.fs.readFileSync(dataFilePath));
-				} catch {
-					return {};
-				}
-		}
-	};
-
-	/**
-	 * 将内存数据写入 Node.js 数据文件。
-	 * Persist in-memory data to Node.js data file.
-	 *
-	 * @private
-	 * @param {string} [dataFile=this.dataFile] 数据文件名 / Data file name.
-	 * @returns {void}
-	 */
-	static #writedata = (dataFile = this.dataFile) => {
-		this.fs ??= globalThis.process.getBuiltinModule("node:fs");
-		this.path ??= globalThis.process.getBuiltinModule("node:path");
-		const rootDirDataFilePath = this.path.resolve(process.cwd(), dataFile);
-		let dataFilePaths;
-		switch (globalThis.process.env.VERCEL) {
-			case "1":
-				dataFilePaths = [this.path.resolve("/tmp", dataFile)];
-				break;
-			default:
-				dataFilePaths = [this.path.resolve(".", dataFile), rootDirDataFilePath];
-				break;
-		}
-		const dataFilePath = dataFilePaths.find(dataPath => this.fs.existsSync(dataPath)) ?? dataFilePaths[0];
-		this.fs.writeFileSync(dataFilePath, JSON.stringify(this.data));
-	};
 }

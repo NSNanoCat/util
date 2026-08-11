@@ -1,7 +1,5 @@
 "use strict";
 
-const { Lodash: _ } = require("./Lodash.mjs");
-
 /**
  * 仅面向 Worker / Node.js 的持久化存储适配器（CJS 版本）。
  * Persistent storage adapter for Worker / Node.js only (CJS version).
@@ -31,6 +29,44 @@ class Storage {
 	 */
 	static #nameRegex = /^@(?<key>[^.]+)(?:\.(?<path>.*))?$/;
 
+	static #toPath(value = "") {
+		return value
+			.replace(/\[(\d+)\]/g, ".$1")
+			.split(".")
+			.filter(Boolean);
+	}
+
+	static #get(object, path) {
+		return Storage.#toPath(path).reduce((previousValue, currentValue) => Object(previousValue)[currentValue], object);
+	}
+
+	static #set(object, path, value) {
+		path = Storage.#toPath(path);
+		const target = path.slice(0, -1).reduce((previousValue, currentValue, currentIndex) => {
+			switch (Object(previousValue[currentValue]) === previousValue[currentValue]) {
+				case true:
+					return previousValue[currentValue];
+				default:
+					previousValue[currentValue] = /^\d+$/.test(path[currentIndex + 1]) ? [] : {};
+					return previousValue[currentValue];
+			}
+		}, object);
+		target[path[path.length - 1]] = value;
+	}
+
+	static #unset(object, path) {
+		path = Storage.#toPath(path);
+		return path.reduce((previousValue, currentValue, currentIndex) => {
+			switch (currentIndex) {
+				case path.length - 1:
+					delete previousValue[currentValue];
+					return true;
+				default:
+					return Object(previousValue)[currentValue];
+			}
+		}, object);
+	}
+
 	/**
 	 * 读取存储值。
 	 * Read value from persistent storage.
@@ -47,7 +83,7 @@ class Storage {
 				keyName = key;
 				let value = Storage.getItem(keyName, {});
 				if (typeof value !== "object") value = {};
-				keyValue = _.get(value, path);
+				keyValue = Storage.#get(value, path);
 				try {
 					keyValue = JSON.parse(keyValue);
 				} catch {}
@@ -93,7 +129,7 @@ class Storage {
 				keyName = key;
 				let value = Storage.getItem(keyName, {});
 				if (typeof value !== "object") value = {};
-				_.set(value, path, keyValue);
+				Storage.#set(value, path, keyValue);
 				result = Storage.setItem(keyName, value);
 				break;
 			}
@@ -128,7 +164,7 @@ class Storage {
 				keyName = key;
 				let value = Storage.getItem(keyName);
 				if (typeof value !== "object") value = {};
-				_.unset(value, path);
+				Storage.#unset(value, path);
 				result = Storage.setItem(keyName, value);
 				break;
 			}

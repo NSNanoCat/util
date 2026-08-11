@@ -34,6 +34,10 @@
 			"require": "./polyfill/fetch.cjs"
 		},
 		"./polyfill/Storage": {
+			"node": {
+				"import": "./polyfill/Storage.node.mjs",
+				"require": "./polyfill/Storage.cjs"
+			},
 			"import": "./polyfill/Storage.mjs",
 			"require": "./polyfill/Storage.cjs"
 		},
