@@ -3,28 +3,53 @@ import { execFile } from "node:child_process";
 import { createRequire } from "node:module";
 import { describe, it } from "node:test";
 import { promisify } from "node:util";
-import { fetch as fetchEsm } from "../index.mjs";
+import { fetch as fetchEsm } from "@nsnanocat/util";
 
 const require = createRequire(import.meta.url);
 const { fetch: fetchCjs } = require("../index.cjs");
 const executeFile = promisify(execFile);
 
 describe("fetch", () => {
-	it("应该在 Node.js 中捕获 ESM 路径的运行时错误", async () => {
-		await assert.rejects(
-			() =>
-				fetchEsm("https://httpbin.org/get", {
-					headers: {
-						Accept: "application/json",
-					},
-					timeout: 10,
-				}),
-			error => {
-				assert.ok(error instanceof Error);
-				assert.match(error.message, /require is not defined/);
-				return true;
-			},
-		);
+	it("应该在 Node.js ESM 路径通过 CookieJar 请求", async () => {
+		const fetchDescriptor = Object.getOwnPropertyDescriptor(globalThis, "fetch");
+		try {
+			Reflect.defineProperty(globalThis, "fetch", {
+				value: async () => new Response("esm", { status: 200 }),
+				configurable: true,
+				enumerable: true,
+				writable: true,
+			});
+
+			const response = await fetchEsm("https://unit.test/esm", {
+				"auto-cookie": true,
+				timeout: 1,
+			});
+
+			assert.strictEqual(response.ok, true);
+			assert.strictEqual(response.status, 200);
+			assert.strictEqual(response.body, "esm");
+			assert.ok(globalThis.fetch.cookieJar);
+		} finally {
+			if (fetchDescriptor) Reflect.defineProperty(globalThis, "fetch", fetchDescriptor);
+			else Reflect.deleteProperty(globalThis, "fetch");
+		}
+	});
+
+	it("Node.js ESM 缺少原生 fetch 时应回退到 node-fetch", async () => {
+		const moduleURL = import.meta.resolve("@nsnanocat/util");
+		const script = `
+			Reflect.deleteProperty(globalThis, "fetch");
+			const { fetch } = await import(${JSON.stringify(moduleURL)});
+			const response = await fetch("data:text/plain,fallback", { "auto-cookie": false, timeout: 1 });
+			console.log(JSON.stringify({ status: response.status, body: response.body, fetchName: globalThis.fetch.name }));
+		`;
+		const { stdout } = await executeFile(process.execPath, ["--input-type=module", "--eval", script]);
+
+		assert.deepStrictEqual(JSON.parse(stdout), {
+			status: 200,
+			body: "fallback",
+			fetchName: "fetch",
+		});
 	});
 
 	it("应该在 Node.js 中通过 CJS 路径保留 CookieJar", async () => {
