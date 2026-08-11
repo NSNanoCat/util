@@ -8,9 +8,11 @@
 
 ### 修复
 - `fix(fetch)`: 增加独立的 `index.node.mjs` 与 `polyfill/fetch.node.mjs`，Node.js/Vercel ESM 通过静态 `import` 加载 `node-fetch` 与 `fetch-cookie`，CommonJS 继续使用 `.cjs`，JavaScriptCore 则保持通用 `.mjs` 路径。
+- `fix(storage)`: 增加独立的 `polyfill/Storage.node.mjs`，集中处理 Node.js/Vercel 的文件路径与读写；CommonJS 不再 `require` ESM 文件。
 
 ### 测试
 - `test(fetch)`: 增加 Node.js 条件导出与 ESM CookieJar 请求回归测试。
+- `test(storage)`: 覆盖 Node.js ESM 条件入口、无 Node 模块的通用 ESM 路径，以及禁用 `require(ESM)` 时的 CommonJS 加载。
 
 ## [2.7.3] - 2026-08-10
 

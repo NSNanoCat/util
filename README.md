@@ -118,6 +118,7 @@ ESM 主入口已导出：
 | `polyfill/fetch.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs`, `polyfill/StatusTexts.mjs`, `polyfill/Console.mjs` | `$app`, `Lodash.set`, `StatusTexts`（`Console` 当前版本未实际调用） | 按平台选请求引擎并做参数映射、响应结构统一 |
 | `polyfill/fetch.node.mjs` | `polyfill/fetch.mjs`, `node-fetch`, `fetch-cookie` | `fetch`, `CookieJar` | 优先使用 Node.js 原生 Fetch，并通过静态 ESM 导入提供回退与 CookieJar |
 | `polyfill/Storage.mjs` | `lib/app.mjs`, `polyfill/Lodash.mjs` | `$app`, `Lodash.get`, `Lodash.set`, `Lodash.unset` | ESM 路径下按平台选持久化后端并支持 `@key.path` 读写 |
+| `polyfill/Storage.node.mjs` | `polyfill/Storage.mjs`, `node:fs`, `node:path` | `Storage`, 文件系统后端 | 为 Node.js ESM 注入本地文件与 Vercel `/tmp` 后端 |
 | `polyfill/Lodash.mjs` | 无 | 无 | 提供路径/合并等基础能力，被多个模块复用 |
 | `polyfill/qs.mjs` | `polyfill/Lodash.mjs` | `Lodash.get`, `Lodash.set`, `Lodash.toPath` | 提供查询字符串与对象之间的解析/序列化能力 |
 | `polyfill/StatusTexts.mjs` | 无 | 无 | 提供 HTTP 状态文案，供 `fetch/done` 使用 |
@@ -448,9 +449,10 @@ Worker / Node.js 使用说明：
 
 ### `polyfill/Storage.mjs`
 
-`Storage` 已拆分为 ESM / CJS 两条运行路径：
-- `polyfill/Storage.mjs`：用于 iOS 脚本平台、Worker 与 Node.js ESM
-- `polyfill/Storage.cjs`：用于 Worker / Node.js（含 `box.dat` 文件读写）
+`Storage` 使用三条明确运行路径：
+- `polyfill/Storage.mjs`：用于通用 ESM、JavaScriptCore、Worker 与 iOS 脚本平台，不加载 Node.js 模块
+- `polyfill/Storage.node.mjs`：用于 Node.js/Vercel ESM，静态导入 `node:fs` 与 `node:path`
+- `polyfill/Storage.cjs`：用于 CommonJS，不加载 ESM 文件
 
 `polyfill/Storage.mjs` 仍仿照 Web Storage 接口（`Storage`）设计：
 - 参考文档：https://developer.mozilla.org/en-US/docs/Web/API/Storage
@@ -486,6 +488,7 @@ Worker / Node.js 使用说明：
 - 数据文件默认：`box.dat`。
 - 读取路径优先级：当前目录 -> `process.cwd()`。
 - Vercel Functions 的 ESM 路径改用 `/tmp/box.dat`；该文件只作为实例级临时缓存，不保证跨实例持久化。
+- Node.js ESM 不再依赖 `process.getBuiltinModule()`；CommonJS 不再 `require` `.mjs` 文件。
 
 Node.js 使用说明：
 - ESM 可通过 `import { Storage } from "@nsnanocat/util"` 调用。
