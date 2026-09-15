@@ -4,6 +4,14 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.7.5] - 2026-09-15
+
+### 修复
+- `fix(getStorage)`: 让 `PersistentStore` 及其别名与未设置 `$argument.Storage` 时保持一致，使用 `database` -> `$argument` -> `PersistentStore` 的合并顺序。
+
+### 测试
+- `test(getStorage)`: 覆盖 `PersistentStore` 模式、未设置模式及其别名的合并优先级。
+
 ## [2.7.4] - 2026-08-11
 
 ### 修复

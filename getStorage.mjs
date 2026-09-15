@@ -22,9 +22,8 @@ import { Storage } from "./polyfill/Storage.mjs";
  *
  * 合并来源与顺序由 `$argument.Storage` 控制（支持以下值 / 别名）：
  * Merge source order is controlled by `$argument.Storage` (accepted values / aliases):
- * - `undefined`: `database[name]` -> `$argument` -> `PersistentStore[name]`
  * - `Argument` / `$argument`: `database[name]` -> `PersistentStore[name]` -> `$argument`
- * - `PersistentStore` / `BoxJs` / `boxjs` / `$persistentStore`（默认）：`database[name]` -> `PersistentStore[name]`
+ * - `PersistentStore` / `BoxJs` / `boxjs` / `$persistentStore` / `undefined`（默认）：`database[name]` -> `$argument` -> `PersistentStore[name]`
  * - `database`: 仅 `database[name]`
  *
  * 注意：字符串比较为精确匹配（区分大小写）。
@@ -77,27 +76,23 @@ export default function getStorage(key, names, database) {
 			});
 			_.merge(Root.Settings, $argument);
 			break;
-		default:
 		case "BoxJs":
 		case "boxjs":
 		case "PersistentStore":
 		case "$persistentStore":
-			names.forEach(name => {
-				_.merge(Root.Settings, database?.[name]?.Settings, PersistentStore?.[name]?.Settings);
-			});
-			break;
-		case "database":
-			names.forEach(name => {
-				_.merge(Root.Settings, database?.[name]?.Settings);
-			});
-			break;
 		case undefined:
+		default:
 			names.forEach(name => {
 				_.merge(Root.Settings, database?.[name]?.Settings);
 			});
 			_.merge(Root.Settings, $argument);
 			names.forEach(name => {
 				_.merge(Root.Settings, PersistentStore?.[name]?.Settings);
+			});
+			break;
+		case "database":
+			names.forEach(name => {
+				_.merge(Root.Settings, database?.[name]?.Settings);
 			});
 			break;
 	}

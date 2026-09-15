@@ -340,10 +340,9 @@ await runScript("$done({})", { timeout: 20 });
 
 合并顺序由 `$argument.Storage` 控制（持久化读取统一使用 `PersistentStore = Storage.getItem(key, {})`；支持别名）：
 - 可用值（大小写敏感）：`undefined` | `Argument` | `$argument` | `PersistentStore` | `BoxJs` | `boxjs` | `$persistentStore` | `database`
-1. `undefined`：`database[name]` -> `$argument` -> `PersistentStore[name]`
+1. `PersistentStore` / `BoxJs` / `boxjs` / `$persistentStore` / `undefined`（默认）：`database[name]` -> `$argument` -> `PersistentStore[name]`
 2. `Argument` / `$argument`：`database[name]` -> `PersistentStore[name]` -> `$argument`
-3. `PersistentStore` / `BoxJs` / `$persistentStore`（默认）：`database[name]` -> `PersistentStore[name]`
-4. `database`：仅 `database[name]`
+3. `database`：仅 `database[name]`
 
 注意：`Configs` 与 `Caches` 始终按每个 `name` 合并（与 `$argument.Storage` 无关）。
 
