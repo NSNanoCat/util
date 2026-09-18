@@ -10,6 +10,8 @@ globalThis.$persistentStore = {
 					shared: "persistent",
 					persistentOnly: true,
 					nested: { persistent: true },
+					selected: ["4021", "4022"],
+					cleared: [],
 				},
 			},
 		});
@@ -34,6 +36,8 @@ const database = {
 			shared: "database",
 			databaseOnly: true,
 			nested: { database: true },
+			selected: [407, 410],
+			cleared: [1, 3],
 		},
 		Configs: { available: true },
 	},
@@ -54,6 +58,8 @@ describe("getStorage", () => {
 			argumentOnly: true,
 			persistentOnly: true,
 			nested: { database: true, argument: true, persistent: true },
+			selected: [4021, 4022],
+			cleared: [],
 		};
 
 		assert.deepStrictEqual(getSettings("PersistentStore"), expected);

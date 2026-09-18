@@ -74,7 +74,8 @@ export class Lodash {
 	 * 限制:
 	 * - 仅处理普通对象 (Plain Object)，不处理 Date/RegExp 等特殊对象
 	 * - Map/Set 仅支持同类型合并，不递归内部值
-	 * - 数组会被直接覆盖，不会合并数组元素
+	 * - 数组会被直接覆盖，不会合并数组元素，包括空数组
+	 * - Arrays directly replace the target without merging elements, including empty arrays
 	 * - 不处理循环引用，可能导致栈溢出
 	 * - 不复制 Symbol 属性和不可枚举属性
 	 * - 不保留原型链，仅处理自身属性
@@ -124,9 +125,6 @@ export class Lodash {
 								targetValue.add(v);
 							}
 						}
-						break;
-					case Array.isArray(sourceValue) && sourceValue.length === 0 && targetValue !== undefined:
-						// 空数组不覆盖已有值
 						break;
 					case (sourceValue instanceof Map && sourceValue.size === 0 && targetValue !== undefined):
 					case (sourceValue instanceof Set && sourceValue.size === 0 && targetValue !== undefined):

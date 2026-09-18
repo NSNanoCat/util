@@ -4,6 +4,14 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)。
 
+## [2.7.6] - 2026-09-18
+
+### 修复
+- `fix(Lodash.merge)`: 让空数组与其他数组一致，按来源优先级直接覆盖已有值。
+
+### 测试
+- `test(getStorage)`: 覆盖持久化空数组清空默认值，以及数组中的纯数字字符串转换为 number。
+
 ## [2.7.5] - 2026-09-15
 
 ### 修复

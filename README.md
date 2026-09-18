@@ -656,7 +656,7 @@ console.log(value); // 1
 
 `merge` 行为（与 lodash 官方有差异）：
 - 深度合并 Plain Object。
-- Array 直接覆盖；空数组不覆盖已存在值。
+- Array 直接覆盖，包括空数组。
 - Map/Set 支持同类型合并；空 Map/Set 不覆盖已存在值。
 - `undefined` 不覆盖，`null` 会覆盖。
 - 直接修改目标对象（mutates target）。
